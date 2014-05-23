@@ -1,0 +1,83 @@
+﻿@model MedRegistration.Data.Doctor
+@{
+    ViewBag.Title = "Schedule";
+}
+
+<div class="container">
+    <h4>График на @Model.Title.Abr @Model.FirstName @Model.LastName</h4>
+
+    <div ng-controller="scheduleController" ng-init="init(@Model.Id)">
+        <div class="row">
+            <div class="col-sm-8">
+                <div ng-repeat="month in months" class="month">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th colspan="7" ng-bind="month.Name"></th>
+                            </tr>
+                            <tr>
+                                <th>пон</th>
+                                <th>вт</th>
+                                <th>ср</th>
+                                <th>чет</th>
+                                <th>пет</th>
+                                <th>съб</th>
+                                <th>нед</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="week in month.Weeks">
+                                <td ng-repeat="day in week.Days" ng-click="onDateClick(day)" ng-bind="day.Date | dayFormat"
+                                    ng-class="{'selected': day.selected, 'out-calendar': day.Status == -1, 'not-set': day.Status == 0, 'setted': day.Status == 1, 'no-interval': day.Status == 2}"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="col-sm-4" ng-show="hasSelected()">
+                <button ng-click="addWorkHours()" class="btn btn-default">Добави интервал</button>
+                <ul class="clear-list" style="margin-top: 10px">
+                    <li ng-repeat="workInterval in workIntervals track by $index" style="margin-bottom: 10px">
+                        <div ng-class="{ 'overlapping': is_overlapps($index) }">
+                            <div style="margin-bottom: 10px">
+                                <div style="display: inline-block;">
+                                    От:<span ng-bind="fromHour($index)"></span>
+                                    До:<span ng-bind="toHour($index)"></span>
+                                </div>
+                                <label style="float: right">
+                                    <input type="checkbox" ng-model="workInterval.nzok">Преглежда
+                                    по каса?
+                                </label>
+                            </div>
+                            <div ui-slider="{range: true}" min="0" max="23.75" step="0.25" use-decimals
+                                 ng-model="workInterval.interval" style="margin-bottom: 5px"></div>
+                            <a class="clear-href" ng-click="$parent.removeHour($index)">
+                                <span class="glyphicon glyphicon-remove"></span> Премахни
+                            </a>
+                        </div>
+                    </li>
+                </ul>
+                <div style="margin-top: 10px">
+                    <label>Бележка:</label>
+                    <textarea ng-model="note" maxlength="1000" style="width: 100%; height: 100px"></textarea>
+                </div>
+                <div style="margin-top: 10px">
+                    <button ng-click="setWorkHours()" class="btn btn-default">
+                        Задай работните
+                        часове
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles
+{
+    <link href="~/static/css/schedule.min.css" rel="stylesheet" />
+}
+
+@section Scripts
+{
+    <script src="~/static/js/scheduleController.js"></script>
+}

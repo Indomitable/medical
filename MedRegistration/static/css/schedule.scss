@@ -1,0 +1,48 @@
+﻿div.overlapping {
+  background-color: red;
+}
+
+div.month {
+  margin-bottom: 20px;
+  table {
+    th {
+      text-align: center;
+    }
+
+    tr:nth-child(2) {
+      th {
+        width: 100px;
+      }
+    }
+
+    td {
+      text-align: center;
+      border: 1px solid #ddd;
+      cursor: pointer;
+    }
+
+    td.out-calendar {
+      background-color: #eee;
+    }
+
+    td.not-set {
+      background-color: #fff;
+    }
+
+    td.not-set.selected {
+      background-color: #deb887;
+    }
+
+    td.setted {
+      background-color: #7fff00;
+    }
+
+    td.setted.selected {
+      background-color: #d2691e;
+    }
+
+    td.no-interval {
+      background-color: #1e90ff;
+    }
+  }
+}

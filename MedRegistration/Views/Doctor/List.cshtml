@@ -1,0 +1,34 @@
+﻿@model List<MedRegistration.Data.Doctor>
+@{
+    ViewBag.Title = "Лекъри";
+}
+<div class="container" ng-controller="doctorsController">
+    <button class="btn btn-default" ng-click="add()">Добави нов лекар</button>
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th style="width: 10px"></th>
+                <th style="width: 100px; text-align: center">Титла</th>
+                <th style="width: 100px; text-align: center">Име</th>
+                <th style="width: 100px; text-align: center">Фамилия</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var doctor in Model)
+            {
+                <tr>
+                    <td class="controls">
+                        <a href="@Url.Action("Index", "Schedule", new { doctorId = doctor.Id })">
+                            <span class="glyphicon glyphicon-calendar"></span>
+                        </a>
+                        <a><span class="glyphicon glyphicon-remove"></span></a>
+                        <a><span class="glyphicon glyphicon-pencil"></span></a>
+                    </td>
+                    <td>@doctor.Title.Description</td>
+                    <td>@doctor.FirstName</td>
+                    <td>@doctor.LastName</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
