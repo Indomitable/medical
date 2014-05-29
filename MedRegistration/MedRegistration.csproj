@@ -95,11 +95,16 @@
     <Content Include="static\css\menu.min.css">
       <DependentUpon>menu.scss</DependentUpon>
     </Content>
+    <Content Include="static\css\registration.min.css">
+      <DependentUpon>registration.scss</DependentUpon>
+    </Content>
     <Content Include="static\css\schedule.min.css">
       <DependentUpon>schedule.scss</DependentUpon>
     </Content>
-    <Content Include="static\js\controllers.js" />
-    <Content Include="static\js\scheduleController.js" />
+    <Content Include="static\js\app.js" />
+    <Content Include="static\js\doctor.js" />
+    <Content Include="static\js\registration.js" />
+    <Content Include="static\js\schedule.js" />
     <Content Include="static\js\slider.js" />
     <Content Include="Web.config" />
   </ItemGroup>
@@ -109,6 +114,7 @@
     <Compile Include="Controllers\BaseController.cs" />
     <Compile Include="Controllers\DoctorController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\RegistrationController.cs" />
     <Compile Include="Controllers\ScheduleController.cs" />
     <Compile Include="Data\Doctor.cs">
       <DependentUpon>Model.tt</DependentUpon>
@@ -184,6 +190,12 @@
     <Content Include="static\css\schedule.min.css.map">
       <DependentUpon>schedule.min.css</DependentUpon>
     </Content>
+    <Content Include="Views\Registration\Index.cshtml" />
+    <Content Include="Views\Shared\Menu.cshtml" />
+    <Content Include="static\css\registration.scss" />
+    <Content Include="static\css\registration.min.css.map">
+      <DependentUpon>registration.min.css</DependentUpon>
+    </Content>
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -194,7 +206,6 @@
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Models\" />
-    <Folder Include="static\fonts\" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />

@@ -1,0 +1,54 @@
+﻿@{
+    ViewBag.Title = "Регистрация";
+}
+
+<h2>Регистрация</h2>
+
+<div ng-controller="registrationController">
+    <div class="week">
+        <a class="week-prev" ng-click="week.prev()">
+            <span class="glyphicon glyphicon-chevron-left"></span>
+        </a>
+        <span class="week-name">{{ week.name() }}</span>
+        <a class="week-next" ng-click="week.next()">
+            <span class="glyphicon glyphicon-chevron-right"></span>
+        </a>
+    </div>
+
+    <table class="schedule table table-bordered table-condensed">
+        <thead>
+            <tr>
+                <th style="width: 80px">Ден</th>
+                <th style="width: 250px">Име</th>
+                <th ng-repeat="hour in week.hours" style="width: 80px" colspan="12">
+                    {{ hour }}
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat-start="day in week.days">
+                <td class="week-day" rowspan="{{ day.doctors.length }}">
+                    <span class="rotated-text">
+                        <span class="rotated-text_inner">{{ day.date | dateDisplay }}</span>
+                    </span>
+                </td>
+                <td class="doctor-name">{{ day.doctors[0].Title }} {{ day.doctors[0].FirstName }} {{ day.doctors[0].LastName }}</td>
+                <td ng-repeat="hour in day.doctors[0].hours | nonZeroHour" colspan="{{ (hour.to - hour.from) / 5 }}" ng-class="{ 'non-work': hour.work == 0, 'nzok': hour.isNZOK }"></td>
+            </tr>
+            <tr ng-repeat-end ng-repeat="doctor in day.doctors | skip: 1">
+                <td class="doctor-name">{{ doctor.Title }} {{ doctor.FirstName }} {{ doctor.LastName }}</td>
+                <td ng-repeat="hour in doctor.hours | nonZeroHour" colspan="{{ (hour.to - hour.from) / 5 }}" ng-class="{ 'non-work': hour.work == 0, 'nzok': hour.isNZOK }"></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+@section Styles
+{
+    <link href="~/static/css/registration.min.css" rel="stylesheet" />
+}
+
+@section Scripts
+{
+    <script src="~/static/js/registration.js"></script>
+}

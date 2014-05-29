@@ -48,8 +48,8 @@ namespace MedRegistration.Controllers
                     schedule.Note,
                     Hours = schedule.ScheduleDates.Select(x => new
                     {
-                        From = x.FromTime.Hours + (double)x.FromTime.Minutes / 60,
-                        To = x.ToTime.Hours + (double)x.ToTime.Minutes / 60,
+                        From = x.FromTime.TotalMinutes / 60,
+                        To = x.ToTime.TotalMinutes / 60,
                         NZOK = x.IsNZOK
                     }).ToArray()
                 });

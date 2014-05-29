@@ -1,0 +1,38 @@
+﻿<nav class="menu-container">
+    <div class="menu">
+        <ul>
+            <li>
+                <a href='@Url.Action("Index", "Home")'>
+                    <span>Home</span>
+                </a>
+            </li>
+            <li class='has-sub'>
+                <a href='#'>
+                    <span>Номенклатура</span>
+                </a>
+                <ul>
+                    <li>
+                        <a href='@Url.Action("List", "Doctor")'>
+                            <span>Лекари</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href='/Patients'>
+                            <span>Пациенти</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <a href='@Url.Action("Index", "Registration")'>
+                    <span>График</span>
+                </a>
+            </li>
+            <li class='last'>
+                <a href='#'>
+                    <span>Настройки</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+</nav>

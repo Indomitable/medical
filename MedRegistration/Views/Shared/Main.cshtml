@@ -11,44 +11,7 @@
     @RenderSection("Styles", false)
 </head>
 <body>
-    <nav class="menu-container">
-        <div class="menu">
-            <ul>
-                <li>
-                    <a href='@Url.Action("Index", "Home")'>
-                        <span>Home</span>
-                    </a>
-                </li>
-                <li class='has-sub'>
-                    <a href='#'>
-                        <span>Номенклатура</span>
-                    </a>
-                    <ul>
-                        <li>
-                            <a href='@Url.Action("List", "Doctor")'>
-                                <span>Лекари</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href='/Patients'>
-                                <span>Пациенти</span>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-                <li>
-                    <a href='#'>
-                        <span>График</span>
-                    </a>
-                </li>
-                <li class='last'>
-                    <a href='#'>
-                        <span>Настройки</span>
-                    </a>
-                </li>
-            </ul>
-        </div>
-    </nav>
+    @Html.Partial("Menu")
     @RenderBody()
     <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js" type="text/javascript"></script>
     <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js" type="text/javascript"></script>
@@ -58,11 +21,10 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.11.0/ui-bootstrap-tpls.min.js" type="text/javascript"></script>
     <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js"></script>
-
-
-    <script src="~/static/js/controllers.js" type="text/javascript"></script>
     <script src="~/static/js/slider.js" type="text/javascript"></script>
+    
 
+    <script src="~/static/js/app.js" type="text/javascript"></script>
     @RenderSection("Scripts", false)
 </body>
 </html>
