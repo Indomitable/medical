@@ -9,7 +9,7 @@ div.month {
     width: 100px; }
   div.month table td {
     text-align: center;
-    border: 1px solid #ddd;
+    /*border: 1px solid #ddd;*/
     cursor: pointer; }
   div.month table td.out-calendar {
     background-color: #eee; }

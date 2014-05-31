@@ -1,27 +1,9 @@
-﻿div.week {
-
-}
-
-table.schedule {
-	width: 100%;
-}
-
-table.schedule th {
-	text-align: center;
-}
-
-table.doctor-day {
-	width: 100%;
-}
-
-
-@mixin rotate($deg) {
+﻿@mixin rotate($deg) {
 	-webkit-transform: translate(15px,100%) rotate($deg);
 	-moz-transform: translate(15px,100%) rotate($deg);
 	-ms-transform: translate(15px,100%) rotate($deg);
 	-o-transform: translate(15px,100%) rotate($deg);
 	transform: translate(15px,100%) rotate($deg);
-	
 	-moz-transform-origin: 0 0;
 	-ms-transform-origin: 0 0;
 	-o-transform-origin: 0 0;
@@ -29,44 +11,45 @@ table.doctor-day {
 	transform-origin: 0 0;
 }
 
-td.week-day {
-	width: 1px;
-	padding: 10px 0;
-}
+table.schedule {
+	width: 100%;
 
-td.week-day .rotated-text {
-	display: inline-block;
-    overflow: hidden;
-}
+	th {
+		text-align: center;
+	}
 
-td.week-day .rotated-text_inner {
-	display: inline-block;
-	white-space: nowrap;
-	@include rotate(-90deg);
-}
+	td.week-day {
+		width: 1px;
+		padding: 10px 0;
 
-td.week-day .rotated-text_inner:after {
-     content: "";
-     float: left;
-     margin-top: 100%;
-}
+		.rotated-text {
+			display: inline-block;
+			overflow: hidden;
+		}
 
-td.week-day-schedule {
-	vertical-align: top;
-}
+		.rotated-text_inner {
+			display: inline-block;
+			white-space: nowrap;
+			@include rotate(-90deg);
+		}
 
-table.schedule td {
-	height: 30px;
-}
+			.rotated-text_inner:after {
+				content: "";
+				float: left;
+				margin-top: 100%;
+			}
+	}
 
-td.doctor-name {
-	padding: 0 5px;
-}
+	td.doctor-name {
+		padding: 0 5px;
+		vertical-align: middle;
+	}
 
-td.non-work {
-	background-color: #eee;
-}
+	td.non-work {
+		background-color: #eee;
+	}
 
-td.nzok {
-	background-color: aqua;
+	td.nzok {
+		background-color: aqua;
+	}
 }

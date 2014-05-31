@@ -84,14 +84,11 @@
                     date: new Date(dt),
                     doctors: data.Schedule[i].Doctors
                 });
-
             }
         });
     };
 
     __self.getSchedule();
-
-    
 
     return {
         from: __self.from,
@@ -128,12 +125,48 @@ app.filter('nonZeroHour', [function () {
         return _.filter(hours, function(h) {
             return h.to - h.from > 0;
         });
-//        var buf = [];
-//        for (var i = 0; i < hours.length; i++) {
-//            if (hours[i].to - hours[i].from == 0)
-//                continue;
-//            buf.push(hours[i]);
-//        }
-//        return buf;
     };
 }]);
+
+app.directive('vmQtip', function () {
+    return {
+        link: function (scope, elm, attrs) {
+            var content = scope.doctor.Title + " " + scope.doctor.FirstName + " " + scope.doctor.LastName + "<br/>"; 
+            if (scope.hour.work === 0)
+                content += 'Неработи';
+            else {
+                if (scope.hour.isNZOK)
+                    content += 'Работи по здравна каса.';
+                else
+                    content += 'Работи.';
+            }
+            content += '<br/>';
+            var hour = Math.floor(scope.hour.from / 60);
+            if (hour < 10)
+                hour = '0' + hour;
+            var minute = Math.round(((scope.hour.from / 60) % 1) * 60);
+            if (minute < 10)
+                minute = '0' + minute;
+            content += 'Начало: ' + hour + ":" + minute;
+            content += '<br/>';
+
+            hour = Math.floor(scope.hour.to / 60);
+            if (hour < 10)
+                hour = '0' + hour;
+            minute = Math.round(((scope.hour.to / 60) % 1) * 60);
+            if (minute < 10)
+                minute = '0' + minute;
+            content += 'Край: ' + hour + ":" + minute;
+            elm.qtip({
+                content: {
+                    text: content
+                },
+                position: {
+                    my: 'bottom left',
+                    at: 'top right',
+                    viewport: $(window)
+                }
+            });
+        }
+    };
+});
