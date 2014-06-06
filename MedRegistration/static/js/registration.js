@@ -114,11 +114,31 @@
     }
 }]);
 
-app.controller('registrationController', ['$scope', '$http', 'customFormatter', 'week',
-    function ($scope, $http, customFormatter, week) {
+app.controller('registrationController', ['$scope', '$http', 'customFormatter', 'week', '$modal',
+    function ($scope, $http, customFormatter, week, $modal) {
         $scope.week = week;
+
+        $scope.registerHour = function(doctor, hour) {
+            var addRegistrationInstance = $modal.open({
+                templateUrl: '/Registration/Register',
+                controller: registrationAddController
+            });
+            addRegistrationInstance.result.then(function () {
+
+            });
+        };
     }
 ]);
+
+var registrationAddController = function ($scope, $modalInstance) {
+    $scope.ok = function () {
+        $modalInstance.close();
+    };
+
+    $scope.cancel = function () {
+        $modalInstance.dismiss('cancel');
+    };
+};
 
 app.filter('nonZeroHour', [function () {
     return function (hours) {
@@ -164,6 +184,7 @@ app.directive('vmQtip', function () {
                 position: {
                     my: 'bottom left',
                     at: 'top right',
+               //     target: 'mouse',
                     viewport: $(window)
                 }
             });

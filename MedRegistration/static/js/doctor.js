@@ -1,7 +1,7 @@
 ﻿app.controller("doctorsController", ["$scope", "$modal", function ($scope, $modal) {
     $scope.add = function () {
         var addDoctorInstance = $modal.open({
-            templateUrl: 'add',
+            templateUrl: '/Doctor/Add',
             controller: doctorAddController
         });
         addDoctorInstance.result.then(function () {

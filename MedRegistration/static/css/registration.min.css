@@ -32,5 +32,11 @@
     background-color: #eee; }
   table.schedule td.nzok {
     background-color: aqua; }
+  table.schedule td.doctor-hour {
+    height: 1px;
+    position: relative;
+    padding: 0; }
+    table.schedule td.doctor-hour div {
+      height: 100%; }
 
 /*# sourceMappingURL=registration.min.css.map */

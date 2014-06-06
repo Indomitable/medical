@@ -60,5 +60,11 @@ namespace MedRegistration.Controllers
                 });
             }
         }
+
+        [HttpGet]
+        public ActionResult Register()
+        {
+            return PartialView();
+        }
     }
 }

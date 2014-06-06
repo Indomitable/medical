@@ -52,4 +52,14 @@ table.schedule {
 	td.nzok {
 		background-color: aqua;
 	}
+
+	td.doctor-hour {
+		height: 1px;
+		position: relative;
+		padding: 0;
+
+		div {
+			height: 100%;
+		}
+	}
 }

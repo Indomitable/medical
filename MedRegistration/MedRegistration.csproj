@@ -196,6 +196,7 @@
     <Content Include="static\css\registration.min.css.map">
       <DependentUpon>registration.min.css</DependentUpon>
     </Content>
+    <Content Include="Views\Registration\Register.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
