@@ -12,19 +12,20 @@ namespace MedRegistration.Data
     using System;
     using System.Collections.Generic;
     
-    public partial class Schedule
+    public partial class Reservation
     {
-        public Schedule()
-        {
-            this.ScheduleDates = new HashSet<ScheduleDate>();
-        }
-    
         public int Id { get; set; }
+        public int PatientId { get; set; }
         public int DoctorId { get; set; }
         public System.DateTime Date { get; set; }
-        public string Note { get; set; }
+        public System.TimeSpan FromTime { get; set; }
+        public System.TimeSpan ToTime { get; set; }
+        public int PaymentTypeId { get; set; }
+        public Nullable<int> PaymentInfoId { get; set; }
     
         public virtual Doctor Doctor { get; set; }
-        public virtual ICollection<ScheduleDate> ScheduleDates { get; set; }
+        public virtual Patient Patient { get; set; }
+        public virtual PaymentInfo PaymentInfo { get; set; }
+        public virtual PaymentType PaymentType { get; set; }
     }
 }

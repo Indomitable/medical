@@ -1,0 +1,48 @@
+﻿@model List<MedRegistration.Data.Patient>
+@{
+    ViewBag.Title = "Пациенти";
+}
+<div class="container" ng-controller="patientsController">
+    <button class="btn btn-default" ng-click="add()">Добави нов пациент</button>
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th style="width: 10px"></th>
+                <th style="width: 100px; text-align: center">Име</th>
+                <th style="width: 100px; text-align: center">Фамилия</th>
+                <th style="width: 100px; text-align: center">Идент. Номер</th>
+                <th style="width: 100px; text-align: center">Телефон</th>
+                <th style="width: 100px; text-align: center">Имейл</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var patient in Model)
+            {
+                <tr>
+                    <td class="controls">
+                        <a href="@Url.Action("Index", "Schedule", new { doctorId = patient.Id })">
+                            <span class="glyphicon glyphicon-calendar"></span>
+                        </a>
+                        <a><span class="glyphicon glyphicon-remove"></span></a>
+                        <a><span class="glyphicon glyphicon-pencil"></span></a>
+                    </td>
+                    <td>@patient.FirstName</td>
+                    <td>@patient.LastName</td>
+                    <td>@patient.IdentNumber</td>
+                    <td>@patient.PatientPhones.SingleOrDefault(x => x.IsPrimary)</td>
+                    <td>@patient.Email</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Styles
+{
+    <link href="~/static/css/patient.min.css" rel="stylesheet" />
+}
+
+@section Scripts
+{
+    <script src="~/static/js/patient.js"></script>
+}

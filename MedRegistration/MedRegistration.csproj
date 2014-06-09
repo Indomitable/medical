@@ -95,6 +95,9 @@
     <Content Include="static\css\menu.min.css">
       <DependentUpon>menu.scss</DependentUpon>
     </Content>
+    <Content Include="static\css\patient.min.css">
+      <DependentUpon>patient.scss</DependentUpon>
+    </Content>
     <Content Include="static\css\registration.min.css">
       <DependentUpon>registration.scss</DependentUpon>
     </Content>
@@ -103,6 +106,7 @@
     </Content>
     <Content Include="static\js\app.js" />
     <Content Include="static\js\doctor.js" />
+    <Content Include="static\js\patient.js" />
     <Content Include="static\js\registration.js" />
     <Content Include="static\js\schedule.js" />
     <Content Include="static\js\slider.js" />
@@ -114,9 +118,19 @@
     <Compile Include="Controllers\BaseController.cs" />
     <Compile Include="Controllers\DoctorController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\PatientController.cs" />
     <Compile Include="Controllers\RegistrationController.cs" />
     <Compile Include="Controllers\ScheduleController.cs" />
     <Compile Include="Data\Doctor.cs">
+      <DependentUpon>Model.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\Fund.cs">
+      <DependentUpon>Model.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\Gender.cs">
+      <DependentUpon>Model.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\IdentificationNumberType.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\Model.Context.cs">
@@ -133,6 +147,27 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Model.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="Data\Patient.cs">
+      <DependentUpon>Model.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\PatientFundInfo.cs">
+      <DependentUpon>Model.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\PatientPhone.cs">
+      <DependentUpon>Model.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\PaymentInfo.cs">
+      <DependentUpon>Model.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\PaymentType.cs">
+      <DependentUpon>Model.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\PhoneType.cs">
+      <DependentUpon>Model.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\Reservation.cs">
+      <DependentUpon>Model.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\Schedule.cs">
       <DependentUpon>Model.tt</DependentUpon>
@@ -197,6 +232,13 @@
       <DependentUpon>registration.min.css</DependentUpon>
     </Content>
     <Content Include="Views\Registration\Register.cshtml" />
+    <Content Include="Views\Patient\List.cshtml" />
+    <Content Include="Views\Patient\Add.cshtml" />
+    <Content Include="static\css\patient.scss" />
+    <Content Include="static\css\patient.min.css.map">
+      <DependentUpon>patient.min.css</DependentUpon>
+    </Content>
+    <Content Include="static\js\ui-med.js" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -205,7 +247,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="App_Data\" />
     <Folder Include="Models\" />
   </ItemGroup>
   <ItemGroup>

@@ -32,7 +32,15 @@ ul.clear-list {
   list-style-type: none;
 }
 
-input[type='number'] {
+input[type=number] {
   text-align: right;
 }
 
+input[type=date][med-date-input] {
+	line-height: 1.42857143;
+}
+
+input.ng-invalid, input.ng-invalid.form-control:focus {
+	border-color: #ea887f;
+	box-shadow: none;
+}

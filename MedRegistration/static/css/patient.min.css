@@ -1,0 +1,27 @@
+﻿div.patient-details div.photo {
+  float: left;
+  margin-right: 10px; }
+  div.patient-details div.photo img {
+    height: 150px;
+    width: 150px; }
+div.patient-details .panel-title a {
+  display: block; }
+div.patient-details div.is-primary {
+  height: 34px;
+  padding-left: 0px; }
+  div.patient-details div.is-primary input[type=radio] {
+    top: 50%;
+    position: relative;
+    -webkit-transform: translateY(-50%);
+    -moz-transform: translateY(-50%);
+    -ms-transform: translateY(-50%);
+    -o-transform: translateY(-50%);
+    transform: translateY(-50%);
+    margin-top: 0px; }
+div.patient-details div.remove-button {
+  padding-left: 0px; }
+  div.patient-details div.remove-button a {
+    position: relative;
+    top: 10px; }
+
+/*# sourceMappingURL=patient.min.css.map */

@@ -7,6 +7,7 @@ namespace MedRegistration.Controllers
 {
     public class DoctorController : BaseController
     {
+        [HttpGet]
         public ActionResult List()
         {
             using (var context = new DataContext())

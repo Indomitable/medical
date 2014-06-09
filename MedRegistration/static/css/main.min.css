@@ -1,6 +1,6 @@
 ﻿html, body {
   margin: 0;
-  padding: 5px;
+  padding: 0;
   height: 100%;
   width: 100%; }
 
@@ -23,7 +23,14 @@ ul.clear-list {
   padding: 0;
   list-style-type: none; }
 
-input[type='number'] {
+input[type=number] {
   text-align: right; }
+
+input[type=date][med-date-input] {
+  line-height: 1.42857; }
+
+input.ng-invalid, input.ng-invalid.form-control:focus {
+  border-color: #ea887f;
+  box-shadow: none; }
 
 /*# sourceMappingURL=main.min.css.map */

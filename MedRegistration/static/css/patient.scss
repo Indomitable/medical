@@ -1,0 +1,40 @@
+﻿div.patient-details {
+	div.photo {
+		float: left;
+		margin-right: 10px;
+
+		img {
+			height: 150px;
+			width: 150px;
+		}
+	}
+
+	.panel-title a {
+		display: block;
+	}
+
+	div.is-primary {
+		height: 34px;
+		padding-left: 0px;
+
+		input[type=radio] {
+			top: 50%;
+			position: relative;
+			-webkit-transform: translateY(-50%);
+			-moz-transform: translateY(-50%);
+			-ms-transform: translateY(-50%);
+			-o-transform: translateY(-50%);
+			transform: translateY(-50%);
+			margin-top: 0px;
+		}
+	}
+
+	div.remove-button {
+		padding-left: 0px;
+
+		a {
+			position: relative;
+			top: 10px;
+		}
+	}
+}

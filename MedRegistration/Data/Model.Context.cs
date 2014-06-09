@@ -26,6 +26,16 @@ namespace MedRegistration.Data
         }
     
         public virtual DbSet<Doctor> Doctors { get; set; }
+        public virtual DbSet<Fund> Funds { get; set; }
+        public virtual DbSet<Gender> Genders { get; set; }
+        public virtual DbSet<IdentificationNumberType> IdentificationNumberTypes { get; set; }
+        public virtual DbSet<Patient> Patients { get; set; }
+        public virtual DbSet<PatientFundInfo> PatientFundInfoes { get; set; }
+        public virtual DbSet<PatientPhone> PatientPhones { get; set; }
+        public virtual DbSet<PaymentInfo> PaymentInfoes { get; set; }
+        public virtual DbSet<PaymentType> PaymentTypes { get; set; }
+        public virtual DbSet<PhoneType> PhoneTypes { get; set; }
+        public virtual DbSet<Reservation> Reservations { get; set; }
         public virtual DbSet<Schedule> Schedules { get; set; }
         public virtual DbSet<ScheduleDate> ScheduleDates { get; set; }
         public virtual DbSet<Speciality> Specialities { get; set; }

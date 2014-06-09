@@ -12,24 +12,30 @@ namespace MedRegistration.Data
     using System;
     using System.Collections.Generic;
     
-    public partial class Doctor
+    public partial class Patient
     {
-        public Doctor()
+        public Patient()
         {
+            this.PatientPhones = new HashSet<PatientPhone>();
             this.Reservations = new HashSet<Reservation>();
-            this.Schedules = new HashSet<Schedule>();
-            this.Specialities = new HashSet<Speciality>();
         }
     
         public int Id { get; set; }
-        public int TitleId { get; set; }
         public string FirstName { get; set; }
+        public string MiddleName { get; set; }
         public string LastName { get; set; }
-        public int DefaultExamTime { get; set; }
+        public string IdentNumber { get; set; }
+        public int IdentNumberTypeId { get; set; }
+        public int GenderId { get; set; }
+        public string Email { get; set; }
+        public string Town { get; set; }
+        public string PostCode { get; set; }
+        public string Address { get; set; }
     
-        public virtual Title Title { get; set; }
+        public virtual Gender Gender { get; set; }
+        public virtual IdentificationNumberType IdentificationNumberType { get; set; }
+        public virtual PatientFundInfo PatientFundInfo { get; set; }
+        public virtual ICollection<PatientPhone> PatientPhones { get; set; }
         public virtual ICollection<Reservation> Reservations { get; set; }
-        public virtual ICollection<Schedule> Schedules { get; set; }
-        public virtual ICollection<Speciality> Specialities { get; set; }
     }
 }

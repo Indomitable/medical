@@ -23,13 +23,105 @@
           <Property Name="SpecialityId" Type="int" Nullable="false" />
           <Property Name="DoctorId" Type="int" Nullable="false" />
         </EntityType>
+        <EntityType Name="Fund">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Name" Type="nvarchar(max)" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Gender">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" Nullable="false" />
+          <Property Name="Type" Type="varchar" MaxLength="10" Nullable="false" />
+        </EntityType>
+        <EntityType Name="IdentificationNumberType">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" Nullable="false" />
+          <Property Name="Type" Type="varchar" MaxLength="50" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Patient">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="FirstName" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="MiddleName" Type="nvarchar" MaxLength="100" />
+          <Property Name="LastName" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="IdentNumber" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="IdentNumberTypeId" Type="int" Nullable="false" />
+          <Property Name="GenderId" Type="int" Nullable="false" />
+          <Property Name="Email" Type="nvarchar" MaxLength="100" />
+          <Property Name="Town" Type="nvarchar" MaxLength="100" />
+          <Property Name="PostCode" Type="nvarchar" MaxLength="50" />
+          <Property Name="Address" Type="nvarchar" MaxLength="300" />
+        </EntityType>
+        <EntityType Name="PatientFundInfo">
+          <Key>
+            <PropertyRef Name="PatientId" />
+          </Key>
+          <Property Name="PatientId" Type="int" Nullable="false" />
+          <Property Name="FundId" Type="int" Nullable="false" />
+          <Property Name="FundCardNumber" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="FundCardExpiration" Type="date" Nullable="false" />
+        </EntityType>
+        <EntityType Name="PatientPhone">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="PatientId" Type="int" Nullable="false" />
+          <Property Name="Number" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="TypeId" Type="int" Nullable="false" />
+          <Property Name="IsPrimary" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityType Name="PaymentInfo">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="FundId" Type="int" />
+          <Property Name="FundCardNumber" Type="nvarchar" MaxLength="50" />
+          <Property Name="FundCardExpiration" Type="date" />
+        </EntityType>
+        <EntityType Name="PaymentType">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" Nullable="false" />
+          <Property Name="Type" Type="varchar" MaxLength="10" Nullable="false" />
+        </EntityType>
+        <EntityType Name="PhoneType">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" Nullable="false" />
+          <Property Name="Type" Type="varchar" MaxLength="10" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Reservation">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="PatientId" Type="int" Nullable="false" />
+          <Property Name="DoctorId" Type="int" Nullable="false" />
+          <Property Name="Date" Type="date" Nullable="false" />
+          <Property Name="FromTime" Type="time" Precision="7" Nullable="false" />
+          <Property Name="ToTime" Type="time" Precision="7" Nullable="false" />
+          <Property Name="PaymentTypeId" Type="int" Nullable="false" />
+          <Property Name="PaymentInfoId" Type="int" />
+        </EntityType>
         <EntityType Name="Schedule">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="DoctorId" Type="int" Nullable="false" />
-          <Property Name="Date" Type="datetime" Nullable="false" />
+          <Property Name="Date" Type="date" Nullable="false" />
           <Property Name="Note" Type="nvarchar" MaxLength="1000" />
         </EntityType>
         <EntityType Name="ScheduleDate">
@@ -70,7 +162,9 @@
           </ReferentialConstraint>
         </Association>
         <Association Name="DoctorSpeciality_Doctor_FK">
-          <End Role="Doctor" Type="Self.Doctor" Multiplicity="1" />
+          <End Role="Doctor" Type="Self.Doctor" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
           <End Role="DoctorSpeciality" Type="Self.DoctorSpeciality" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="Doctor">
@@ -82,7 +176,9 @@
           </ReferentialConstraint>
         </Association>
         <Association Name="DoctorSpeciality_Speciality_FK">
-          <End Role="Speciality" Type="Self.Speciality" Multiplicity="1" />
+          <End Role="Speciality" Type="Self.Speciality" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
           <End Role="DoctorSpeciality" Type="Self.DoctorSpeciality" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="Speciality">
@@ -93,8 +189,144 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="Schedule_Doctor_FK">
+        <Association Name="FundInfo_Fund_FK">
+          <End Role="Fund" Type="Self.Fund" Multiplicity="1" />
+          <End Role="PatientFundInfo" Type="Self.PatientFundInfo" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Fund">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="PatientFundInfo">
+              <PropertyRef Name="FundId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FundInfo_Patient_FK">
+          <End Role="Patient" Type="Self.Patient" Multiplicity="1" />
+          <End Role="PatientFundInfo" Type="Self.PatientFundInfo" Multiplicity="0..1" />
+          <ReferentialConstraint>
+            <Principal Role="Patient">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="PatientFundInfo">
+              <PropertyRef Name="PatientId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="Patient_Gender_FK">
+          <End Role="Gender" Type="Self.Gender" Multiplicity="1" />
+          <End Role="Patient" Type="Self.Patient" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Gender">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Patient">
+              <PropertyRef Name="GenderId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="Patient_IdentificationNumberType_FK">
+          <End Role="IdentificationNumberType" Type="Self.IdentificationNumberType" Multiplicity="1" />
+          <End Role="Patient" Type="Self.Patient" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="IdentificationNumberType">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Patient">
+              <PropertyRef Name="IdentNumberTypeId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="PatientPhone_Patient_FK">
+          <End Role="Patient" Type="Self.Patient" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="PatientPhone" Type="Self.PatientPhone" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Patient">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="PatientPhone">
+              <PropertyRef Name="PatientId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="PatientPhone_PhoneType_FK">
+          <End Role="PhoneType" Type="Self.PhoneType" Multiplicity="1" />
+          <End Role="PatientPhone" Type="Self.PatientPhone" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="PhoneType">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="PatientPhone">
+              <PropertyRef Name="TypeId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="PaymentInfo_Fund_FK">
+          <End Role="Fund" Type="Self.Fund" Multiplicity="0..1" />
+          <End Role="PaymentInfo" Type="Self.PaymentInfo" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Fund">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="PaymentInfo">
+              <PropertyRef Name="FundId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="Reservation_Doctor_FK">
           <End Role="Doctor" Type="Self.Doctor" Multiplicity="1" />
+          <End Role="Reservation" Type="Self.Reservation" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Doctor">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Reservation">
+              <PropertyRef Name="DoctorId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="Reservation_Patient_FK">
+          <End Role="Patient" Type="Self.Patient" Multiplicity="1" />
+          <End Role="Reservation" Type="Self.Reservation" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Patient">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Reservation">
+              <PropertyRef Name="PatientId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="Reservation_PaymentInfo_FK">
+          <End Role="PaymentInfo" Type="Self.PaymentInfo" Multiplicity="0..1" />
+          <End Role="Reservation" Type="Self.Reservation" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="PaymentInfo">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Reservation">
+              <PropertyRef Name="PaymentInfoId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="Reservation_PaymentType_FK">
+          <End Role="PaymentType" Type="Self.PaymentType" Multiplicity="1" />
+          <End Role="Reservation" Type="Self.Reservation" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="PaymentType">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Reservation">
+              <PropertyRef Name="PaymentTypeId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="Schedule_Doctor_FK">
+          <End Role="Doctor" Type="Self.Doctor" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
           <End Role="Schedule" Type="Self.Schedule" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="Doctor">
@@ -106,7 +338,9 @@
           </ReferentialConstraint>
         </Association>
         <Association Name="ScheduleDate_Schedule_FK">
-          <End Role="Schedule" Type="Self.Schedule" Multiplicity="1" />
+          <End Role="Schedule" Type="Self.Schedule" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
           <End Role="ScheduleDate" Type="Self.ScheduleDate" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="Schedule">
@@ -120,6 +354,16 @@
         <EntityContainer Name="medicalModelStoreContainer">
           <EntitySet Name="Doctor" EntityType="Self.Doctor" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="DoctorSpeciality" EntityType="Self.DoctorSpeciality" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Fund" EntityType="Self.Fund" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Gender" EntityType="Self.Gender" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="IdentificationNumberType" EntityType="Self.IdentificationNumberType" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Patient" EntityType="Self.Patient" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="PatientFundInfo" EntityType="Self.PatientFundInfo" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="PatientPhone" EntityType="Self.PatientPhone" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="PaymentInfo" EntityType="Self.PaymentInfo" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="PaymentType" EntityType="Self.PaymentType" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="PhoneType" EntityType="Self.PhoneType" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Reservation" EntityType="Self.Reservation" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Schedule" EntityType="Self.Schedule" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ScheduleDate" EntityType="Self.ScheduleDate" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Speciality" EntityType="Self.Speciality" Schema="dbo" store:Type="Tables" />
@@ -136,6 +380,50 @@
             <End Role="Speciality" EntitySet="Speciality" />
             <End Role="DoctorSpeciality" EntitySet="DoctorSpeciality" />
           </AssociationSet>
+          <AssociationSet Name="FundInfo_Fund_FK" Association="Self.FundInfo_Fund_FK">
+            <End Role="Fund" EntitySet="Fund" />
+            <End Role="PatientFundInfo" EntitySet="PatientFundInfo" />
+          </AssociationSet>
+          <AssociationSet Name="FundInfo_Patient_FK" Association="Self.FundInfo_Patient_FK">
+            <End Role="Patient" EntitySet="Patient" />
+            <End Role="PatientFundInfo" EntitySet="PatientFundInfo" />
+          </AssociationSet>
+          <AssociationSet Name="Patient_Gender_FK" Association="Self.Patient_Gender_FK">
+            <End Role="Gender" EntitySet="Gender" />
+            <End Role="Patient" EntitySet="Patient" />
+          </AssociationSet>
+          <AssociationSet Name="Patient_IdentificationNumberType_FK" Association="Self.Patient_IdentificationNumberType_FK">
+            <End Role="IdentificationNumberType" EntitySet="IdentificationNumberType" />
+            <End Role="Patient" EntitySet="Patient" />
+          </AssociationSet>
+          <AssociationSet Name="PatientPhone_Patient_FK" Association="Self.PatientPhone_Patient_FK">
+            <End Role="Patient" EntitySet="Patient" />
+            <End Role="PatientPhone" EntitySet="PatientPhone" />
+          </AssociationSet>
+          <AssociationSet Name="PatientPhone_PhoneType_FK" Association="Self.PatientPhone_PhoneType_FK">
+            <End Role="PhoneType" EntitySet="PhoneType" />
+            <End Role="PatientPhone" EntitySet="PatientPhone" />
+          </AssociationSet>
+          <AssociationSet Name="PaymentInfo_Fund_FK" Association="Self.PaymentInfo_Fund_FK">
+            <End Role="Fund" EntitySet="Fund" />
+            <End Role="PaymentInfo" EntitySet="PaymentInfo" />
+          </AssociationSet>
+          <AssociationSet Name="Reservation_Doctor_FK" Association="Self.Reservation_Doctor_FK">
+            <End Role="Doctor" EntitySet="Doctor" />
+            <End Role="Reservation" EntitySet="Reservation" />
+          </AssociationSet>
+          <AssociationSet Name="Reservation_Patient_FK" Association="Self.Reservation_Patient_FK">
+            <End Role="Patient" EntitySet="Patient" />
+            <End Role="Reservation" EntitySet="Reservation" />
+          </AssociationSet>
+          <AssociationSet Name="Reservation_PaymentInfo_FK" Association="Self.Reservation_PaymentInfo_FK">
+            <End Role="PaymentInfo" EntitySet="PaymentInfo" />
+            <End Role="Reservation" EntitySet="Reservation" />
+          </AssociationSet>
+          <AssociationSet Name="Reservation_PaymentType_FK" Association="Self.Reservation_PaymentType_FK">
+            <End Role="PaymentType" EntitySet="PaymentType" />
+            <End Role="Reservation" EntitySet="Reservation" />
+          </AssociationSet>
           <AssociationSet Name="Schedule_Doctor_FK" Association="Self.Schedule_Doctor_FK">
             <End Role="Doctor" EntitySet="Doctor" />
             <End Role="Schedule" EntitySet="Schedule" />
@@ -151,13 +439,71 @@
       <Schema Namespace="MedicalModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
         <EntityContainer Name="DataContext" annotation:LazyLoadingEnabled="true">
           <EntitySet Name="Doctors" EntityType="MedicalModel.Doctor" />
+          <EntitySet Name="Funds" EntityType="MedicalModel.Fund" />
+          <EntitySet Name="Genders" EntityType="MedicalModel.Gender" />
+          <EntitySet Name="IdentificationNumberTypes" EntityType="MedicalModel.IdentificationNumberType" />
+          <EntitySet Name="Patients" EntityType="MedicalModel.Patient" />
+          <EntitySet Name="PatientFundInfoes" EntityType="MedicalModel.PatientFundInfo" />
+          <EntitySet Name="PatientPhones" EntityType="MedicalModel.PatientPhone" />
+          <EntitySet Name="PaymentInfoes" EntityType="MedicalModel.PaymentInfo" />
+          <EntitySet Name="PaymentTypes" EntityType="MedicalModel.PaymentType" />
+          <EntitySet Name="PhoneTypes" EntityType="MedicalModel.PhoneType" />
+          <EntitySet Name="Reservations" EntityType="MedicalModel.Reservation" />
           <EntitySet Name="Schedules" EntityType="MedicalModel.Schedule" />
           <EntitySet Name="ScheduleDates" EntityType="MedicalModel.ScheduleDate" />
           <EntitySet Name="Specialities" EntityType="MedicalModel.Speciality" />
           <EntitySet Name="Titles" EntityType="MedicalModel.Title" />
+          <AssociationSet Name="Doctor_Title_FK" Association="MedicalModel.Doctor_Title_FK">
+            <End Role="Title" EntitySet="Titles" />
+            <End Role="Doctor" EntitySet="Doctors" />
+          </AssociationSet>
+          <AssociationSet Name="Reservation_Doctor_FK" Association="MedicalModel.Reservation_Doctor_FK">
+            <End Role="Doctor" EntitySet="Doctors" />
+            <End Role="Reservation" EntitySet="Reservations" />
+          </AssociationSet>
           <AssociationSet Name="Schedule_Doctor_FK" Association="MedicalModel.Schedule_Doctor_FK">
             <End Role="Doctor" EntitySet="Doctors" />
             <End Role="Schedule" EntitySet="Schedules" />
+          </AssociationSet>
+          <AssociationSet Name="FundInfo_Fund_FK" Association="MedicalModel.FundInfo_Fund_FK">
+            <End Role="Fund" EntitySet="Funds" />
+            <End Role="PatientFundInfo" EntitySet="PatientFundInfoes" />
+          </AssociationSet>
+          <AssociationSet Name="PaymentInfo_Fund_FK" Association="MedicalModel.PaymentInfo_Fund_FK">
+            <End Role="Fund" EntitySet="Funds" />
+            <End Role="PaymentInfo" EntitySet="PaymentInfoes" />
+          </AssociationSet>
+          <AssociationSet Name="Patient_Gender_FK" Association="MedicalModel.Patient_Gender_FK">
+            <End Role="Gender" EntitySet="Genders" />
+            <End Role="Patient" EntitySet="Patients" />
+          </AssociationSet>
+          <AssociationSet Name="Patient_IdentificationNumberType_FK" Association="MedicalModel.Patient_IdentificationNumberType_FK">
+            <End Role="IdentificationNumberType" EntitySet="IdentificationNumberTypes" />
+            <End Role="Patient" EntitySet="Patients" />
+          </AssociationSet>
+          <AssociationSet Name="FundInfo_Patient_FK" Association="MedicalModel.FundInfo_Patient_FK">
+            <End Role="Patient" EntitySet="Patients" />
+            <End Role="PatientFundInfo" EntitySet="PatientFundInfoes" />
+          </AssociationSet>
+          <AssociationSet Name="PatientPhone_Patient_FK" Association="MedicalModel.PatientPhone_Patient_FK">
+            <End Role="Patient" EntitySet="Patients" />
+            <End Role="PatientPhone" EntitySet="PatientPhones" />
+          </AssociationSet>
+          <AssociationSet Name="Reservation_Patient_FK" Association="MedicalModel.Reservation_Patient_FK">
+            <End Role="Patient" EntitySet="Patients" />
+            <End Role="Reservation" EntitySet="Reservations" />
+          </AssociationSet>
+          <AssociationSet Name="PatientPhone_PhoneType_FK" Association="MedicalModel.PatientPhone_PhoneType_FK">
+            <End Role="PhoneType" EntitySet="PhoneTypes" />
+            <End Role="PatientPhone" EntitySet="PatientPhones" />
+          </AssociationSet>
+          <AssociationSet Name="Reservation_PaymentInfo_FK" Association="MedicalModel.Reservation_PaymentInfo_FK">
+            <End Role="PaymentInfo" EntitySet="PaymentInfoes" />
+            <End Role="Reservation" EntitySet="Reservations" />
+          </AssociationSet>
+          <AssociationSet Name="Reservation_PaymentType_FK" Association="MedicalModel.Reservation_PaymentType_FK">
+            <End Role="PaymentType" EntitySet="PaymentTypes" />
+            <End Role="Reservation" EntitySet="Reservations" />
           </AssociationSet>
           <AssociationSet Name="ScheduleDate_Schedule_FK" Association="MedicalModel.ScheduleDate_Schedule_FK">
             <End Role="Schedule" EntitySet="Schedules" />
@@ -166,10 +512,6 @@
           <AssociationSet Name="DoctorSpeciality" Association="MedicalModel.DoctorSpeciality">
             <End Role="Doctor" EntitySet="Doctors" />
             <End Role="Speciality" EntitySet="Specialities" />
-          </AssociationSet>
-          <AssociationSet Name="Doctor_Title_FK" Association="MedicalModel.Doctor_Title_FK">
-            <End Role="Title" EntitySet="Titles" />
-            <End Role="Doctor" EntitySet="Doctors" />
           </AssociationSet>
         </EntityContainer>
         <EntityType Name="Doctor">
@@ -181,9 +523,123 @@
           <Property Name="FirstName" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
           <Property Name="LastName" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
           <Property Name="DefaultExamTime" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Title" Relationship="MedicalModel.Doctor_Title_FK" FromRole="Doctor" ToRole="Title" />
+          <NavigationProperty Name="Reservations" Relationship="MedicalModel.Reservation_Doctor_FK" FromRole="Doctor" ToRole="Reservation" />
           <NavigationProperty Name="Schedules" Relationship="MedicalModel.Schedule_Doctor_FK" FromRole="Doctor" ToRole="Schedule" />
           <NavigationProperty Name="Specialities" Relationship="MedicalModel.DoctorSpeciality" FromRole="Doctor" ToRole="Speciality" />
-          <NavigationProperty Name="Title" Relationship="MedicalModel.Doctor_Title_FK" FromRole="Doctor" ToRole="Title" />
+        </EntityType>
+        <EntityType Name="Fund">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="PatientFundInfoes" Relationship="MedicalModel.FundInfo_Fund_FK" FromRole="Fund" ToRole="PatientFundInfo" />
+          <NavigationProperty Name="PaymentInfoes" Relationship="MedicalModel.PaymentInfo_Fund_FK" FromRole="Fund" ToRole="PaymentInfo" />
+        </EntityType>
+        <EntityType Name="Gender">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" />
+          <Property Name="Type" Type="String" Nullable="false" MaxLength="10" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="Patients" Relationship="MedicalModel.Patient_Gender_FK" FromRole="Gender" ToRole="Patient" />
+        </EntityType>
+        <EntityType Name="IdentificationNumberType">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" />
+          <Property Name="Type" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="Patients" Relationship="MedicalModel.Patient_IdentificationNumberType_FK" FromRole="IdentificationNumberType" ToRole="Patient" />
+        </EntityType>
+        <EntityType Name="Patient">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="FirstName" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="MiddleName" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="LastName" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="IdentNumber" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="IdentNumberTypeId" Type="Int32" Nullable="false" />
+          <Property Name="GenderId" Type="Int32" Nullable="false" />
+          <Property Name="Email" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="Town" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="PostCode" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Address" Type="String" MaxLength="300" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Gender" Relationship="MedicalModel.Patient_Gender_FK" FromRole="Patient" ToRole="Gender" />
+          <NavigationProperty Name="IdentificationNumberType" Relationship="MedicalModel.Patient_IdentificationNumberType_FK" FromRole="Patient" ToRole="IdentificationNumberType" />
+          <NavigationProperty Name="PatientFundInfo" Relationship="MedicalModel.FundInfo_Patient_FK" FromRole="Patient" ToRole="PatientFundInfo" />
+          <NavigationProperty Name="PatientPhones" Relationship="MedicalModel.PatientPhone_Patient_FK" FromRole="Patient" ToRole="PatientPhone" />
+          <NavigationProperty Name="Reservations" Relationship="MedicalModel.Reservation_Patient_FK" FromRole="Patient" ToRole="Reservation" />
+        </EntityType>
+        <EntityType Name="PatientFundInfo">
+          <Key>
+            <PropertyRef Name="PatientId" />
+          </Key>
+          <Property Name="PatientId" Type="Int32" Nullable="false" />
+          <Property Name="FundId" Type="Int32" Nullable="false" />
+          <Property Name="FundCardNumber" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="FundCardExpiration" Type="DateTime" Nullable="false" Precision="0" />
+          <NavigationProperty Name="Fund" Relationship="MedicalModel.FundInfo_Fund_FK" FromRole="PatientFundInfo" ToRole="Fund" />
+          <NavigationProperty Name="Patient" Relationship="MedicalModel.FundInfo_Patient_FK" FromRole="PatientFundInfo" ToRole="Patient" />
+        </EntityType>
+        <EntityType Name="PatientPhone">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="PatientId" Type="Int32" Nullable="false" />
+          <Property Name="Number" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="TypeId" Type="Int32" Nullable="false" />
+          <Property Name="IsPrimary" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="Patient" Relationship="MedicalModel.PatientPhone_Patient_FK" FromRole="PatientPhone" ToRole="Patient" />
+          <NavigationProperty Name="PhoneType" Relationship="MedicalModel.PatientPhone_PhoneType_FK" FromRole="PatientPhone" ToRole="PhoneType" />
+        </EntityType>
+        <EntityType Name="PaymentInfo">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="FundId" Type="Int32" />
+          <Property Name="FundCardNumber" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="FundCardExpiration" Type="DateTime" Precision="0" />
+          <NavigationProperty Name="Fund" Relationship="MedicalModel.PaymentInfo_Fund_FK" FromRole="PaymentInfo" ToRole="Fund" />
+          <NavigationProperty Name="Reservations" Relationship="MedicalModel.Reservation_PaymentInfo_FK" FromRole="PaymentInfo" ToRole="Reservation" />
+        </EntityType>
+        <EntityType Name="PaymentType">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" />
+          <Property Name="Type" Type="String" Nullable="false" MaxLength="10" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="Reservations" Relationship="MedicalModel.Reservation_PaymentType_FK" FromRole="PaymentType" ToRole="Reservation" />
+        </EntityType>
+        <EntityType Name="PhoneType">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" />
+          <Property Name="Type" Type="String" Nullable="false" MaxLength="10" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="PatientPhones" Relationship="MedicalModel.PatientPhone_PhoneType_FK" FromRole="PhoneType" ToRole="PatientPhone" />
+        </EntityType>
+        <EntityType Name="Reservation">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="PatientId" Type="Int32" Nullable="false" />
+          <Property Name="DoctorId" Type="Int32" Nullable="false" />
+          <Property Name="Date" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="FromTime" Type="Time" Nullable="false" Precision="7" />
+          <Property Name="ToTime" Type="Time" Nullable="false" Precision="7" />
+          <Property Name="PaymentTypeId" Type="Int32" Nullable="false" />
+          <Property Name="PaymentInfoId" Type="Int32" />
+          <NavigationProperty Name="Doctor" Relationship="MedicalModel.Reservation_Doctor_FK" FromRole="Reservation" ToRole="Doctor" />
+          <NavigationProperty Name="Patient" Relationship="MedicalModel.Reservation_Patient_FK" FromRole="Reservation" ToRole="Patient" />
+          <NavigationProperty Name="PaymentInfo" Relationship="MedicalModel.Reservation_PaymentInfo_FK" FromRole="Reservation" ToRole="PaymentInfo" />
+          <NavigationProperty Name="PaymentType" Relationship="MedicalModel.Reservation_PaymentType_FK" FromRole="Reservation" ToRole="PaymentType" />
         </EntityType>
         <EntityType Name="Schedule">
           <Key>
@@ -191,10 +647,10 @@
           </Key>
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="DoctorId" Type="Int32" Nullable="false" />
+          <Property Name="Date" Type="DateTime" Nullable="false" Precision="0" />
           <Property Name="Note" Type="String" MaxLength="1000" FixedLength="false" Unicode="true" />
           <NavigationProperty Name="Doctor" Relationship="MedicalModel.Schedule_Doctor_FK" FromRole="Schedule" ToRole="Doctor" />
           <NavigationProperty Name="ScheduleDates" Relationship="MedicalModel.ScheduleDate_Schedule_FK" FromRole="Schedule" ToRole="ScheduleDate" />
-          <Property Name="Date" Type="DateTime" Nullable="false" Precision="3" />
         </EntityType>
         <EntityType Name="ScheduleDate">
           <Key>
@@ -224,8 +680,34 @@
           <Property Name="Description" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
           <NavigationProperty Name="Doctors" Relationship="MedicalModel.Doctor_Title_FK" FromRole="Title" ToRole="Doctor" />
         </EntityType>
-        <Association Name="Schedule_Doctor_FK">
+        <Association Name="Doctor_Title_FK">
+          <End Type="MedicalModel.Title" Role="Title" Multiplicity="1" />
+          <End Type="MedicalModel.Doctor" Role="Doctor" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Title">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Doctor">
+              <PropertyRef Name="TitleId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="Reservation_Doctor_FK">
           <End Type="MedicalModel.Doctor" Role="Doctor" Multiplicity="1" />
+          <End Type="MedicalModel.Reservation" Role="Reservation" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Doctor">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Reservation">
+              <PropertyRef Name="DoctorId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="Schedule_Doctor_FK">
+          <End Type="MedicalModel.Doctor" Role="Doctor" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
           <End Type="MedicalModel.Schedule" Role="Schedule" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="Doctor">
@@ -236,8 +718,132 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FundInfo_Fund_FK">
+          <End Type="MedicalModel.Fund" Role="Fund" Multiplicity="1" />
+          <End Type="MedicalModel.PatientFundInfo" Role="PatientFundInfo" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Fund">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="PatientFundInfo">
+              <PropertyRef Name="FundId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="PaymentInfo_Fund_FK">
+          <End Type="MedicalModel.Fund" Role="Fund" Multiplicity="0..1" />
+          <End Type="MedicalModel.PaymentInfo" Role="PaymentInfo" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Fund">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="PaymentInfo">
+              <PropertyRef Name="FundId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="Patient_Gender_FK">
+          <End Type="MedicalModel.Gender" Role="Gender" Multiplicity="1" />
+          <End Type="MedicalModel.Patient" Role="Patient" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Gender">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Patient">
+              <PropertyRef Name="GenderId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="Patient_IdentificationNumberType_FK">
+          <End Type="MedicalModel.IdentificationNumberType" Role="IdentificationNumberType" Multiplicity="1" />
+          <End Type="MedicalModel.Patient" Role="Patient" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="IdentificationNumberType">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Patient">
+              <PropertyRef Name="IdentNumberTypeId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FundInfo_Patient_FK">
+          <End Type="MedicalModel.Patient" Role="Patient" Multiplicity="1" />
+          <End Type="MedicalModel.PatientFundInfo" Role="PatientFundInfo" Multiplicity="0..1" />
+          <ReferentialConstraint>
+            <Principal Role="Patient">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="PatientFundInfo">
+              <PropertyRef Name="PatientId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="PatientPhone_Patient_FK">
+          <End Type="MedicalModel.Patient" Role="Patient" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Type="MedicalModel.PatientPhone" Role="PatientPhone" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Patient">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="PatientPhone">
+              <PropertyRef Name="PatientId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="Reservation_Patient_FK">
+          <End Type="MedicalModel.Patient" Role="Patient" Multiplicity="1" />
+          <End Type="MedicalModel.Reservation" Role="Reservation" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Patient">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Reservation">
+              <PropertyRef Name="PatientId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="PatientPhone_PhoneType_FK">
+          <End Type="MedicalModel.PhoneType" Role="PhoneType" Multiplicity="1" />
+          <End Type="MedicalModel.PatientPhone" Role="PatientPhone" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="PhoneType">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="PatientPhone">
+              <PropertyRef Name="TypeId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="Reservation_PaymentInfo_FK">
+          <End Type="MedicalModel.PaymentInfo" Role="PaymentInfo" Multiplicity="0..1" />
+          <End Type="MedicalModel.Reservation" Role="Reservation" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="PaymentInfo">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Reservation">
+              <PropertyRef Name="PaymentInfoId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="Reservation_PaymentType_FK">
+          <End Type="MedicalModel.PaymentType" Role="PaymentType" Multiplicity="1" />
+          <End Type="MedicalModel.Reservation" Role="Reservation" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="PaymentType">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Reservation">
+              <PropertyRef Name="PaymentTypeId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="ScheduleDate_Schedule_FK">
-          <End Type="MedicalModel.Schedule" Role="Schedule" Multiplicity="1" />
+          <End Type="MedicalModel.Schedule" Role="Schedule" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
           <End Type="MedicalModel.ScheduleDate" Role="ScheduleDate" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="Schedule">
@@ -252,19 +858,7 @@
           <End Type="MedicalModel.Doctor" Role="Doctor" Multiplicity="*" />
           <End Type="MedicalModel.Speciality" Role="Speciality" Multiplicity="*" />
         </Association>
-        <Association Name="Doctor_Title_FK">
-          <End Type="MedicalModel.Title" Role="Title" Multiplicity="1" />
-          <End Type="MedicalModel.Doctor" Role="Doctor" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Title">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Doctor">
-              <PropertyRef Name="TitleId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-      </Schema>
+        </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
     <edmx:Mappings>
@@ -281,11 +875,113 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <EntitySetMapping Name="Funds">
+            <EntityTypeMapping TypeName="MedicalModel.Fund">
+              <MappingFragment StoreEntitySet="Fund">
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Genders">
+            <EntityTypeMapping TypeName="MedicalModel.Gender">
+              <MappingFragment StoreEntitySet="Gender">
+                <ScalarProperty Name="Type" ColumnName="Type" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="IdentificationNumberTypes">
+            <EntityTypeMapping TypeName="MedicalModel.IdentificationNumberType">
+              <MappingFragment StoreEntitySet="IdentificationNumberType">
+                <ScalarProperty Name="Type" ColumnName="Type" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Patients">
+            <EntityTypeMapping TypeName="MedicalModel.Patient">
+              <MappingFragment StoreEntitySet="Patient">
+                <ScalarProperty Name="Address" ColumnName="Address" />
+                <ScalarProperty Name="PostCode" ColumnName="PostCode" />
+                <ScalarProperty Name="Town" ColumnName="Town" />
+                <ScalarProperty Name="Email" ColumnName="Email" />
+                <ScalarProperty Name="GenderId" ColumnName="GenderId" />
+                <ScalarProperty Name="IdentNumberTypeId" ColumnName="IdentNumberTypeId" />
+                <ScalarProperty Name="IdentNumber" ColumnName="IdentNumber" />
+                <ScalarProperty Name="LastName" ColumnName="LastName" />
+                <ScalarProperty Name="MiddleName" ColumnName="MiddleName" />
+                <ScalarProperty Name="FirstName" ColumnName="FirstName" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="PatientFundInfoes">
+            <EntityTypeMapping TypeName="MedicalModel.PatientFundInfo">
+              <MappingFragment StoreEntitySet="PatientFundInfo">
+                <ScalarProperty Name="FundCardExpiration" ColumnName="FundCardExpiration" />
+                <ScalarProperty Name="FundCardNumber" ColumnName="FundCardNumber" />
+                <ScalarProperty Name="FundId" ColumnName="FundId" />
+                <ScalarProperty Name="PatientId" ColumnName="PatientId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="PatientPhones">
+            <EntityTypeMapping TypeName="MedicalModel.PatientPhone">
+              <MappingFragment StoreEntitySet="PatientPhone">
+                <ScalarProperty Name="IsPrimary" ColumnName="IsPrimary" />
+                <ScalarProperty Name="TypeId" ColumnName="TypeId" />
+                <ScalarProperty Name="Number" ColumnName="Number" />
+                <ScalarProperty Name="PatientId" ColumnName="PatientId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="PaymentInfoes">
+            <EntityTypeMapping TypeName="MedicalModel.PaymentInfo">
+              <MappingFragment StoreEntitySet="PaymentInfo">
+                <ScalarProperty Name="FundCardExpiration" ColumnName="FundCardExpiration" />
+                <ScalarProperty Name="FundCardNumber" ColumnName="FundCardNumber" />
+                <ScalarProperty Name="FundId" ColumnName="FundId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="PaymentTypes">
+            <EntityTypeMapping TypeName="MedicalModel.PaymentType">
+              <MappingFragment StoreEntitySet="PaymentType">
+                <ScalarProperty Name="Type" ColumnName="Type" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="PhoneTypes">
+            <EntityTypeMapping TypeName="MedicalModel.PhoneType">
+              <MappingFragment StoreEntitySet="PhoneType">
+                <ScalarProperty Name="Type" ColumnName="Type" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Reservations">
+            <EntityTypeMapping TypeName="MedicalModel.Reservation">
+              <MappingFragment StoreEntitySet="Reservation">
+                <ScalarProperty Name="PaymentInfoId" ColumnName="PaymentInfoId" />
+                <ScalarProperty Name="PaymentTypeId" ColumnName="PaymentTypeId" />
+                <ScalarProperty Name="ToTime" ColumnName="ToTime" />
+                <ScalarProperty Name="FromTime" ColumnName="FromTime" />
+                <ScalarProperty Name="Date" ColumnName="Date" />
+                <ScalarProperty Name="DoctorId" ColumnName="DoctorId" />
+                <ScalarProperty Name="PatientId" ColumnName="PatientId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
           <EntitySetMapping Name="Schedules">
             <EntityTypeMapping TypeName="MedicalModel.Schedule">
               <MappingFragment StoreEntitySet="Schedule">
-                <ScalarProperty Name="Date" ColumnName="Date" />
                 <ScalarProperty Name="Note" ColumnName="Note" />
+                <ScalarProperty Name="Date" ColumnName="Date" />
                 <ScalarProperty Name="DoctorId" ColumnName="DoctorId" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
