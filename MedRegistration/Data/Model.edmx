@@ -27,7 +27,7 @@
           <Key>
             <PropertyRef Name="Id" />
           </Key>
-          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Id" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
           <Property Name="Name" Type="nvarchar(max)" Nullable="false" />
         </EntityType>
         <EntityType Name="Gender">
@@ -52,7 +52,7 @@
           <Property Name="FirstName" Type="nvarchar" MaxLength="100" Nullable="false" />
           <Property Name="MiddleName" Type="nvarchar" MaxLength="100" />
           <Property Name="LastName" Type="nvarchar" MaxLength="100" Nullable="false" />
-          <Property Name="IdentNumber" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="IdentNumber" Type="nvarchar" MaxLength="100" />
           <Property Name="IdentNumberTypeId" Type="int" Nullable="false" />
           <Property Name="GenderId" Type="int" Nullable="false" />
           <Property Name="Email" Type="nvarchar" MaxLength="100" />
@@ -561,7 +561,7 @@
           <Property Name="FirstName" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
           <Property Name="MiddleName" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
           <Property Name="LastName" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
-          <Property Name="IdentNumber" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="IdentNumber" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
           <Property Name="IdentNumberTypeId" Type="Int32" Nullable="false" />
           <Property Name="GenderId" Type="Int32" Nullable="false" />
           <Property Name="Email" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />

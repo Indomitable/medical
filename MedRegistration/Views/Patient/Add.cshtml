@@ -1,5 +1,6 @@
 ﻿<div class="modal-body patient-details">
     <form name="detailsForm" novalidate="novalidate" ng-submit="save()" ng-controller="patientAddFormController">
+        @Html.AntiForgeryToken()
         <div class="alert alert-danger" ng-show="model.errors.length > 0">
             <div ng-repeat="error in model.errors">
                 {{ error }}
@@ -63,18 +64,13 @@
                             <div class="form-group">
                                 <label for="patientAddress" class="col-sm-3 control-label">Адрес:</label>
                                 <div class="col-sm-9">
-                                    <input id="patientAddress"
-                                           type="text" ng-model="model.address" placeholder="Адрес"
-                                           typeahead="a.address for a in getLocation($viewValue) | filter:$viewValue"
-                                           typeahead-loading="loadingLocations" class="form-control" typeahead-min-length="3"
-                                           typeahead-on-select="addressSelected($item, address)" required>
-                                    <i ng-show="loadingLocations" class="glyphicon glyphicon-refresh"></i>
+                                    <input id="patientAddress" type="text" ng-model="model.address" placeholder="Адрес" class="form-control" />
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label for="patientTown" class="col-sm-3 control-label">Град:</label>
                                 <div class="col-sm-9">
-                                    <input id="patientTown" type="text" placeholder="Град" class="form-control" ng-model="model.town" required />
+                                    <input id="patientTown" type="text" placeholder="Град" class="form-control" ng-model="model.town" />
                                 </div>
 
                             </div>
@@ -98,15 +94,15 @@
                     </div>
                     <div id="collapseTwo" class="panel-collapse collapse">
                         <div class="panel-body">
-                            <div class="row" ng-repeat="phone in model.phones.data" style="padding-bottom: 5px;">
+                            <div class="row" ng-repeat="phone in model.phones" style="padding-bottom: 5px;">
                                 <div class="col-sm-5">
-                                    <select ng-options="pt.name for pt in data.phoneTypes track by pt.id" ng-model="phone.phoneType" class="form-control"></select>
+                                    <select ng-options="pt.name for pt in data.phoneTypes track by pt.id" ng-model="phone.type" class="form-control"></select>
                                 </div>
                                 <div class="col-sm-5" style="padding-left: 0px">
                                     <input type="text" ng-model="phone.number" class="form-control" placeholder="Телефон" required />
                                 </div>
                                 <div class="col-sm-1 is-primary">
-                                    <input type="radio" ng-model="model.phones.primary" ng-value="phone.number" name="IsPrimaryPhone" />
+                                    <input type="checkbox" ng-model="phone.isPrimary" name="IsPrimaryPhone" ng-change="onSelectPrimaryPhone(phone)" />
                                 </div>
                                 <div class="col-sm-1 remove-button">
                                     <a class="button clear-href" ng-click="removePhone(phone)">
@@ -115,7 +111,7 @@
                                 </div>
                             </div>
                             <div class="add-new-detail">
-                                <button class="btn btn-default" ng-click="addNewPhone()">Добави нов</button>
+                                <button type="button" class="btn btn-default" ng-click="addNewPhone()">Добави нов</button>
                             </div>
                         </div>
                     </div>
@@ -135,7 +131,7 @@
                                 <div class="form-group">
                                     <label for="fundCardNumber" class="col-sm-3 control-label">Име:</label>
                                     <div class="col-sm-9">
-                                        <select class="form-control" ng-model="model.fundName"></select>
+                                        <select class="form-control" ng-model="model.fund" ng-options="f.name for f in data.funds track by f.id"></select>
                                     </div>
                                 </div>                                
                                 <div class="form-group">
@@ -147,7 +143,7 @@
                                 <div class="form-group">
                                     <label for="fundCardExpire" class="col-sm-3 control-label">Валидна До:</label>
                                     <div class="col-sm-9">
-                                        <input class="form-control" med-date-input ng-model="model.fundCardExpire" />
+                                        <input class="form-control" med-date-input ng-model="model.fundCardExpiration" />
                                     </div>
                                 </div>
                             </div>
@@ -157,9 +153,9 @@
             </div>
         </div>
         <div style="margin-top: 5px; overflow: hidden">
-            <button class="btn btn-default" style="float: left; width: 100px">Save</button>
-            <button type="button" class="btn btn-default" style="float: left; width: 100px; margin-left: 10px;" ng-click="cancel()">Cancel</button>
-            <button type="button" class="btn btn-default" style="float: right; width: 100px" ng-click="delete()" ng-show="model.id > 0">Delete</button>
+            <button class="btn btn-default" style="float: left; width: 100px">Запис</button>
+            <button type="button" class="btn btn-default" style="float: left; width: 100px; margin-left: 10px;" ng-click="cancel()">Отказ</button>
+            <button type="button" class="btn btn-default" style="float: right; width: 100px" ng-click="delete()" ng-show="model.id > 0">Изтрий</button>
         </div>
     </form>
 </div>

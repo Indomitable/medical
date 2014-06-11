@@ -59,17 +59,17 @@ app.controller('scheduleController', ['$scope', '$http', 'checkSchedule', functi
             }
         }).success(function (data) {
             $scope.months = [];
-            for (var i = 0; i < data.Months.length; i++) {
-                $scope.months.push(data.Months[i]);
+            for (var i = 0; i < data.months.length; i++) {
+                $scope.months.push(data.months[i]);
             }
             //checkSchedule.start(data.schedule_version, function () { window.location.reload(true); });
         });
     }
 
     $scope.onDateClick = function (day) {
-        if (day.Date) {
+        if (day.date) {
 
-            if (day.Status > 0) {
+            if (day.status > 0) {
                 if (!day.selected) {
                     _.each(__self.getDays(), function (d) {
                         d.selected = false;
@@ -77,7 +77,7 @@ app.controller('scheduleController', ['$scope', '$http', 'checkSchedule', functi
                 }
             } else {
                 _.each(__self.getDays(), function (d) {
-                    if (d.Status > 0)
+                    if (d.status > 0)
                         d.selected = false;
                 });
             }
@@ -87,8 +87,8 @@ app.controller('scheduleController', ['$scope', '$http', 'checkSchedule', functi
             if (day.selected) {
                 $scope.workIntervals = [];
                 $scope.note = '';
-                if (day.Status > 0) {
-                    __self.load_day_schedules(day.Date);
+                if (day.status > 0) {
+                    __self.load_day_schedules(day.date);
                 }
             }
         }
@@ -97,9 +97,9 @@ app.controller('scheduleController', ['$scope', '$http', 'checkSchedule', functi
     __self.getDays = function () {
         var days = [];
         for (var i = 0; i < $scope.months.length; i++) {
-            for (var j = 0; j < $scope.months[i].Weeks.length; j++) {
-                for (var k = 0; k < $scope.months[i].Weeks[j].Days.length; k++) {
-                    days.push($scope.months[i].Weeks[j].Days[k]);
+            for (var j = 0; j < $scope.months[i].weeks.length; j++) {
+                for (var k = 0; k < $scope.months[i].weeks[j].days.length; k++) {
+                    days.push($scope.months[i].weeks[j].days[k]);
                 }
             }
         }
@@ -122,7 +122,7 @@ app.controller('scheduleController', ['$scope', '$http', 'checkSchedule', functi
         var selectedDays = _.map(_.filter(__self.getDays(), function (x) {
             return x.selected;
         }), function (x) {
-            return x.Date;
+            return x.date;
         });
         $http({
             method: 'POST',
@@ -197,11 +197,11 @@ app.controller('scheduleController', ['$scope', '$http', 'checkSchedule', functi
         }).success(function (data) {
             if (!data)
                 return;
-            $scope.note = data.Note;
+            $scope.note = data.note;
             $scope.workIntervals = [];
-            for (var i = 0; i < data.Hours.length; i++) {
-                var val = data.Hours[i];
-                $scope.workIntervals.push(new WorkInterval([val.From, val.To], val.NZOK));
+            for (var i = 0; i < data.hours.length; i++) {
+                var val = data.hours[i];
+                $scope.workIntervals.push(new WorkInterval([val.from, val.to], val.nzok));
             }
         });
     }

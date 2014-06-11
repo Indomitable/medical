@@ -121,6 +121,7 @@
     <Compile Include="Controllers\PatientController.cs" />
     <Compile Include="Controllers\RegistrationController.cs" />
     <Compile Include="Controllers\ScheduleController.cs" />
+    <Compile Include="Data\DataContext.cs" />
     <Compile Include="Data\Doctor.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
@@ -184,6 +185,7 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Infrastructure\AntiForgeryValidate.cs" />
     <Compile Include="Infrastructure\JsonNetResult.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

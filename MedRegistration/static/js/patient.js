@@ -1,16 +1,98 @@
-﻿app.controller("patientsController", ["$scope", "$modal", function ($scope, $modal) {
-    $scope.add = function () {
-        var addPatientInstance = $modal.open({
+﻿app.controller("patientsController", ["$scope", '$http', "$modal", function ($scope, $http, $modal) {
+    var __self = this;
+    $scope.patients = [];
+    __self.openPatient = function (id) {
+        var patientInstance = $modal.open({
             templateUrl: '/Patient/Add',
-            controller: 'patientAddController'
+            controller: 'patientAddController',
+            resolve: {
+                id: function () {
+                    return id;
+                }
+            }
         });
-        addPatientInstance.result.then(function () {
+        patientInstance.result.then(function () {
+            __self.loadPatients();
+        });
+    }
 
+    __self.loadPatients = function() {
+        $http({
+            method: 'GET',
+            url: '/Patient/GetPatients'
+        }).success(function (patients) {
+            $scope.patients = patients;
         });
+    };
+
+    __self.loadPatients();
+
+    $scope.add = function () {
+        __self.openPatient(0);
+    };
+
+    $scope.edit = function (id) {
+        __self.openPatient(id);
     };
 }]);
 
-app.controller("patientAddController", ['$scope', '$http', '$modalInstance', function ($scope, $http, $modalInstance) {
+app.controller("patientAddController", ['$scope', '$http', '$q', '$modalInstance', 'id', function ($scope, $http, $q, $modalInstance, id) {
+
+    var __self = this;
+
+    __self.loadData = function() {
+        var waits = [];
+        waits.push(__self.loadFunds());
+        return $q.all(waits);
+    };
+
+    __self.loadFunds = function () {
+        return $http({
+            method: 'GET',
+            url: '/Patient/GetFunds'
+        }).success(function (funds) {
+            for (var i = 0; i < funds.length; i++) {
+                $scope.data.funds.push(funds[i]);
+            }
+        });
+    };
+
+    __self.loadPatient = function () {
+        $http({
+            method: 'GET',
+            url: '/Patient/GetPatient',
+            params: {
+                id: id
+            }
+        }).success(function (patient) {
+            var model = $scope.model;
+            model.firstName = patient.firstName;
+            model.middleName = patient.middleName;
+            model.lastName = patient.lastName;
+            model.identType = _.find($scope.data.identTypes, function (x) { return x.id === patient.identNumberTypeId; });
+            model.identNumber = patient.identNumber;
+            model.gender = _.find($scope.data.genders, function (x) { return x.id === patient.genderId; });
+            model.email = patient.email;
+            model.address = patient.address;
+            model.town = patient.town;
+            model.postCode = patient.postCode;
+            for (var i = 0; i < patient.patientPhones.length; i++) {
+                var phone = patient.patientPhones[i];
+                model.phones.push({
+                    type: _.find($scope.data.phoneTypes, function (x) { return x.id === phone.typeId; }),
+                    number: phone.number,
+                    isPrimary: phone.isPrimary
+                });
+            }
+
+            if (patient.patientFundInfo) {
+                model.fund = _.find($scope.data.funds, function (x) { return x.id === patient.patientFundInfo.fundId; });
+                model.fundCardNumber = patient.patientFundInfo.fundCardNumber;
+                model.fundCardExpiration = patient.patientFundInfo.fundCardExpiration;
+            }
+        });
+    };
+
     $scope.data = {};
     $scope.data.identTypes = [
                  { id: 1, name: 'ЕГН' },
@@ -29,30 +111,61 @@ app.controller("patientAddController", ['$scope', '$http', '$modalInstance', fun
                  { id: 3, name: 'Мобилен' }
     ];
 
+    $scope.data.funds = [
+             { id: 0, name: '-- Изберете Фонд --' }
+    ];
+
     $scope.model = {
+        id: id,
+        firstName: '',
+        middleName: '',
+        lastName: '',
+        identNumber: '',
+        email: '',
+        town: '',
+        postCode: '',
+        address: '',
+        fund: $scope.data.funds[0],
+        fundCardNumber: '',
+        fundCardExpiration: '',
         identType: $scope.data.identTypes[0],
         gender: $scope.data.genders[0],
         paymentType: "1",
         errors: [],
-        phones: {
-            data: [],
-            primary: ""
-        }
+        phones: []
     };
 
+    __self.loadData().then(function() {
+        if (id > 0)
+            __self.loadPatient();
+    });
+
     $scope.addNewPhone = function () {
-        $scope.model.phones.data.push({
-            phoneType: $scope.data.phoneTypes[2],
-            number: ""
+        var isPrimary = $scope.model.phones.length === 0;
+        $scope.model.phones.push({
+            type: $scope.data.phoneTypes[2],
+            number: "",
+            isPrimary: isPrimary
         });
     };
 
     $scope.removePhone = function (phone) {
-        var indx = $scope.model.phones.data.indexOf(phone);
-        $scope.model.phones.data.splice(indx, 1);
+        var indx = $scope.model.phones.indexOf(phone);
+        $scope.model.phones.splice(indx, 1);
+        if (phone.isPrimary && $scope.model.phones.length > 0) {
+            $scope.model.phones[0].isPrimary = true;
+        }
     };
 
-    $scope.fundDetailsVisible = function() {
+    $scope.onSelectPrimaryPhone = function (phone) {
+        for (var i = 0; i < $scope.model.phones.length; i++) {
+            if ($scope.model.phones[i] != phone)
+                $scope.model.phones[i].isPrimary = false;
+        }
+        phone.isPrimary = true;
+    };
+
+    $scope.fundDetailsVisible = function () {
         return $scope.model.paymentType == "2";
     };
 
@@ -62,62 +175,6 @@ app.controller("patientAddController", ['$scope', '$http', '$modalInstance', fun
 
     $scope.cancel = function () {
         $modalInstance.dismiss('cancel');
-    };
-
-    $scope.getLocation = function (val) {
-
-        function extractCountry(item) {
-            for (var i = 0; i < item.address_components.length; i++) {
-                var component = item.address_components[i];
-                if (_.any(component.types, function (t) { return t == "country"; }))
-                    return component.long_name;
-            }
-            return "";
-        }
-
-        function extractPostCode(item) {
-            for (var i = 0; i < item.address_components.length; i++) {
-                var component = item.address_components[i];
-                if (_.any(component.types, function (t) { return t == "postal_code"; }))
-                    return component.long_name;
-            }
-            return "";
-        }
-
-        function extractTown(item) {
-            //Get first administrative area level
-            for (var i = 0; i < item.address_components.length; i++) {
-                var component = item.address_components[i];
-                if (_.any(component.types, function (t) { return t.indexOf("administrative_area_level") == 0; }))
-                    return component.long_name;
-            }
-            return "";
-        }
-
-        return $http.get('http://maps.googleapis.com/maps/api/geocode/json', {
-            params: {
-                address: val,
-                sensor: false
-            }
-        }).then(function (res) {
-            var addresses = [];
-            angular.forEach(res.data.results, function (item) {
-                addresses.push(
-                {
-                    address: item.formatted_address,
-                    country: extractCountry(item),
-                    postCode: extractPostCode(item),
-                    town: extractTown(item)
-                });
-            });
-            return addresses;
-        });
-    };
-
-    $scope.addressSelected = function ($item, address) {
-        address.country = $item.country;
-        address.postCode = $item.postCode;
-        address.town = $item.town;
     };
 
     $scope.$watch('model.identNumber', function (newVal, oldVal) {
@@ -132,21 +189,34 @@ app.controller("patientAddController", ['$scope', '$http', '$modalInstance', fun
             }
         }
     });
+
+    $scope.$watch('model.fund', function (newVal, oldVal) {
+        if (newVal && newVal.id === 0) {
+            $scope.model.fundCardNumber = '';
+            $scope.model.fundCardExpiration = null;
+        }
+    });
 }]);
 
 app.controller("patientAddFormController", [
     '$scope', '$http', function ($scope, $http) {
-        $scope.save = function() {
+        $scope.save = function () {
             $scope.model.errors = [];
             if ($scope.detailsForm.$invalid) {
                 $scope.model.errors.push("Моля попълнете всички задължителни полета!");
             }
-            if ($scope.model.phones.data.length === 0 || _.all($scope.model.phones.data, function(p) { return !p.number || p.number.trim() === ""; })) {
+            if ($scope.model.phones.length === 0 || _.all($scope.model.phones, function (p) { return !p.number || p.number.trim() === ""; })) {
                 $scope.model.errors.push("Моля въведете поне един телефонен номер!");
             }
             if ($scope.model.errors.length > 0)
                 return false;
+
+            if (_.all($scope.model.phones, function (p) { return !p.isPrimary; })) {
+                $scope.model.phones[0].isPrimary = true;
+            }
+
             var patient = {
+                id: $scope.model.id,
                 firstName: $scope.model.firstName,
                 middleName: $scope.model.middleName,
                 lastName: $scope.model.lastName,
@@ -156,20 +226,50 @@ app.controller("patientAddFormController", [
                 town: $scope.model.town,
                 postCode: $scope.model.postCode,
                 address: $scope.model.address,
-                genderId: $scope.model.gender.id
+                genderId: $scope.model.gender.id,
+                patientPhones: $scope.model.phones,
             };
+
+            for (var i = 0; i < patient.patientPhones.length; i++) {
+                patient.patientPhones[i].typeId = patient.patientPhones[i].type.id;
+            }
+
+            if ($scope.model.fund.id > 0) {
+                patient.patientFundInfo = {
+                    fundId: $scope.model.fund.id,
+                    fundCardNumber: $scope.model.fundCardNumber,
+                    fundCardExpiration: $scope.model.fundCardExpiration
+                };
+            }
 
             $http(
             {
                 method: 'POST',
                 url: '/Patient/Save',
                 data: patient
-            }).success(function() {
+            }).success(function (res) {
                 $scope.ok();
-            }).fail(function(err) {
+            }).error(function (err) {
                 $scope.model.errors.push(err);
             });
             return true;
         };
+
+        $scope.delete = function() {
+            if (confirm('Сигурни ли сте, че искате да изтриете пациента: ' + $scope.model.firstName + ' ' + $scope.model.lastName)) {
+                $http(
+                {
+                    method: 'POST',
+                    url: '/Patient/Delete',
+                    data: {
+                        id: $scope.model.id
+                    }
+                }).success(function (res) {
+                    $scope.ok();
+                }).error(function (err) {
+                    $scope.model.errors.push(err);
+                });
+            }
+        }
     }
 ]);

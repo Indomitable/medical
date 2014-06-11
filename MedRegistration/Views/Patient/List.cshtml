@@ -1,10 +1,19 @@
-﻿@model List<MedRegistration.Data.Patient>
-@{
+﻿@{
     ViewBag.Title = "Пациенти";
 }
 <div class="container" ng-controller="patientsController">
-    <button class="btn btn-default" ng-click="add()">Добави нов пациент</button>
-    <table class="table table-hover">
+    <div>
+        <div class="col-xs-2">
+            <button class="btn btn-default" ng-click="add()">Добави нов пациент</button>
+        </div>
+        <div class="col-xs-3 col-xs-offset-7">
+            <div class="input-group">
+                <input type="search" ng-model="searchText" class="form-control" />
+                <span class="input-group-addon glyphicon glyphicon-search" style="top: 0"></span>
+            </div>
+        </div>
+    </div>
+    <table class="table table-hover table-nomen">
         <thead>
             <tr>
                 <th style="width: 10px"></th>
@@ -15,24 +24,17 @@
                 <th style="width: 100px; text-align: center">Имейл</th>
             </tr>
         </thead>
-        <tbody>
-            @foreach (var patient in Model)
-            {
-                <tr>
-                    <td class="controls">
-                        <a href="@Url.Action("Index", "Schedule", new { doctorId = patient.Id })">
-                            <span class="glyphicon glyphicon-calendar"></span>
-                        </a>
-                        <a><span class="glyphicon glyphicon-remove"></span></a>
-                        <a><span class="glyphicon glyphicon-pencil"></span></a>
-                    </td>
-                    <td>@patient.FirstName</td>
-                    <td>@patient.LastName</td>
-                    <td>@patient.IdentNumber</td>
-                    <td>@patient.PatientPhones.SingleOrDefault(x => x.IsPrimary)</td>
-                    <td>@patient.Email</td>
-                </tr>
-            }
+        <tbody ng-cloak="">
+            <tr ng-repeat="patient in patients | filter:searchText">
+                <td class="controls">
+                    <a ng-click="edit(patient.id)"><span class="glyphicon glyphicon-pencil"></span></a>
+                </td>
+                <td ng-bind="patient.firstName">/td>
+                <td ng-bind="patient.lastName"></td>
+                <td ng-bind="patient.identNumber"></td>
+                <td ng-bind="patient.phoneNumber"></td>
+                <td ng-bind="patient.email"></td>
+            </tr>
         </tbody>
     </table>
 </div>

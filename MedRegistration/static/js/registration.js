@@ -10,7 +10,7 @@
     __self.hours = [];
 
     __self.buildHours = function (weekMinHour, weekMaxHour, doctor) {
-        var sortedSchedules = _.sortBy(doctor.Schedule, function (x) { return x.FromTime; });
+        var sortedSchedules = _.sortBy(doctor.schedule, function (x) { return x.fromTime; });
         doctor.hours = [];
 
         for (var i = 0; i < sortedSchedules.length; i++) {
@@ -19,39 +19,39 @@
                 doctor.hours.push({
                     work: 0,
                     from: weekMinHour,
-                    to: schedule.FromTime
+                    to: schedule.fromTime
                 });
             } else {
                 doctor.hours.push({
                     work: 0,
-                    from: sortedSchedules[i - 1].ToTime,
-                    to: schedule.FromTime
+                    from: sortedSchedules[i - 1].toTime,
+                    to: schedule.fromTime
                 });
             }
 
-            var time = schedule.FromTime + doctor.ExamTime;
-            while (time < schedule.ToTime) {
+            var time = schedule.fromTime + doctor.examTime;
+            while (time < schedule.toTime) {
                 doctor.hours.push({
                     work: 1,
-                    from: time - doctor.ExamTime,
+                    from: time - doctor.examTime,
                     to: time,
-                    isNZOK: schedule.IsNZOK
+                    isnzok: schedule.isnzok
                 });
-                time += doctor.ExamTime;
+                time += doctor.examTime;
             }
-            if (time - doctor.ExamTime < schedule.ToTime) {
+            if (time - doctor.examTime < schedule.toTime) {
                 doctor.hours.push({
                     work: 1,
-                    from: time - doctor.ExamTime,
-                    to: schedule.ToTime,
-                    isNZOK: schedule.IsNZOK
+                    from: time - doctor.examTime,
+                    to: schedule.toTime,
+                    isnzok: schedule.isnzok
                 });
             }
 
             if (i == sortedSchedules.length - 1) {
                 doctor.hours.push({
                     work: 0,
-                    from: schedule.ToTime,
+                    from: schedule.toTime,
                     to: weekMaxHour
                 });
             }
@@ -70,19 +70,19 @@
         })
         .success(function (data) {
             __self.hours.splice(0, __self.hours.length);
-            for (var k = data.WeekMinHour; k < data.WeekMaxHour; k+=60) {
+            for (var k = data.weekMinHour; k < data.weekMaxHour; k+=60) {
                 __self.hours.push(k/60);
             }
             __self.days.splice(0, __self.days.length);
-            for (var i = 0; i < data.Schedule.length; i++) {
-                var dt = data.Schedule[i].Date;
-                for (var j = 0; j < data.Schedule[i].Doctors.length; j++) {
-                    var doctor = data.Schedule[i].Doctors[j];
-                    __self.buildHours(data.WeekMinHour, data.WeekMaxHour, doctor);
+            for (var i = 0; i < data.schedule.length; i++) {
+                var dt = data.schedule[i].date;
+                for (var j = 0; j < data.schedule[i].doctors.length; j++) {
+                    var doctor = data.schedule[i].doctors[j];
+                    __self.buildHours(data.weekMinHour, data.weekMaxHour, doctor);
                 }
                 __self.days.push({
                     date: new Date(dt),
-                    doctors: data.Schedule[i].Doctors
+                    doctors: data.schedule[i].doctors
                 });
             }
         });
@@ -151,11 +151,11 @@ app.filter('nonZeroHour', [function () {
 app.directive('vmQtip', function () {
     return {
         link: function (scope, elm, attrs) {
-            var content = scope.doctor.Title + " " + scope.doctor.FirstName + " " + scope.doctor.LastName + "<br/>"; 
+            var content = scope.doctor.title + " " + scope.doctor.firstName + " " + scope.doctor.lastName + "<br/>"; 
             if (scope.hour.work === 0)
                 content += 'Неработи';
             else {
-                if (scope.hour.isNZOK)
+                if (scope.hour.isnzok)
                     content += 'Работи по здравна каса.';
                 else
                     content += 'Работи.';

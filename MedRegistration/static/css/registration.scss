@@ -1,4 +1,12 @@
-﻿@mixin rotate($deg) {
+﻿div.registration {
+	margin: 0 10px;
+}
+
+div.week {
+	margin-bottom: 10px;
+}
+
+@mixin rotate($deg) {
 	-webkit-transform: translate(15px,100%) rotate($deg);
 	-moz-transform: translate(15px,100%) rotate($deg);
 	-ms-transform: translate(15px,100%) rotate($deg);

@@ -13,7 +13,7 @@
                     <table class="table table-bordered table-condensed">
                         <thead>
                             <tr>
-                                <th colspan="7" ng-bind="month.Name"></th>
+                                <th colspan="7" ng-bind="month.name"></th>
                             </tr>
                             <tr>
                                 <th>пон</th>
@@ -26,9 +26,9 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr ng-repeat="week in month.Weeks">
-                                <td ng-repeat="day in week.Days" ng-click="onDateClick(day)" ng-bind="day.Date | dayFormat"
-                                    ng-class="{'selected': day.selected, 'out-calendar': day.Status == -1, 'not-set': day.Status == 0, 'setted': day.Status == 1, 'no-interval': day.Status == 2}"></td>
+                            <tr ng-repeat="week in month.weeks">
+                                <td ng-repeat="day in week.days" ng-click="onDateClick(day)" ng-bind="day.date | dayFormat"
+                                    ng-class="{'selected': day.selected, 'out-calendar': day.status == -1, 'not-set': day.status == 0, 'setted': day.status == 1, 'no-interval': day.status == 2}"></td>
                             </tr>
                         </tbody>
                     </table>

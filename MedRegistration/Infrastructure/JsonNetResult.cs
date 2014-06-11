@@ -2,6 +2,7 @@
 using System.Text;
 using System.Web.Mvc;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace MedRegistration.Infrastructure
 {
@@ -9,10 +10,12 @@ namespace MedRegistration.Infrastructure
         where T : class
     {
         private readonly T data;
+//        private readonly bool lowerCase;
 
-        public JsonNetResult(T data)
+        public JsonNetResult(T data/*, bool lowerCase = false*/)
         {
             this.data = data;
+            //this.lowerCase = lowerCase;
             JsonRequestBehavior = JsonRequestBehavior.AllowGet;
         }
 
@@ -29,8 +32,26 @@ namespace MedRegistration.Infrastructure
                 return;
 
             JsonSerializerSettings settings = new JsonSerializerSettings { Formatting = Formatting.None };
+            settings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+            settings.ContractResolver = new CamelCasePropertyNamesContractResolver();
             var serializedObject = JsonConvert.SerializeObject(data, settings);
             response.Write(serializedObject);
+        }
+    }
+
+    public class LowerCasePropertyNamesContractResolver : DefaultContractResolver
+    {
+        public LowerCasePropertyNamesContractResolver()
+            : base(true)
+        {
+        }
+
+        protected override string ResolvePropertyName(string propertyName)
+        {
+            if (!string.IsNullOrWhiteSpace(propertyName))
+                return propertyName.ToLowerInvariant();
+            else
+                return string.Empty;
         }
     }
 }
