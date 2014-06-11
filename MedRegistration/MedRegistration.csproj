@@ -106,6 +106,7 @@
     </Content>
     <Content Include="static\js\app.js" />
     <Content Include="static\js\doctor.js" />
+    <Content Include="static\js\functions.js" />
     <Content Include="static\js\patient.js" />
     <Content Include="static\js\registration.js" />
     <Content Include="static\js\schedule.js" />

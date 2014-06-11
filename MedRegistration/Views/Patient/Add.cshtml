@@ -2,9 +2,7 @@
     <form name="detailsForm" novalidate="novalidate" ng-submit="save()" ng-controller="patientAddFormController">
         @Html.AntiForgeryToken()
         <div class="alert alert-danger" ng-show="model.errors.length > 0">
-            <div ng-repeat="error in model.errors">
-                {{ error }}
-            </div>
+            <div ng-repeat="error in model.errors" ng-bind="error"></div>
         </div>
         <div class="panel-group" id="accordion">
             <!-- Main -->

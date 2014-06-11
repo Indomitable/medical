@@ -1,30 +1,29 @@
-﻿@model List<MedRegistration.Data.Title>
-<div class="modal-form">
-    <form role="form" method="POST" action="@Url.Action("Add")">
+﻿<div class="modal-form">
+    <form role="form" method="POST" ng-submit="save()" novalidate>
+        @Html.AntiForgeryToken()
+        <div class="alert alert-danger" ng-show="model.errors.length > 0">
+            <div ng-repeat="error in model.errors" ng-bind="error"></div>
+        </div>
         <div class="form-group">
             <label for="inputTitle" class="control-label">Титла</label>
-            <select class="form-control" name="TitleId">
-                @foreach (var title in Model)
-                {
-                    <option value="@title.Id">@title.Description</option>
-                }
-            </select>
+            <select class="form-control" ng-model="model.title" ng-options="t.description for t in data.titles track by t.id"></select>
         </div>
         <div class="form-group">
             <label for="inputName" class="control-label">Име</label>
-            <input type="text" class="form-control" id="inputName" name="FirstName" placeholder="Име">
+            <input type="text" class="form-control" id="inputName" ng-model="model.firstName" placeholder="Име" required>
         </div>
         <div class="form-group">
             <label for="inputFamily" class="control-label">Фамилия</label>
-            <input type="text" class="form-control" id="inputFamily" name="LastName" placeholder="Фамилия">
+            <input type="text" class="form-control" id="inputFamily" ng-model="model.lastName" placeholder="Фамилия" required>
         </div>
         <div class="form-group">
             <label for="inputDefaultExampTime" class="control-label">Време за преглед (мин.)</label>
-            <input type="number" class="form-control" id="inputDefaultExampTime" name="DefaultExamTime" placeholder="Време за преглед" value="20">
+            <input type="number" class="form-control" id="inputDefaultExampTime" ng-model="model.defaultExamTime" placeholder="Време за преглед">
         </div>
         <div style="margin-top: 5px; overflow: hidden">
             <button type="submit" class="btn btn-default" style="float: left; width: 100px">Запис</button>
+            <button type="button" class="btn btn-default" style="float: left; width: 100px; margin-left: 10px;" ng-click="cancel()">Отказ</button>
             <button type="button" class="btn btn-default" style="float: right; width: 100px" ng-click="delete()" ng-show="model.id > 0">Изтрий</button>
         </div>
-</form>
+    </form>
 </div>

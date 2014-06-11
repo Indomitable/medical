@@ -79,37 +79,33 @@ namespace MedRegistration.Controllers
                                                .SingleOrDefault();
                         if (dbPatient == null)
                             return JsonNet(new { result = 3 });
-                        else
+                        dbPatient.FirstName = patient.FirstName;
+                        dbPatient.MiddleName = patient.MiddleName;
+                        dbPatient.LastName = patient.LastName;
+                        dbPatient.IdentNumberTypeId = patient.IdentNumberTypeId;
+                        dbPatient.IdentNumber = patient.IdentNumber;
+                        dbPatient.GenderId = patient.GenderId;
+                        dbPatient.Email = patient.Email;
+                        dbPatient.Address = patient.Address;
+                        dbPatient.Town = patient.Town;
+                        dbPatient.PostCode = patient.PostCode;
+                        context.PatientPhones.RemoveRange(dbPatient.PatientPhones);
+                        foreach (var phone in patient.PatientPhones)
                         {
-                            dbPatient.FirstName = patient.FirstName;
-                            dbPatient.MiddleName = patient.MiddleName;
-                            dbPatient.LastName = patient.LastName;
-                            dbPatient.IdentNumberTypeId = patient.IdentNumberTypeId;
-                            dbPatient.IdentNumber = patient.IdentNumber;
-                            dbPatient.GenderId = patient.GenderId;
-                            dbPatient.Email = patient.Email;
-                            dbPatient.Address = patient.Address;
-                            dbPatient.Town = patient.Town;
-                            dbPatient.PostCode = patient.PostCode;
-                            context.PatientPhones.RemoveRange(dbPatient.PatientPhones);
-                            foreach (var phone in patient.PatientPhones)
-                            {
-                                dbPatient.PatientPhones.Add(phone);
-                            }
-
-                            if (patient.PatientFundInfo != null)
-                            {
-                                dbPatient.PatientFundInfo.FundId = patient.PatientFundInfo.FundId;
-                                dbPatient.PatientFundInfo.FundCardNumber = patient.PatientFundInfo.FundCardNumber;
-                                dbPatient.PatientFundInfo.FundCardExpiration = patient.PatientFundInfo.FundCardExpiration;
-                            }
-                            else
-                            {
-                                if (dbPatient.PatientFundInfo != null)
-                                    context.PatientFundInfoes.Remove(dbPatient.PatientFundInfo);
-                            }
+                            dbPatient.PatientPhones.Add(phone);
                         }
 
+                        if (patient.PatientFundInfo != null)
+                        {
+                            dbPatient.PatientFundInfo.FundId = patient.PatientFundInfo.FundId;
+                            dbPatient.PatientFundInfo.FundCardNumber = patient.PatientFundInfo.FundCardNumber;
+                            dbPatient.PatientFundInfo.FundCardExpiration = patient.PatientFundInfo.FundCardExpiration;
+                        }
+                        else
+                        {
+                            if (dbPatient.PatientFundInfo != null)
+                                context.PatientFundInfoes.Remove(dbPatient.PatientFundInfo);
+                        }
                     }
                     context.SaveChanges();
                 }

@@ -16,7 +16,7 @@
         });
     }
 
-    __self.loadPatients = function() {
+    __self.loadPatients = function () {
         $http({
             method: 'GET',
             url: '/Patient/GetPatients'
@@ -40,7 +40,7 @@ app.controller("patientAddController", ['$scope', '$http', '$q', '$modalInstance
 
     var __self = this;
 
-    __self.loadData = function() {
+    __self.loadData = function () {
         var waits = [];
         waits.push(__self.loadFunds());
         return $q.all(waits);
@@ -51,9 +51,7 @@ app.controller("patientAddController", ['$scope', '$http', '$q', '$modalInstance
             method: 'GET',
             url: '/Patient/GetFunds'
         }).success(function (funds) {
-            for (var i = 0; i < funds.length; i++) {
-                $scope.data.funds.push(funds[i]);
-            }
+            $scope.data.funds.pushAll(funds);
         });
     };
 
@@ -69,51 +67,49 @@ app.controller("patientAddController", ['$scope', '$http', '$q', '$modalInstance
             model.firstName = patient.firstName;
             model.middleName = patient.middleName;
             model.lastName = patient.lastName;
-            model.identType = _.find($scope.data.identTypes, function (x) { return x.id === patient.identNumberTypeId; });
+            model.identType = $scope.data.identTypes.find(function (x) { return x.id === patient.identNumberTypeId; });
             model.identNumber = patient.identNumber;
-            model.gender = _.find($scope.data.genders, function (x) { return x.id === patient.genderId; });
+            model.gender = $scope.data.genders.find(function (x) { return x.id === patient.genderId; });
             model.email = patient.email;
             model.address = patient.address;
             model.town = patient.town;
             model.postCode = patient.postCode;
-            for (var i = 0; i < patient.patientPhones.length; i++) {
-                var phone = patient.patientPhones[i];
-                model.phones.push({
-                    type: _.find($scope.data.phoneTypes, function (x) { return x.id === phone.typeId; }),
+
+            model.phones.pushAll(patient.patientPhones, function (phone) {
+                return {
+                    type: $scope.data.phoneTypes.find(function (x) { return x.id === phone.typeId; }),
                     number: phone.number,
                     isPrimary: phone.isPrimary
-                });
-            }
+                };
+            });
 
             if (patient.patientFundInfo) {
-                model.fund = _.find($scope.data.funds, function (x) { return x.id === patient.patientFundInfo.fundId; });
+                model.fund = $scope.data.funds.find(function (x) { return x.id === patient.patientFundInfo.fundId; });
                 model.fundCardNumber = patient.patientFundInfo.fundCardNumber;
                 model.fundCardExpiration = patient.patientFundInfo.fundCardExpiration;
             }
         });
     };
 
-    $scope.data = {};
-    $scope.data.identTypes = [
+    $scope.data = {
+        identTypes: [
                  { id: 1, name: 'ЕГН' },
                  { id: 2, name: 'ЛНЧ' },
                  { id: 3, name: 'Частично ЕГН' }
-    ];
-
-    $scope.data.genders = [
+        ],
+        genders: [
                  { id: 1, name: 'Мъж' },
                  { id: 2, name: 'Жена' }
-    ];
-
-    $scope.data.phoneTypes = [
-                 { id: 1, name: 'Домашен' },
-                 { id: 2, name: 'Работен' },
-                 { id: 3, name: 'Мобилен' }
-    ];
-
-    $scope.data.funds = [
+        ],
+        phoneTypes: [
+                { id: 1, name: 'Домашен' },
+                { id: 2, name: 'Работен' },
+                { id: 3, name: 'Мобилен' }
+        ],
+        funds: [
              { id: 0, name: '-- Изберете Фонд --' }
-    ];
+        ]
+    };
 
     $scope.model = {
         id: id,
@@ -135,7 +131,7 @@ app.controller("patientAddController", ['$scope', '$http', '$q', '$modalInstance
         phones: []
     };
 
-    __self.loadData().then(function() {
+    __self.loadData().then(function () {
         if (id > 0)
             __self.loadPatient();
     });
@@ -150,8 +146,7 @@ app.controller("patientAddController", ['$scope', '$http', '$q', '$modalInstance
     };
 
     $scope.removePhone = function (phone) {
-        var indx = $scope.model.phones.indexOf(phone);
-        $scope.model.phones.splice(indx, 1);
+        $scope.model.phones.remove(phone);
         if (phone.isPrimary && $scope.model.phones.length > 0) {
             $scope.model.phones[0].isPrimary = true;
         }
@@ -255,7 +250,7 @@ app.controller("patientAddFormController", [
             return true;
         };
 
-        $scope.delete = function() {
+        $scope.delete = function () {
             if (confirm('Сигурни ли сте, че искате да изтриете пациента: ' + $scope.model.firstName + ' ' + $scope.model.lastName)) {
                 $http(
                 {
