@@ -37,7 +37,9 @@ namespace MedRegistration.Controllers
         {
             using (var context = new DataContext(lazyLoading: false))
             {
-                var doctors = from d in context.Doctors.Include(x => x.Title)
+                var doctors = from d in context.Doctors
+                                               .Include(x => x.Title)
+                                               .Include(x => x.Specialities)
                               where d.Id == id
                               select d;
                 return JsonNet(doctors.SingleOrDefault());
@@ -52,7 +54,7 @@ namespace MedRegistration.Controllers
 
         [HttpPost]
         [AntiForgeryValidate]
-        public ActionResult Save(Doctor doctor)
+        public ActionResult Save(Doctor doctor, Speciality[] specialities)
         {
             try
             {
@@ -71,7 +73,21 @@ namespace MedRegistration.Controllers
                         dbDoctor.FirstName = doctor.FirstName;
                         dbDoctor.LastName = doctor.LastName;
                         dbDoctor.DefaultExamTime = doctor.DefaultExamTime;
+
+                        dbDoctor.Specialities.Clear();
                     }
+                    context.SaveChanges();
+
+                    var specialityDoctor = context.Doctors.Single(d => d.Id == doctor.Id);
+                    if (specialities != null)
+                    {
+                        foreach (var speciality in specialities)
+                        {
+                            var spec = context.Specialities.Single(s => s.Id == speciality.Id);
+                            specialityDoctor.Specialities.Add(spec);
+                        }
+                    }
+
                     context.SaveChanges();
                 }
                 return JsonNet(new { result = 1 });

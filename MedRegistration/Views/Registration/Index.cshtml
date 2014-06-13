@@ -14,37 +14,31 @@
         </a>
     </div>
 
-    <table class="schedule table table-bordered table-condensed">
+    <table class="schedule">
         <thead>
             <tr>
                 <th style="width: 80px">Ден</th>
                 <th style="width: 250px">Име</th>
-                <th ng-repeat="hour in week.hours" style="width: 80px" colspan="12">
-                    {{ hour }}
-                </th>
+                <th ng-repeat="hour in week.hours" style="width: 80px" colspan="12" ng-bind="hour"></th>
             </tr>
         </thead>
         <tbody>
             <tr ng-repeat-start="day in week.days">
                 <td class="week-day" rowspan="{{ day.doctors.length + 1 }}">
                     <span class="rotated-text">
-                        <span class="rotated-text_inner">{{ day.date | dateDisplay }}</span>
+                        <span class="rotated-text_inner" ng-bind="day.date | dateDisplay"></span>
                     </span>
                 </td>
-                @*                <td class="doctor-name">{{ day.doctors[0].Title }} {{ day.doctors[0].FirstName }} {{ day.doctors[0].LastName }}</td>*@
-                @*                <td ng-repeat="hour in day.doctors[0].hours | nonZeroHour" colspan="{{ (hour.to - hour.from) / 5 }}"*@
-                @*                    ng-class="{ 'non-work': hour.work == 0, 'nzok': hour.isnzok }" vm-qtip data-from="{{ hour.from }}" data-to="{{ hour.to }}"></td>*@
             </tr>
-            <tr ng-repeat-end ng-repeat="doctor in day.doctors">
-                @*| skip: 1*@
-                <td class="doctor-name">{{ doctor.title }} {{ doctor.firstName }} {{ doctor.lastName }}</td>
+            <tr ng-repeat-end ng-repeat="doctor in day.doctors" class="doctor-row" ng-class="{ 'single-row': day.doctors.length === 1, 'multiple-row': day.doctors.length > 1 }">
+                <td class="doctor-name" ng-bind="doctor.title + ' ' + doctor.firstName + ' ' + doctor.lastName"></td>
                 <td ng-repeat="hour in doctor.hours | nonZeroHour" colspan="{{ (hour.to - hour.from) / 5 }}"
                     ng-class="{ 'non-work': hour.work == 0, 'nzok': hour.isnzok }" vm-qtip
                     class="doctor-hour">
                     <div ng-show="hour.work == 1" class="dropdown">
                         <div class="dropdown-toggle"></div>
                         <ul class="dropdown-menu" role="menu">
-                            <li><a ng-click="registerHour(doctor, hour)">Запис на час</a></li>
+                            <li class="clickable"><a ng-click="registerHour(doctor, day, hour)">Запис на час</a></li>
                         </ul>
                     </div>
                 </td>

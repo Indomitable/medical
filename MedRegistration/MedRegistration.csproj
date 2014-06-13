@@ -89,6 +89,12 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Global.asax" />
+    <Content Include="static\css\dialog-styles.min.css">
+      <DependentUpon>dialog-styles.scss</DependentUpon>
+    </Content>
+    <Content Include="static\css\doctor.min.css">
+      <DependentUpon>doctor.scss</DependentUpon>
+    </Content>
     <Content Include="static\css\main.min.css">
       <DependentUpon>main.scss</DependentUpon>
     </Content>
@@ -242,6 +248,14 @@
       <DependentUpon>patient.min.css</DependentUpon>
     </Content>
     <Content Include="static\js\ui-med.js" />
+    <Content Include="static\css\dialog-styles.scss" />
+    <Content Include="static\css\dialog-styles.min.css.map">
+      <DependentUpon>dialog-styles.min.css</DependentUpon>
+    </Content>
+    <Content Include="static\css\doctor.scss" />
+    <Content Include="static\css\doctor.min.css.map">
+      <DependentUpon>doctor.min.css</DependentUpon>
+    </Content>
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

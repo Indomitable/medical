@@ -59,7 +59,7 @@
 
     };
 
-    __self.getSchedule = function() {
+    __self.getSchedule = function () {
         $http({
             method: 'GET',
             url: '/Registration/GetDoctorsSchedule',
@@ -70,8 +70,8 @@
         })
         .success(function (data) {
             __self.hours.splice(0, __self.hours.length);
-            for (var k = data.weekMinHour; k < data.weekMaxHour; k+=60) {
-                __self.hours.push(k/60);
+            for (var k = data.weekMinHour; k < data.weekMaxHour; k += 60) {
+                __self.hours.push(k / 60);
             }
             __self.days.splice(0, __self.days.length);
             for (var i = 0; i < data.schedule.length; i++) {
@@ -96,17 +96,17 @@
         days: __self.days,
         hours: __self.hours,
 
-        name: function() {
+        name: function () {
             return "От: " + customFormatter.dateToUserString(__self.from) + ", До: " + customFormatter.dateToUserString(__self.to);
         },
 
-        next: function() {
+        next: function () {
             __self.from.setDate(__self.from.getDate() + 7);
             __self.to.setDate(__self.to.getDate() + 7);
             __self.getSchedule();
         },
 
-        prev: function() {
+        prev: function () {
             __self.from.setDate(__self.from.getDate() - 7);
             __self.to.setDate(__self.to.getDate() - 7);
             __self.getSchedule();
@@ -118,10 +118,20 @@ app.controller('registrationController', ['$scope', '$http', 'customFormatter', 
     function ($scope, $http, customFormatter, week, $modal) {
         $scope.week = week;
 
-        $scope.registerHour = function(doctor, hour) {
+        $scope.registerHour = function (doctor, day, hour) {
             var addRegistrationInstance = $modal.open({
                 templateUrl: '/Registration/Register',
-                controller: registrationAddController
+                controller: 'registrationAddController',
+                size: 'lg',
+                resolve: {
+                    info: function() {
+                        return {
+                            doctor: doctor,
+                            day: day,
+                            hour: hour
+                        };
+                    }
+                }
             });
             addRegistrationInstance.result.then(function () {
 
@@ -130,28 +140,120 @@ app.controller('registrationController', ['$scope', '$http', 'customFormatter', 
     }
 ]);
 
-var registrationAddController = function ($scope, $modalInstance) {
-    $scope.ok = function () {
+app.controller('registrationAddController', ['$scope', '$http', '$modalInstance', 'timeConverter', 'info', function ($scope, $http, $modalInstance, timeConverter, info) {
+    var __self = this;
+    $scope.data = {
+        funds: [
+            { id: 0, name: '-- Изберете Фонд --' }
+        ]
+    };
+    $scope.model = {
+        errors: [],
+        date: info.day.date,
+        fromTime: timeConverter.convertToHours(info.hour.from),
+        toTime: timeConverter.convertToHours(info.hour.to),
+        nzok: info.hour.isnzok,
+        patients: [],
+        selectedPatient: 0,
+        isNewPatient: 0,
+        newPatient: {
+            firstName: '',
+            lastName: '',
+            phoneNumber: ''           
+        },
+        paymentType: 1,
+        fund: $scope.data.funds[0],
+        fundCardNumber: '',
+        fundCardExpiration: ''
+    };
+    __self.loadPatients = function () {
+        $http({
+            method: 'GET',
+            url: '/Patient/GetPatients'
+        }).success(function (patients) {
+            $scope.model.patients = patients;
+        });
+    };
+
+    __self.loadFunds = function () {
+        $http({
+            method: 'GET',
+            url: '/Registration/GetFunds'
+        }).success(function (funds) {
+            $scope.data.funds.pushAll(funds);
+        });
+    };
+    __self.loadPatients();
+
+    __self.loadFunds();
+
+    $scope.onSelectPatient = function (patient) {
+        $scope.model.selectedPatient = patient.id;
+    };
+
+    __self.closeModal = function() {
         $modalInstance.close();
     };
 
-    $scope.cancel = function () {
+    $scope.select = function () {
+        $scope.model.errors = [];
+        if ($scope.model.isNewPatient === 0 && !$scope.model.selectedPatient) {
+            $scope.model.errors.push('Моля изберете пациент!');
+        }
+        if ($scope.model.errors.length > 0) {
+            return;
+        }
+
+        if ($scope.model.isNewPatient === 0) {
+            var reservation = {
+                patientId: $scope.model.selectedPatient,
+                doctorId: info.doctor.doctorId,
+                date: $scope.model.date,
+                fromTime: $scope.model.fromTime,
+                toTime: $scope.model.toTime,
+                paymentTypeId: $scope.model.paymentType
+            };
+
+            if (reservation.paymentTypeId === 3 && $scope.model.fund.id > 0) {
+                reservation.paymentInfo = {
+                    fundId: $scope.model.fund.id,
+                    fundCardNumber: $scope.model.fundCardNumber,
+                    fundCardExpiration: $scope.model.fundCardExpiration
+                };
+            }
+
+            $http(
+            {
+                method: 'POST',
+                url: '/Registration/RegisterExistingPatient',
+                data: reservation
+            }).success(function (res) {
+                __self.closeModal();
+            }).error(function (err) {
+                $scope.model.errors.push(err);
+            });
+        } else {
+                
+        }
+    };
+
+    $scope.cancel = function() {
         $modalInstance.dismiss('cancel');
     };
-};
+}]);
 
 app.filter('nonZeroHour', [function () {
     return function (hours) {
-        return _.filter(hours, function(h) {
+        return _.filter(hours, function (h) {
             return h.to - h.from > 0;
         });
     };
 }]);
 
-app.directive('vmQtip', function () {
+app.directive('vmQtip', ['timeConverter', function (timeConverter) {
     return {
         link: function (scope, elm, attrs) {
-            var content = scope.doctor.title + " " + scope.doctor.firstName + " " + scope.doctor.lastName + "<br/>"; 
+            var content = scope.doctor.title + " " + scope.doctor.firstName + " " + scope.doctor.lastName + "<br/>";
             if (scope.hour.work === 0)
                 content += 'Неработи';
             else {
@@ -161,22 +263,9 @@ app.directive('vmQtip', function () {
                     content += 'Работи.';
             }
             content += '<br/>';
-            var hour = Math.floor(scope.hour.from / 60);
-            if (hour < 10)
-                hour = '0' + hour;
-            var minute = Math.round(((scope.hour.from / 60) % 1) * 60);
-            if (minute < 10)
-                minute = '0' + minute;
-            content += 'Начало: ' + hour + ":" + minute;
+            content += 'Начало: ' + timeConverter.convertToHours(scope.hour.from);
             content += '<br/>';
-
-            hour = Math.floor(scope.hour.to / 60);
-            if (hour < 10)
-                hour = '0' + hour;
-            minute = Math.round(((scope.hour.to / 60) % 1) * 60);
-            if (minute < 10)
-                minute = '0' + minute;
-            content += 'Край: ' + hour + ":" + minute;
+            content += 'Край: ' + timeConverter.convertToHours(scope.hour.to);
             elm.qtip({
                 content: {
                     text: content
@@ -184,10 +273,10 @@ app.directive('vmQtip', function () {
                 position: {
                     my: 'bottom left',
                     at: 'top right',
-               //     target: 'mouse',
+                    //     target: 'mouse',
                     viewport: $(window)
                 }
             });
         }
     };
-});
+}]);

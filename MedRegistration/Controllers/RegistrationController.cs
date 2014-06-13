@@ -66,5 +66,16 @@ namespace MedRegistration.Controllers
         {
             return PartialView();
         }
+
+        [HttpPost]
+        public ActionResult RegisterExistingPatient(Reservation reservation)
+        {
+//            using (var context = new DataContext())
+//            {
+//                context.Reservations.Add(reservation);
+//                context.SaveChanges();
+//            }
+            return JsonNet(new {result = 1});
+        }
     }
 }

@@ -37,7 +37,7 @@ app.service('checkSchedule', ['$http', function ($http) {
     }
 }]);
 
-app.controller('scheduleController', ['$scope', '$http', 'checkSchedule', function ($scope, $http, checkSchedule) {
+app.controller('scheduleController', ['$scope', '$http', 'checkSchedule', 'timeConverter', function ($scope, $http, checkSchedule, timeConverter) {
     $scope.months = [];
     $scope.workIntervals = [];
     $scope.note = '';
@@ -124,12 +124,19 @@ app.controller('scheduleController', ['$scope', '$http', 'checkSchedule', functi
         }), function (x) {
             return x.date;
         });
+        var intervals = _.map($scope.workIntervals, function(w) {
+            return {
+                fromTime: timeConverter.convertToHours(w.interval[0]),
+                toTime: timeConverter.convertToHours(w.interval[1]),
+                nzok: w.nzok
+            };
+        });
         $http({
             method: 'POST',
             url: '/schedule/sethours',
             data: {
                 days: selectedDays,
-                intervals: $scope.workIntervals,
+                intervals: intervals,
                 note: $scope.note,
                 doctorId: __self.doctor
             }
@@ -140,12 +147,12 @@ app.controller('scheduleController', ['$scope', '$http', 'checkSchedule', functi
     }
 
     $scope.addWorkHours = function () {
-        var from = 8, to = 18;
+        var from = 8 * 60, to = 17 * 60;
         if ($scope.workIntervals.length > 0) {
             var lastInterval = $scope.workIntervals[$scope.workIntervals.length - 1].interval;
-            if (lastInterval[1] < 23) {
-                from = lastInterval[1] + 0.5;
-                to = lastInterval[1] + 1;
+            if (lastInterval[1] < 23 * 60) {
+                from = lastInterval[1] + 30;
+                to = lastInterval[1] + 60;
             }
         }
 
@@ -157,30 +164,25 @@ app.controller('scheduleController', ['$scope', '$http', 'checkSchedule', functi
     }
 
     $scope.fromHour = function (interval_index) {
-        var part = ($scope.workIntervals[interval_index].interval[0] % 1) * 60;
-        if (part < 10)
-            part = '0' + part;
-        return Math.floor($scope.workIntervals[interval_index].interval[0]) + ":" + part;
+        return timeConverter.convertToHours($scope.workIntervals[interval_index].interval[0]);
     }
 
     $scope.toHour = function (interval_index) {
-        var part = ($scope.workIntervals[interval_index].interval[1] % 1) * 60;
-        if (part < 10)
-            part = '0' + part;
-        return Math.floor($scope.workIntervals[interval_index].interval[1]) + ":" + part;
+        return timeConverter.convertToHours($scope.workIntervals[interval_index].interval[1]);
     }
 
-    __self.hasOverlappingInterval = function (interval_index) {
+    __self.hasOverlappingInterval = function(interval_index) {
         for (var i = 0; i < $scope.workIntervals.length; i++) {
             if (interval_index == i)
                 continue;
             var interval1 = $scope.workIntervals[interval_index].interval;
             var interval2 = $scope.workIntervals[i].interval;
-            if (interval2[0] < interval1[1] && interval2[1] > interval1[0]) {  //i2.from < i1.to and i2.to > i1.from
+            if (interval2[0] < interval1[1] && interval2[1] > interval1[0]) { //i2.from < i1.to and i2.to > i1.from
                 return true;
             }
         }
-    }
+        return false;
+    };
 
     $scope.is_overlapps = function (interval_index) {
         return __self.hasOverlappingInterval(interval_index);

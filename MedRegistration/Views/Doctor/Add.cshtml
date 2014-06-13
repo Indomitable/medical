@@ -4,26 +4,70 @@
         <div class="alert alert-danger" ng-show="model.errors.length > 0">
             <div ng-repeat="error in model.errors" ng-bind="error"></div>
         </div>
-        <div class="form-group">
-            <label for="inputTitle" class="control-label">Титла</label>
-            <select class="form-control" ng-model="model.title" ng-options="t.description for t in data.titles track by t.id"></select>
-        </div>
-        <div class="form-group">
-            <label for="inputName" class="control-label">Име</label>
-            <input type="text" class="form-control" id="inputName" ng-model="model.firstName" placeholder="Име" required>
-        </div>
-        <div class="form-group">
-            <label for="inputFamily" class="control-label">Фамилия</label>
-            <input type="text" class="form-control" id="inputFamily" ng-model="model.lastName" placeholder="Фамилия" required>
-        </div>
-        <div class="form-group">
-            <label for="inputDefaultExampTime" class="control-label">Време за преглед (мин.)</label>
-            <input type="number" class="form-control" id="inputDefaultExampTime" ng-model="model.defaultExamTime" placeholder="Време за преглед">
+        <div class="panel-group" id="accordion">
+            <!-- Main -->
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne">
+                            Доктор
+                        </a>
+                    </h4>
+                </div>
+                <div id="collapseOne" class="panel-collapse collapse in">
+                    <div class="panel-body">
+                        <div class="form-group">
+                            <label for="inputTitle" class="control-label">Титла</label>
+                            <select class="form-control" ng-model="model.title" ng-options="t.description for t in data.titles track by t.id"></select>
+                        </div>
+                        <div class="form-group">
+                            <label for="inputName" class="control-label">Име</label>
+                            <input type="text" class="form-control" id="inputName" ng-model="model.firstName" placeholder="Име" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="inputFamily" class="control-label">Фамилия</label>
+                            <input type="text" class="form-control" id="inputFamily" ng-model="model.lastName" placeholder="Фамилия" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="inputDefaultExampTime" class="control-label">Време за преглед (мин.)</label>
+                            <input type="number" class="form-control" id="inputDefaultExampTime" ng-model="model.defaultExamTime" placeholder="Време за преглед">
+                        </div>
+                    </div>
+                </div>
+                <!-- Specialities -->
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" data-parent="#accordion" href="#collapseTwo">
+                                Специалности
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="collapseTwo" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            <div class="row" ng-repeat="speciality in model.specialities" style="padding-bottom: 5px;">
+                                <div class="col-xs-9 col-xs-offset-1" style="padding-left: 0">
+                                    <select class="form-control" ng-model="speciality.type" ng-options="s.description for s in speciality.types track by s.id"></select>
+                                </div>
+                                <div class="col-xs-1 remove-button">
+                                    <a class="button clear-href" ng-click="removeSpeciality(speciality)">
+                                        <span class="glyphicon glyphicon-remove"></span>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="add-new-detail">
+                                <button type="button" class="btn btn-default" ng-click="addNewSpeciality()">Добави новa</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
         <div style="margin-top: 5px; overflow: hidden">
             <button type="submit" class="btn btn-default" style="float: left; width: 100px">Запис</button>
             <button type="button" class="btn btn-default" style="float: left; width: 100px; margin-left: 10px;" ng-click="cancel()">Отказ</button>
             <button type="button" class="btn btn-default" style="float: right; width: 100px" ng-click="delete()" ng-show="model.id > 0">Изтрий</button>
         </div>
+
     </form>
 </div>

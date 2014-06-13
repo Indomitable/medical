@@ -19,16 +19,34 @@ div.week {
 	transform-origin: 0 0;
 }
 
+$single-row-height: 100px;
+$multiple-row-height: 50px;
+
+@mixin border-left-right($color) {
+	border-left: 1px solid $color;
+	border-right: 1px solid $color;
+}
+
+@mixin border-top-bottom($color) {
+	border-top: 1px solid $color;
+	border-bottom: 1px solid $color;
+}
+
 table.schedule {
 	width: 100%;
+	border-collapse: separate;
 
 	th {
 		text-align: center;
+		@include border-top-bottom(#eee);
+		@include border-left-right(#eee);
 	}
 
 	td.week-day {
 		width: 1px;
 		padding: 10px 0;
+		vertical-align: middle;
+		@include border-top-bottom(#eee);
 
 		.rotated-text {
 			display: inline-block;
@@ -48,26 +66,58 @@ table.schedule {
 			}
 	}
 
-	td.doctor-name {
-		padding: 0 5px;
-		vertical-align: middle;
-	}
-
-	td.non-work {
-		background-color: #eee;
-	}
-
-	td.nzok {
-		background-color: aqua;
-	}
-
-	td.doctor-hour {
-		height: 1px;
-		position: relative;
-		padding: 0;
-
-		div {
-			height: 100%;
+	tr.doctor-row {
+		
+		td {
+			padding: 0;
+			@include border-left-right(#eee);
+			@include border-top-bottom(#eee);
+			div {
+				height: 100%;
+			}
 		}
+
+			td.non-work {
+				background-color: #f1f1f1;
+			}
+
+			td.nzok {
+				background-color: aqua;
+			}
+
+			td.doctor-name {
+				padding: 0 5px;
+				vertical-align: middle;
+			}
 	}
+
+		tr.doctor-row:hover {
+			td {
+				@include border-top-bottom(#000);
+			}
+			td.doctor-name {
+				color: #228b22;
+			}
+		}
+
+		tr.doctor-row.single-row {
+			height: $single-row-height;
+
+			td {
+				height: $single-row-height;
+			}
+		}
+
+		tr.doctor-row.multiple-row {
+			height: $multiple-row-height;
+
+			td {
+				height: $multiple-row-height;
+			}
+		}
+}
+
+div.patient-container {
+	max-height: 500px;
+	overflow: auto;
 }

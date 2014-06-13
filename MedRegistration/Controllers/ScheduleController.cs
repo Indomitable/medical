@@ -28,13 +28,6 @@ namespace MedRegistration.Controllers
             return JsonNet(calendar);
         }
 
-
-        public class WorkInterval
-        {
-            public double[] Interval { get; set; }
-            public bool NZOK { get; set; }
-        }
-
         [HttpGet]
         public ActionResult GetDate(DateTime date, int doctorId)
         {
@@ -54,6 +47,13 @@ namespace MedRegistration.Controllers
                     }).ToArray()
                 });
             }
+        }
+
+        public class WorkInterval
+        {
+            public TimeSpan FromTime { get; set; }
+            public TimeSpan ToTime { get; set; }
+            public bool NZOK { get; set; }
         }
 
         [HttpPost]
@@ -85,8 +85,8 @@ namespace MedRegistration.Controllers
                         foreach (var interval in intervals)
                         {
                             var scheduleDate = new ScheduleDate();
-                            scheduleDate.FromTime = new TimeSpan((int) Math.Floor(interval.Interval[0]), (int) Math.Floor((interval.Interval[0]%1)*60), 0);
-                            scheduleDate.ToTime = new TimeSpan((int) Math.Floor(interval.Interval[1]), (int) Math.Floor((interval.Interval[1]%1)*60), 0);
+                            scheduleDate.FromTime = interval.FromTime;
+                            scheduleDate.ToTime = interval.ToTime;
                             scheduleDate.IsNZOK = interval.NZOK;
                             schedule.ScheduleDates.Add(scheduleDate);
                         }

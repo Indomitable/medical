@@ -39,13 +39,15 @@
 }]);
 
 app.controller('doctorAddController', [
-    '$scope', '$http', '$q', '$modalInstance', 'id', function($scope, $http, $q, $modalInstance, id) {
+    '$scope', '$http', '$q', '$modalInstance', 'id', function ($scope, $http, $q, $modalInstance, id) {
         var __self = this;
         $scope.data = {
             titles: [],
-            specialities: []
+            specialities: [
+                { id: 0, description: '-- Избери Специалност --' }
+            ]
         };
-        
+
 
         $scope.model = {
             id: id,
@@ -95,6 +97,18 @@ app.controller('doctorAddController', [
                 $scope.model.firstName = doctor.firstName;
                 $scope.model.lastName = doctor.lastName;
                 $scope.model.defaultExamTime = doctor.defaultExamTime;
+
+                for (var i = 0; i < doctor.specialities.length; i++) {
+                    var specialty = doctor.specialities[i];
+                    $scope.model.specialities.push({
+                        type: $scope.data.specialities.find(function(x) { return x.id == specialty.id; }),
+                        types: _.filter($scope.data.specialities, function (s) {
+                            if (s.id === 0)
+                                return true;
+                            return !_.any($scope.model.specialities, function (ms) { return ms.type.id === s.id; });
+                        })
+                    });
+                }
             });
         };
 
@@ -121,11 +135,20 @@ app.controller('doctorAddController', [
                 lastName: $scope.model.lastName,
                 defaultExamTime: $scope.model.defaultExamTime
             };
+            var specialities = [];
+            for (var i = 0; i < $scope.model.specialities.length; i++) {
+                var speciality = $scope.model.specialities[i];
+                if (speciality.type.id > 0)
+                    specialities.push(speciality.type);
+            }
             $http(
             {
                 method: 'POST',
                 url: '/Doctor/Save',
-                data: doctor
+                data: {
+                    doctor: doctor,
+                    specialities: specialities
+                }
             }).success(function (res) {
                 __self.ok();
             }).error(function (err) {
@@ -159,5 +182,22 @@ app.controller('doctorAddController', [
                 });
             }
         }
+
+        $scope.addNewSpeciality = function () {
+            if (_.any($scope.model.specialities, function (s) { return s.type.id === 0; }))
+                return;
+            $scope.model.specialities.push({
+                type: $scope.data.specialities[0],
+                types: _.filter($scope.data.specialities, function (s) {
+                    if (s.id === 0)
+                        return true;
+                    return !_.any($scope.model.specialities, function (ms) { return ms.type.id === s.id; });
+                })
+            });
+        };
+
+        $scope.removeSpeciality = function (speciality) {
+            $scope.model.specialities.remove(speciality);
+        };
     }
 ]);

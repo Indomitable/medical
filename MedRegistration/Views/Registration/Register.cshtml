@@ -1,8 +1,130 @@
 ﻿<div class="modal-form">
-    <form role="form" method="POST" action="@Url.Action("Register")">
+    @Html.AntiForgeryToken()
+    <div class="alert alert-danger" ng-show="model.errors.length > 0">
+        <div ng-repeat="error in model.errors" ng-bind="error"></div>
+    </div>
+    <div class="alert alert-warning" ng-show="model.warning && model.warning.length > 0" ng-bind="model.warning">
+        
+    </div>
+    <div class="alert alert-warning" ng-show="!model.nzok && model.paymentType === 1">
+        В този часови диапазон доктора не преглежда по каса!
+    </div>
+    <div class="form-horizontal" role="form">
         <div class="form-group">
-            <label for="inputName" class="control-label">Пациент</label>
-            <input type="text" class="form-control" id="inputName" name="Name" placeholder="Пациент">
+            <label class="col-xs-4 control-label">Дата:</label>
+            <div class="col-xs-4">
+                <pre ng-bind="model.date | dateDisplay"></pre>
+            </div>
         </div>
-    </form>
+        <div class="form-group">
+            <label class="col-xs-2 control-label">От:</label>
+            <div class="col-xs-3">
+                <input med-time-input class="form-control" ng-model="model.fromTime" max="{{ model.toTime }}" />
+            </div>
+            <label class="col-xs-2 control-label">До:</label>
+            <div class="col-xs-3">
+                <input med-time-input class="form-control" ng-model="model.toTime" min="{{ model.fromTime }}" />
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-8">
+            <h3>Пациент</h3>
+        </div>
+        <div class="col-xs-4">
+            <button class="btn btn-default" ng-model="model.isNewPatient" data-btn-checkbox data-btn-checkbox-true="1" data-btn-checkbox-false="0" style="width: 150px">
+                <span ng-show="model.isNewPatient === 0">Нов Пациент</span>
+                <span ng-show="model.isNewPatient === 1">Избор Пациент</span>
+            </button>
+        </div>
+    </div>
+    <div ng-show="model.isNewPatient === 0">
+        <input type="text" class="form-control" ng-model="searchText" placeholder="Пациент">
+    </div>
+    <div class="patient-container" ng-show="model.isNewPatient === 0">
+        <table class="table table-hover table-nomen">
+            <thead>
+                <tr>
+                    <th style="width: 10px"></th>
+                    <th style="width: 100px; text-align: center">Име</th>
+                    <th style="width: 100px; text-align: center">Фамилия</th>
+                    <th style="width: 100px; text-align: center">Телефон</th>
+                </tr>
+            </thead>
+            <tbody ng-cloak="">
+                <tr ng-repeat="patient in model.patients | filter:searchText" ng-click="onSelectPatient(patient)" class="clickable">
+                    <td class="controls">
+                        <input type="radio" ng-value="patient.id" name="patient" ng-model="model.selectedPatient" />
+                    </td>
+                    <td ng-bind="patient.firstName">/td>
+                    <td ng-bind="patient.lastName"></td>
+                    <td ng-bind="patient.phoneNumber"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div ng-show="model.isNewPatient === 1">
+        <form novalidate>
+            <div class="form-horizontal" role="form">
+                <div class="form-group">
+                    <label for="patientFirstName" class="col-xs-3 control-label">Име:</label>
+                    <div class="col-xs-7">
+                        <input id="patientFirstName" class="form-control" ng-model="model.newPatient.firstName" placeholder="Име" required />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="patientLastName" class="col-xs-3 control-label">Фамилия:</label>
+                    <div class="col-xs-7">
+                        <input id="patientLastName" class="form-control" ng-model="model.newPatient.lastName" placeholder="Фамилия" required />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="patientPhone" class="col-xs-3 control-label">Телефон:</label>
+                    <div class="col-xs-7">
+                        <input id="patientPhone" class="form-control" ng-model="model.newPatient.phoneNumber" placeholder="Телефон" required />
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="form-group">
+        <div class="row">
+            <div class="col-xs-4 col-xs-offset-1">
+                <h4>
+                    Избор на плащане
+                </h4>
+            </div>
+            <div class="col-xs-6">
+                <div class="btn-group">
+                    <label class="btn btn-default" ng-model="model.paymentType" btn-radio="1">Каса</label>
+                    <label class="btn btn-default" ng-model="model.paymentType" btn-radio="2">Платено</label>
+                    <label class="btn btn-default" ng-model="model.paymentType" btn-radio="3">Фонд</label>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-horizontal" role="form" ng-show="model.paymentType === 3">
+        <div class="form-group">
+            <label for="fundCardNumber" class="col-xs-3 control-label">Име:</label>
+            <div class="col-xs-7">
+                <select class="form-control" ng-model="model.fund" ng-options="f.name for f in data.funds track by f.id"></select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="fundCardNumber" class="col-xs-3 control-label">Карта Номер:</label>
+            <div class="col-xs-7">
+                <input id="fundCardNumber" class="form-control" ng-model="model.fundCardNumber" placeholder="Карта Номер" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="fundCardExpire" class="col-xs-3 control-label">Валидна До:</label>
+            <div class="col-xs-7">
+                <input class="form-control" med-date-input ng-model="model.fundCardExpiration" />
+            </div>
+        </div>
+    </div>
+    <div style="margin-top: 10px; overflow: hidden">
+        <button type="button" class="btn btn-default" style="float: left; width: 100px;" ng-click="select()">Избери</button>
+        <button type="button" class="btn btn-default" style="float: right; width: 100px;" ng-click="cancel()">Отказ</button>
+    </div>
 </div>

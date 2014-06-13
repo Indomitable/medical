@@ -52,3 +52,17 @@ input.ng-invalid, input.ng-invalid.form-control:focus {
 	border-color: #ea887f;
 	box-shadow: none;
 }
+
+
+.clickable {
+	cursor: pointer;
+}
+
+.clear {
+	clear: both;
+}
+
+
+.ui-slider-range {
+	cursor: ew-resize;
+}

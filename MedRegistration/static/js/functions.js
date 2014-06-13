@@ -21,6 +21,13 @@ Array.prototype.remove = function(obj) {
     this.splice(indx, 1);
 };
 
+Array.prototype.removeAll = function(arr) {
+    for (var i = 0; i < arr.length; i++) {
+        var obj = arr[i];
+        this.remove(obj);
+    }
+};
+
 Array.prototype.find = function(predicate, deflt) {
     for (var i = 0; i < this.length; i++) {
         if (predicate(this[i]))
