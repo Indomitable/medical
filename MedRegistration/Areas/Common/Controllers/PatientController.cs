@@ -89,6 +89,7 @@ namespace MedRegistration.Areas.Common.Controllers
                         dbPatient.Address = patient.Address;
                         dbPatient.Town = patient.Town;
                         dbPatient.PostCode = patient.PostCode;
+                        dbPatient.Note = patient.Note;
                         context.PatientPhones.RemoveRange(dbPatient.PatientPhones);
                         foreach (var phone in patient.PatientPhones)
                         {

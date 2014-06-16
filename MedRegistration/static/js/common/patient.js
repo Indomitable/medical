@@ -74,6 +74,7 @@ app.controller("patientAddController", ['$scope', '$http', '$q', '$modalInstance
             model.address = patient.address;
             model.town = patient.town;
             model.postCode = patient.postCode;
+            model.note = patient.note;
 
             model.phones.pushAll(patient.patientPhones, function (phone) {
                 return {
@@ -121,6 +122,7 @@ app.controller("patientAddController", ['$scope', '$http', '$q', '$modalInstance
         town: '',
         postCode: '',
         address: '',
+        note: '',
         fund: $scope.data.funds[0],
         fundCardNumber: '',
         fundCardExpiration: '',
@@ -221,6 +223,7 @@ app.controller("patientAddFormController", [
                 town: $scope.model.town,
                 postCode: $scope.model.postCode,
                 address: $scope.model.address,
+                note: $scope.model.note,
                 genderId: $scope.model.gender.id,
                 patientPhones: $scope.model.phones,
             };
