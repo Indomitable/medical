@@ -122,7 +122,7 @@ app.controller('registrationController', ['$scope', '$http', 'customFormatter', 
             var addRegistrationInstance = $modal.open({
                 templateUrl: '/Registration/Register',
                 controller: 'registrationAddController',
-                size: 'lg',
+                //size: 'lg',
                 resolve: {
                     info: function() {
                         return {
@@ -150,6 +150,7 @@ app.controller('registrationAddController', ['$scope', '$http', '$modalInstance'
     $scope.model = {
         errors: [],
         date: info.day.date,
+        doctor: info.doctor,
         fromTime: timeConverter.convertToHours(info.hour.from),
         toTime: timeConverter.convertToHours(info.hour.to),
         nzok: info.hour.isnzok,

@@ -121,6 +121,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="Areas\Common\CommonAreaRegistration.cs" />
+    <Compile Include="Areas\Registration\RegistrationAreaRegistration.cs" />
     <Compile Include="Business\Calendar.cs" />
     <Compile Include="Controllers\BaseController.cs" />
     <Compile Include="Controllers\DoctorController.cs" />
@@ -256,6 +258,8 @@
     <Content Include="static\css\doctor.min.css.map">
       <DependentUpon>doctor.min.css</DependentUpon>
     </Content>
+    <Content Include="Areas\Registration\Views\web.config" />
+    <Content Include="Areas\Common\Views\web.config" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -264,6 +268,12 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Areas\Common\Controllers\" />
+    <Folder Include="Areas\Common\Models\" />
+    <Folder Include="Areas\Common\Views\Shared\" />
+    <Folder Include="Areas\Registration\Controllers\" />
+    <Folder Include="Areas\Registration\Models\" />
+    <Folder Include="Areas\Registration\Views\Shared\" />
     <Folder Include="Models\" />
   </ItemGroup>
   <ItemGroup>

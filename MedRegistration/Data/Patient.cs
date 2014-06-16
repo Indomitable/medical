@@ -31,6 +31,7 @@ namespace MedRegistration.Data
         public string Town { get; set; }
         public string PostCode { get; set; }
         public string Address { get; set; }
+        public string Note { get; set; }
     
         public virtual Gender Gender { get; set; }
         public virtual IdentificationNumberType IdentificationNumberType { get; set; }

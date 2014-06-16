@@ -4,26 +4,27 @@
         <div ng-repeat="error in model.errors" ng-bind="error"></div>
     </div>
     <div class="alert alert-warning" ng-show="model.warning && model.warning.length > 0" ng-bind="model.warning">
-        
+
     </div>
     <div class="alert alert-warning" ng-show="!model.nzok && model.paymentType === 1">
         В този часови диапазон доктора не преглежда по каса!
     </div>
     <div class="form-horizontal" role="form">
         <div class="form-group">
-            <label class="col-xs-4 control-label">Дата:</label>
-            <div class="col-xs-4">
-                <pre ng-bind="model.date | dateDisplay"></pre>
-            </div>
+            <h4 class="form-control-static text-center" ng-bind="model.doctor.title + ' ' + model.doctor.firstName + ' ' + model.doctor.lastName"></h4>
         </div>
         <div class="form-group">
-            <label class="col-xs-2 control-label">От:</label>
-            <div class="col-xs-3">
-                <input med-time-input class="form-control" ng-model="model.fromTime" max="{{ model.toTime }}" />
+            <label class="col-xs-2 control-label">Дата:</label>
+            <div class="col-xs-2">
+                <p class="form-control-static" ng-bind="model.date | dateDisplay"></p>
             </div>
-            <label class="col-xs-2 control-label">До:</label>
-            <div class="col-xs-3">
-                <input med-time-input class="form-control" ng-model="model.toTime" min="{{ model.fromTime }}" />
+            <label class="col-xs-1 control-label">От:</label>
+            <div class="col-xs-1">
+                <p class="form-control-static" ng-bind="model.fromTime"></p>
+            </div>
+            <label class="col-xs-1 control-label">До:</label>
+            <div class="col-xs-1">
+                <p class="form-control-static" ng-bind="model.toTime"></p>
             </div>
         </div>
     </div>
@@ -52,7 +53,7 @@
                 </tr>
             </thead>
             <tbody ng-cloak="">
-                <tr ng-repeat="patient in model.patients | filter:searchText" ng-click="onSelectPatient(patient)" class="clickable">
+                <tr ng-repeat="patient in model.patients | filter:searchText | limitTo:20" ng-click="onSelectPatient(patient)" class="clickable">
                     <td class="controls">
                         <input type="radio" ng-value="patient.id" name="patient" ng-model="model.selectedPatient" />
                     </td>

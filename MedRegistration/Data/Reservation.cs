@@ -22,6 +22,7 @@ namespace MedRegistration.Data
         public System.TimeSpan ToTime { get; set; }
         public int PaymentTypeId { get; set; }
         public Nullable<int> PaymentInfoId { get; set; }
+        public string Note { get; set; }
     
         public virtual Doctor Doctor { get; set; }
         public virtual Patient Patient { get; set; }

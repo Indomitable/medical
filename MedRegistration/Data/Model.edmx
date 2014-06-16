@@ -59,6 +59,7 @@
           <Property Name="Town" Type="nvarchar" MaxLength="100" />
           <Property Name="PostCode" Type="nvarchar" MaxLength="50" />
           <Property Name="Address" Type="nvarchar" MaxLength="300" />
+          <Property Name="Note" Type="nvarchar(max)" />
         </EntityType>
         <EntityType Name="PatientFundInfo">
           <Key>
@@ -114,6 +115,7 @@
           <Property Name="ToTime" Type="time" Precision="7" Nullable="false" />
           <Property Name="PaymentTypeId" Type="int" Nullable="false" />
           <Property Name="PaymentInfoId" Type="int" />
+          <Property Name="Note" Type="nvarchar(max)" />
         </EntityType>
         <EntityType Name="Schedule">
           <Key>
@@ -573,6 +575,7 @@
           <NavigationProperty Name="PatientFundInfo" Relationship="MedicalModel.FundInfo_Patient_FK" FromRole="Patient" ToRole="PatientFundInfo" />
           <NavigationProperty Name="PatientPhones" Relationship="MedicalModel.PatientPhone_Patient_FK" FromRole="Patient" ToRole="PatientPhone" />
           <NavigationProperty Name="Reservations" Relationship="MedicalModel.Reservation_Patient_FK" FromRole="Patient" ToRole="Reservation" />
+          <Property Name="Note" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
         </EntityType>
         <EntityType Name="PatientFundInfo">
           <Key>
@@ -640,6 +643,7 @@
           <NavigationProperty Name="Patient" Relationship="MedicalModel.Reservation_Patient_FK" FromRole="Reservation" ToRole="Patient" />
           <NavigationProperty Name="PaymentInfo" Relationship="MedicalModel.Reservation_PaymentInfo_FK" FromRole="Reservation" ToRole="PaymentInfo" />
           <NavigationProperty Name="PaymentType" Relationship="MedicalModel.Reservation_PaymentType_FK" FromRole="Reservation" ToRole="PaymentType" />
+          <Property Name="Note" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
         </EntityType>
         <EntityType Name="Schedule">
           <Key>
@@ -902,6 +906,7 @@
           <EntitySetMapping Name="Patients">
             <EntityTypeMapping TypeName="MedicalModel.Patient">
               <MappingFragment StoreEntitySet="Patient">
+                <ScalarProperty Name="Note" ColumnName="Note" />
                 <ScalarProperty Name="Address" ColumnName="Address" />
                 <ScalarProperty Name="PostCode" ColumnName="PostCode" />
                 <ScalarProperty Name="Town" ColumnName="Town" />
@@ -966,6 +971,7 @@
           <EntitySetMapping Name="Reservations">
             <EntityTypeMapping TypeName="MedicalModel.Reservation">
               <MappingFragment StoreEntitySet="Reservation">
+                <ScalarProperty Name="Note" ColumnName="Note" />
                 <ScalarProperty Name="PaymentInfoId" ColumnName="PaymentInfoId" />
                 <ScalarProperty Name="PaymentTypeId" ColumnName="PaymentTypeId" />
                 <ScalarProperty Name="ToTime" ColumnName="ToTime" />
