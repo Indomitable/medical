@@ -42,8 +42,8 @@ namespace MedRegistration.Areas.Common.Controllers
                     schedule.Note,
                     Hours = schedule.ScheduleDates.Select(x => new
                     {
-                        From = x.FromTime.TotalMinutes / 60,
-                        To = x.ToTime.TotalMinutes / 60,
+                        From = Convert.ToInt32(x.FromTime.TotalMinutes),
+                        To = Convert.ToInt32(x.ToTime.TotalMinutes),
                         NZOK = x.IsNZOK
                     }).ToArray()
                 });
