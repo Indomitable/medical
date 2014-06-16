@@ -3,7 +3,7 @@
     $scope.patients = [];
     __self.openPatient = function (id) {
         var patientInstance = $modal.open({
-            templateUrl: '/Patient/Add',
+            templateUrl: '/Common/Patient/Add',
             controller: 'patientAddController',
             resolve: {
                 id: function () {
@@ -19,7 +19,7 @@
     __self.loadPatients = function () {
         $http({
             method: 'GET',
-            url: '/Patient/GetPatients'
+            url: '/Common/Patient/GetPatients'
         }).success(function (patients) {
             $scope.patients = patients;
         });
@@ -49,7 +49,7 @@ app.controller("patientAddController", ['$scope', '$http', '$q', '$modalInstance
     __self.loadFunds = function () {
         return $http({
             method: 'GET',
-            url: '/Patient/GetFunds'
+            url: '/Common/Patient/GetFunds'
         }).success(function (funds) {
             $scope.data.funds.pushAll(funds);
         });
@@ -58,7 +58,7 @@ app.controller("patientAddController", ['$scope', '$http', '$q', '$modalInstance
     __self.loadPatient = function () {
         $http({
             method: 'GET',
-            url: '/Patient/GetPatient',
+            url: '/Common/Patient/GetPatient',
             params: {
                 id: id
             }
@@ -240,7 +240,7 @@ app.controller("patientAddFormController", [
             $http(
             {
                 method: 'POST',
-                url: '/Patient/Save',
+                url: '/Common/Patient/Save',
                 data: patient
             }).success(function (res) {
                 $scope.ok();
@@ -255,7 +255,7 @@ app.controller("patientAddFormController", [
                 $http(
                 {
                     method: 'POST',
-                    url: '/Patient/Delete',
+                    url: '/Common/Patient/Delete',
                     data: {
                         id: $scope.model.id
                     }

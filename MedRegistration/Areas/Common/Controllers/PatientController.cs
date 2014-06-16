@@ -1,12 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Data.Entity;
+using System.Linq;
 using System.Web.Mvc;
+using MedRegistration.Controllers;
 using MedRegistration.Data;
 using MedRegistration.Infrastructure;
 
-namespace MedRegistration.Controllers
+namespace MedRegistration.Areas.Common.Controllers
 {
     public class PatientController : BaseController
     {

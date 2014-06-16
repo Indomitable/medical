@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Data.Entity;
+using System.Linq;
 using System.Web.Mvc;
 using MedRegistration.Business;
+using MedRegistration.Controllers;
 using MedRegistration.Data;
 
-namespace MedRegistration.Controllers
+namespace MedRegistration.Areas.Common.Controllers
 {
     public class ScheduleController : BaseController
     {

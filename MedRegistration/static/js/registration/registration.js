@@ -62,7 +62,7 @@
     __self.getSchedule = function () {
         $http({
             method: 'GET',
-            url: '/Registration/GetDoctorsSchedule',
+            url: '/Registration/Registration/GetDoctorsSchedule',
             params: {
                 fromDate: customFormatter.dateToString(__self.from),
                 toDate: customFormatter.dateToString(__self.to)
@@ -120,7 +120,7 @@ app.controller('registrationController', ['$scope', '$http', 'customFormatter', 
 
         $scope.registerHour = function (doctor, day, hour) {
             var addRegistrationInstance = $modal.open({
-                templateUrl: '/Registration/Register',
+                templateUrl: '/Registration/Registration/Register',
                 controller: 'registrationAddController',
                 //size: 'lg',
                 resolve: {
@@ -170,7 +170,7 @@ app.controller('registrationAddController', ['$scope', '$http', '$modalInstance'
     __self.loadPatients = function () {
         $http({
             method: 'GET',
-            url: '/Patient/GetPatients'
+            url: '/Common/Patient/GetPatients'
         }).success(function (patients) {
             $scope.model.patients = patients;
         });
@@ -179,7 +179,7 @@ app.controller('registrationAddController', ['$scope', '$http', '$modalInstance'
     __self.loadFunds = function () {
         $http({
             method: 'GET',
-            url: '/Registration/GetFunds'
+            url: '/Registration/Registration/GetFunds'
         }).success(function (funds) {
             $scope.data.funds.pushAll(funds);
         });
@@ -226,7 +226,7 @@ app.controller('registrationAddController', ['$scope', '$http', '$modalInstance'
             $http(
             {
                 method: 'POST',
-                url: '/Registration/RegisterExistingPatient',
+                url: '/Registration/Registration/RegisterExistingPatient',
                 data: reservation
             }).success(function (res) {
                 __self.closeModal();

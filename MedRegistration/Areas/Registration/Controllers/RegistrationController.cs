@@ -1,10 +1,11 @@
 ﻿using System;
-using System.Linq;
 using System.Data.Entity;
+using System.Linq;
 using System.Web.Mvc;
+using MedRegistration.Controllers;
 using MedRegistration.Data;
 
-namespace MedRegistration.Controllers
+namespace MedRegistration.Areas.Registration.Controllers
 {
     public class RegistrationController : BaseController
     {

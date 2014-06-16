@@ -29,7 +29,7 @@ app.service('checkSchedule', ['$http', function ($http) {
     __self.check = function () {
         $http({
             method: 'GET',
-            url: '/shedule/calendar/version'
+            url: '/Common/Shedule/Calendar/Version'
         }).success(function (version) {
             if (__self.currentVersion != version && __self.onDiff)
                 __self.onDiff();
@@ -52,7 +52,7 @@ app.controller('scheduleController', ['$scope', '$http', 'checkSchedule', 'timeC
     __self.getSchedule = function () {
         $http({
             method: 'GET',
-            url: '/schedule/calendar',
+            url: '/Common/Schedule/Calendar',
             params: {
                 months: 3,
                 doctorId: __self.doctor
@@ -133,7 +133,7 @@ app.controller('scheduleController', ['$scope', '$http', 'checkSchedule', 'timeC
         });
         $http({
             method: 'POST',
-            url: '/schedule/sethours',
+            url: '/Common/Schedule/SetHours',
             data: {
                 days: selectedDays,
                 intervals: intervals,
@@ -191,7 +191,7 @@ app.controller('scheduleController', ['$scope', '$http', 'checkSchedule', 'timeC
     __self.load_day_schedules = function (date) {
         $http({
             method: 'GET',
-            url: '/schedule/getdate',
+            url: '/Common/Schedule/GetDate',
             params: {
                 date: date,
                 doctorId: __self.doctor

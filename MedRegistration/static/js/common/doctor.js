@@ -5,7 +5,7 @@
     __self.loadDoctors = function () {
         $http({
             method: 'GET',
-            url: '/Doctor/GetDoctors'
+            url: '/Common/Doctor/GetDoctors'
         }).success(function (doctors) {
             $scope.doctors = doctors;
         });
@@ -16,7 +16,7 @@
 
     __self.openDoctor = function (id) {
         var addDoctorInstance = $modal.open({
-            templateUrl: '/Doctor/Add',
+            templateUrl: '/Common/Doctor/Add',
             controller: 'doctorAddController',
             resolve: {
                 id: function () {
@@ -62,7 +62,7 @@ app.controller('doctorAddController', [
         __self.loadTitles = function () {
             return $http({
                 method: 'GET',
-                url: '/Doctor/GetTitles'
+                url: '/Common/Doctor/GetTitles'
             }).success(function (titles) {
                 $scope.data.titles.pushAll(titles);
                 $scope.model.title = titles[0];
@@ -72,7 +72,7 @@ app.controller('doctorAddController', [
         __self.loadSpecialities = function () {
             return $http({
                 method: 'GET',
-                url: '/Doctor/GetSpecialities'
+                url: '/Common/Doctor/GetSpecialities'
             }).success(function (specialities) {
                 $scope.data.specialities.pushAll(specialities);
             });
@@ -88,7 +88,7 @@ app.controller('doctorAddController', [
         __self.loadDoctor = function () {
             $http({
                 method: 'GET',
-                url: '/Doctor/GetDoctor',
+                url: '/Common/Doctor/GetDoctor',
                 params: {
                     id: id
                 }
@@ -144,7 +144,7 @@ app.controller('doctorAddController', [
             $http(
             {
                 method: 'POST',
-                url: '/Doctor/Save',
+                url: '/Common/Doctor/Save',
                 data: {
                     doctor: doctor,
                     specialities: specialities
@@ -171,7 +171,7 @@ app.controller('doctorAddController', [
                 $http(
                 {
                     method: 'POST',
-                    url: '/Doctor/Delete',
+                    url: '/Common/Doctor/Delete',
                     data: {
                         id: $scope.model.id
                     }

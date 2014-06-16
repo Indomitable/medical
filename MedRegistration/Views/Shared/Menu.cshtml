@@ -12,19 +12,19 @@
                 </a>
                 <ul>
                     <li>
-                        <a href='@Url.Action("List", "Doctor")'>
+                        <a href='@Url.Action("List", "Doctor", new { area = "Common" })'>
                             <span>Лекари</span>
                         </a>
                     </li>
                     <li>
-                        <a href='@Url.Action("List", "Patient")'>
+                        <a href='@Url.Action("List", "Patient", new { area = "Common" })'>
                             <span>Пациенти</span>
                         </a>
                     </li>
                 </ul>
             </li>
             <li>
-                <a href='@Url.Action("Index", "Registration")'>
+                <a href='@Url.Action("Index", "Registration", new { area = "Registration" })'>
                     <span>График</span>
                 </a>
             </li>

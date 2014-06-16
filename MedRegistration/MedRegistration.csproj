@@ -111,11 +111,11 @@
       <DependentUpon>schedule.scss</DependentUpon>
     </Content>
     <Content Include="static\js\app.js" />
-    <Content Include="static\js\doctor.js" />
+    <Content Include="static\js\common\doctor.js" />
     <Content Include="static\js\functions.js" />
-    <Content Include="static\js\patient.js" />
-    <Content Include="static\js\registration.js" />
-    <Content Include="static\js\schedule.js" />
+    <Content Include="static\js\common\patient.js" />
+    <Content Include="static\js\registration\registration.js" />
+    <Content Include="static\js\common\schedule.js" />
     <Content Include="static\js\slider.js" />
     <Content Include="Web.config" />
   </ItemGroup>
@@ -125,11 +125,11 @@
     <Compile Include="Areas\Registration\RegistrationAreaRegistration.cs" />
     <Compile Include="Business\Calendar.cs" />
     <Compile Include="Controllers\BaseController.cs" />
-    <Compile Include="Controllers\DoctorController.cs" />
+    <Compile Include="Areas\Common\Controllers\DoctorController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
-    <Compile Include="Controllers\PatientController.cs" />
-    <Compile Include="Controllers\RegistrationController.cs" />
-    <Compile Include="Controllers\ScheduleController.cs" />
+    <Compile Include="Areas\Common\Controllers\PatientController.cs" />
+    <Compile Include="Areas\Registration\Controllers\RegistrationController.cs" />
+    <Compile Include="Areas\Common\Controllers\ScheduleController.cs" />
     <Compile Include="Data\DataContext.cs" />
     <Compile Include="Data\Doctor.cs">
       <DependentUpon>Model.tt</DependentUpon>
@@ -213,8 +213,8 @@
     <Content Include="static\css\schedule.scss" />
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\_ViewStart.cshtml" />
-    <Content Include="Views\Doctor\List.cshtml" />
-    <Content Include="Views\Doctor\Add.cshtml" />
+    <Content Include="Areas\Common\Views\Doctor\List.cshtml" />
+    <Content Include="Areas\Common\Views\Doctor\Add.cshtml" />
     <EntityDeploy Include="Data\Model.edmx">
       <Generator>EntityModelCodeGenerator</Generator>
       <LastGenOutput>Model.Designer.cs</LastGenOutput>
@@ -232,19 +232,19 @@
       <DependentUpon>Model.edmx</DependentUpon>
       <LastGenOutput>Model.cs</LastGenOutput>
     </Content>
-    <Content Include="Views\Schedule\Index.cshtml" />
+    <Content Include="Areas\Common\Views\Schedule\Index.cshtml" />
     <Content Include="static\css\schedule.min.css.map">
       <DependentUpon>schedule.min.css</DependentUpon>
     </Content>
-    <Content Include="Views\Registration\Index.cshtml" />
+    <Content Include="Areas\Registration\Views\Registration\Index.cshtml" />
     <Content Include="Views\Shared\Menu.cshtml" />
     <Content Include="static\css\registration.scss" />
     <Content Include="static\css\registration.min.css.map">
       <DependentUpon>registration.min.css</DependentUpon>
     </Content>
-    <Content Include="Views\Registration\Register.cshtml" />
-    <Content Include="Views\Patient\List.cshtml" />
-    <Content Include="Views\Patient\Add.cshtml" />
+    <Content Include="Areas\Registration\Views\Registration\Register.cshtml" />
+    <Content Include="Areas\Common\Views\Patient\List.cshtml" />
+    <Content Include="Areas\Common\Views\Patient\Add.cshtml" />
     <Content Include="static\css\patient.scss" />
     <Content Include="static\css\patient.min.css.map">
       <DependentUpon>patient.min.css</DependentUpon>
@@ -260,6 +260,8 @@
     </Content>
     <Content Include="Areas\Registration\Views\web.config" />
     <Content Include="Areas\Common\Views\web.config" />
+    <Content Include="Areas\Common\Views\_ViewStart.cshtml" />
+    <Content Include="Areas\Registration\Views\_ViewStart.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -268,10 +270,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Areas\Common\Controllers\" />
     <Folder Include="Areas\Common\Models\" />
+    <Folder Include="Areas\Common\Views\Default\" />
     <Folder Include="Areas\Common\Views\Shared\" />
-    <Folder Include="Areas\Registration\Controllers\" />
     <Folder Include="Areas\Registration\Models\" />
     <Folder Include="Areas\Registration\Views\Shared\" />
     <Folder Include="Models\" />
