@@ -8,7 +8,7 @@
 
     <div ng-controller="scheduleController" ng-init="init(@Model.Id)">
         <div class="row">
-            <div class="col-sm-8">
+            <div class="col-xs-4">
                 <div ng-repeat="month in months" class="month">
                     <table class="table table-bordered table-condensed">
                         <thead>
@@ -34,11 +34,14 @@
                     </table>
                 </div>
             </div>
-            <div class="col-sm-4" ng-show="hasSelected()">
+            <div class="col-xs-8" ng-show="hasSelected()">
+                <div class="alert alert-danger" ng-show="model.errors.length > 0">
+                    <div ng-repeat="error in model.errors" ng-bind="error"></div>
+                </div>
                 <button ng-click="addWorkHours()" class="btn btn-default">Добави интервал</button>
                 <ul class="clear-list" style="margin-top: 10px">
                     <li ng-repeat="workInterval in workIntervals track by $index" style="margin-bottom: 10px">
-                        <div ng-class="{ 'overlapping': is_overlapps($index) }">
+                        <div>
                             <div style="margin-bottom: 10px">
                                 <div style="display: inline-block;">
                                     От:<span ng-bind="fromHour($index)"></span>
@@ -49,8 +52,9 @@
                                     по каса?
                                 </label>
                             </div>
-                            <div ui-range-slider min="0" max="1440" step="15"
-                                 ng-model="workInterval.interval" style="margin-bottom: 5px"></div>
+                            <div ui-range-slider min="0" max="1439" step="5"
+                                 ng-model="workInterval.interval" style="margin-bottom: 5px"
+                                 ng-class="{ 'overlapping': is_overlapps($index) }"></div>
                             <a class="clear-href" ng-click="$parent.removeHour($index)">
                                 <span class="glyphicon glyphicon-remove"></span> Премахни
                             </a>

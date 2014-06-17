@@ -6,41 +6,13 @@
         this.nzok = false;
 }
 
-app.service('checkSchedule', ['$http', function ($http) {
-    var __self = this;
-    __self.interval = null;
-    __self.currentVersion = 0;
-    __self.onDiff = null;
-
-    __self.start = function (version, onDiff) {
-        __self.currentVersion = version;
-        __self.onDiff = onDiff;
-        __self.interval = setInterval(__self.check, 60 * 1000);
-    }
-
-    __self.stop = function () {
-        clearInterval(__self.interval);
-    }
-
-    __self.refresh_now = function () {
-        __self.check()
-    }
-
-    __self.check = function () {
-        $http({
-            method: 'GET',
-            url: '/Common/Shedule/Calendar/Version'
-        }).success(function (version) {
-            if (__self.currentVersion != version && __self.onDiff)
-                __self.onDiff();
-        });
-    }
-}]);
-
-app.controller('scheduleController', ['$scope', '$http', 'checkSchedule', 'timeConverter', function ($scope, $http, checkSchedule, timeConverter) {
+app.controller('scheduleController', ['$scope', '$http', 'timeConverter', function ($scope, $http, timeConverter) {
     $scope.months = [];
     $scope.workIntervals = [];
     $scope.note = '';
+    $scope.model = {
+        errors: []
+    };
     var __self = this;
 
     $scope.init = function (doctor) {
@@ -62,7 +34,6 @@ app.controller('scheduleController', ['$scope', '$http', 'checkSchedule', 'timeC
             for (var i = 0; i < data.months.length; i++) {
                 $scope.months.push(data.months[i]);
             }
-            //checkSchedule.start(data.schedule_version, function () { window.location.reload(true); });
         });
     }
 
@@ -113,18 +84,23 @@ app.controller('scheduleController', ['$scope', '$http', 'checkSchedule', 'timeC
     }
 
     $scope.setWorkHours = function () {
+        $scope.model.errors = [];
         for (var i = 0; i < $scope.workIntervals.length; i++) {
             if (__self.hasOverlappingInterval(i)) {
-                alert("Има припокриващи се интервали!");
-                return;
+                $scope.model.errors.push("Има припокриващи се интервали!"); 
+                break;
             }
         }
+        if ($scope.model.errors.length > 0)
+            return;
         var selectedDays = _.map(_.filter(__self.getDays(), function (x) {
             return x.selected;
         }), function (x) {
             return x.date;
         });
-        var intervals = _.map($scope.workIntervals, function(w) {
+        var intervals = _.map($scope.workIntervals, function (w) {
+            if (w.interval[1] === 1440) //Instead of 24:00 write 23:59
+                w.interval[1] = 1439;
             return {
                 fromTime: timeConverter.convertToHours(w.interval[0]),
                 toTime: timeConverter.convertToHours(w.interval[1]),
@@ -141,8 +117,7 @@ app.controller('scheduleController', ['$scope', '$http', 'checkSchedule', 'timeC
                 doctorId: __self.doctor
             }
         }).success(function(data) {
-            alert('Hours were successfuly updated');
-            //checkSchedule.refresh_now();
+            __self.getSchedule();
         });
     }
 
