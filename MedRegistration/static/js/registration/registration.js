@@ -1,14 +1,16 @@
 ﻿app.factory('week', ['$http', '$q', 'customFormatter', function ($http, $q, customFormatter) {
     var __self = this;
-    var date = new Date();
-    date.setDate(date.getDate() - (7 + date.getDay() - 1) % 7);
-    __self.from = date;
-    date = new Date();
-    date.setDate(date.getDate() + (7 - date.getDay() + 7) % 7);
-    __self.to = date;
     __self.days = [];
     __self.hours = [];
     __self.reservations = [];
+
+    __self.setWeekByDate = function (date) {
+        date.setDate(date.getDate() - (7 + date.getDay() - 1) % 7);
+        __self.from = date;
+        date = new Date();
+        date.setDate(date.getDate() + (7 - date.getDay() + 7) % 7);
+        __self.to = date;
+    };
 
     __self.buildHours = function (weekMinHour, weekMaxHour, doctor) {
         var sortedSchedules = _.sortBy(doctor.schedule, function (x) { return x.fromTime; });
@@ -142,13 +144,15 @@
         $q.all(waits).then(__self.applyReservations);
     };
 
-    __self.getData();
-
     return {
         from: __self.from,
         to: __self.to,
         days: __self.days,
         hours: __self.hours,
+
+        setDate: function(date) {
+            __self.setWeekByDate(date);
+        },
 
         reload: function () {
             __self.getData();
@@ -175,6 +179,10 @@
 app.controller('registrationController', ['$scope', '$http', 'customFormatter', 'week', '$modal',
     function ($scope, $http, customFormatter, week, $modal) {
         $scope.week = week;
+        var date = new Date();
+        $scope.currentDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+        $scope.week.setDate($scope.currentDate);
+        $scope.week.reload();
 
         $scope.registerHour = function (doctor, day, hour) {
             var addRegistrationInstance = $modal.open({
@@ -196,7 +204,6 @@ app.controller('registrationController', ['$scope', '$http', 'customFormatter', 
             });
         };
 
-
         $scope.viewPatient = function(patientId) {
             $modal.open({
                 templateUrl: '/Common/Patient/Add',
@@ -208,6 +215,21 @@ app.controller('registrationController', ['$scope', '$http', 'customFormatter', 
                 }
             });
         };
+
+        $scope.$watch("currentDate", function(newVal, oldVal) {
+            if (newVal && oldVal && newVal.valueOf() != oldVal.valueOf()) {
+                var oldDate = new Date(oldVal.getFullYear(), oldVal.getMonth(), oldVal.getDate());
+                var newDate = new Date(newVal.getFullYear(), newVal.getMonth(), newVal.getDate());
+
+                oldDate.setDate(oldDate.getDate() - (7 + oldDate.getDay() - 1) % 7);
+                newDate.setDate(newDate.getDate() - (7 + newDate.getDay() - 1) % 7);
+
+                if (oldDate.valueOf() != newDate.valueOf()) {
+                    $scope.week.setDate(newDate);
+                    $scope.week.reload();
+                }
+            }
+        });
     }
 ]);
 
