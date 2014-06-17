@@ -55,6 +55,18 @@ app.controller("patientAddController", ['$scope', '$http', '$q', '$modalInstance
         });
     };
 
+    __self.getCanBeDeleted = function() {
+        return $http({
+            method: 'GET',
+            url: '/Common/Patient/CanBeDeleted',
+            params: {
+                id: id
+            }
+        }).success(function (res) {
+            $scope.model.canBeDeleted = res;
+        });
+    };
+
     __self.loadPatient = function () {
         $http({
             method: 'GET',
@@ -134,8 +146,10 @@ app.controller("patientAddController", ['$scope', '$http', '$q', '$modalInstance
     };
 
     __self.loadData().then(function () {
-        if (id > 0)
+        if (id > 0) {
+            __self.getCanBeDeleted();
             __self.loadPatient();
+        }
     });
 
     $scope.addNewPhone = function () {
@@ -205,6 +219,11 @@ app.controller("patientAddFormController", [
             if ($scope.model.phones.length === 0 || _.all($scope.model.phones, function (p) { return !p.number || p.number.trim() === ""; })) {
                 $scope.model.errors.push("Моля въведете поне един телефонен номер!");
             }
+
+            if ($scope.model.fund.id > 0 && (!$scope.model.fundCardNumber || !$scope.model.fundCardExpiration)) {
+                $scope.model.errors.push("Моля въведете номер и/или валидност на фондовата карта!");
+            }
+
             if ($scope.model.errors.length > 0)
                 return false;
 

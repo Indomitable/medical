@@ -24,14 +24,15 @@ namespace MedRegistration.Areas.Common.Controllers
                 var patients = from p in context.Patients
                                                 .Include(x => x.PatientPhones)
                                let primaryPhone = p.PatientPhones.FirstOrDefault(pp => pp.IsPrimary)
+                               orderby p.Reservations.Count() descending 
                                select new
                                {
                                    p.Id,
-                                   p.FirstName,
-                                   p.LastName,
-                                   p.IdentNumber,
-                                   PhoneNumber = primaryPhone.Number,
-                                   p.Email
+                                   fn = p.FirstName,
+                                   ln = p.LastName,
+                                   @in = p.IdentNumber,
+                                   pn = primaryPhone.Number,
+                                   em = p.Email
                                };
                 return JsonNet(patients.ToList());
             }
@@ -51,6 +52,26 @@ namespace MedRegistration.Areas.Common.Controllers
             }
         }
 
+        [HttpGet]
+        public ActionResult CanBeDeleted(int id)
+        {
+            using (var context = new DataContext(lazyLoading: false))
+            {
+                var patient = context.Patients.Where(p => p.Id == id).Include(x => x.Reservations).Single();
+                var res = !patient.Reservations.Any();
+                return JsonNet(res);
+            }
+        }
+
+        [HttpGet]
+        public ActionResult GetPatientFundInfo(int id)
+        {
+            using (var context = new DataContext(lazyLoading: false))
+            {
+                var patient = context.Patients.Where(p => p.Id == id).Include(p => p.PatientFundInfo).Single();
+                return JsonNet(patient.PatientFundInfo);
+            }
+        }
 
         [HttpGet]
         public ActionResult Add()
@@ -98,6 +119,8 @@ namespace MedRegistration.Areas.Common.Controllers
 
                         if (patient.PatientFundInfo != null)
                         {
+                            if (dbPatient.PatientFundInfo == null)
+                                dbPatient.PatientFundInfo = new PatientFundInfo();
                             dbPatient.PatientFundInfo.FundId = patient.PatientFundInfo.FundId;
                             dbPatient.PatientFundInfo.FundCardNumber = patient.PatientFundInfo.FundCardNumber;
                             dbPatient.PatientFundInfo.FundCardExpiration = patient.PatientFundInfo.FundCardExpiration;

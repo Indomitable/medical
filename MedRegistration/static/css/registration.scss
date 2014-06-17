@@ -82,7 +82,11 @@ table.schedule {
 			}
 
 			td.nzok {
-				background-color: aqua;
+				background-color: #0ff;
+			}
+
+			td.reserved {
+				background-color: #8b0000;
 			}
 
 			td.doctor-name {
@@ -118,6 +122,6 @@ table.schedule {
 }
 
 div.patient-container {
-	max-height: 500px;
+	max-height: 400px;
 	overflow: auto;
 }

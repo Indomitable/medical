@@ -176,3 +176,5 @@ FakesAssemblies/
 #Min CSS Files
 *.min.css
 *.min.css.map
+
+MedRegistration.Tests/Data/

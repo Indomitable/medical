@@ -7,15 +7,12 @@ using Newtonsoft.Json.Serialization;
 namespace MedRegistration.Infrastructure
 {
     public class JsonNetResult<T> : JsonResult
-        where T : class
     {
         private readonly T data;
-//        private readonly bool lowerCase;
 
-        public JsonNetResult(T data/*, bool lowerCase = false*/)
+        public JsonNetResult(T data)
         {
             this.data = data;
-            //this.lowerCase = lowerCase;
             JsonRequestBehavior = JsonRequestBehavior.AllowGet;
         }
 
@@ -28,7 +25,7 @@ namespace MedRegistration.Infrastructure
             response.ContentType = "application/json";
             response.ContentEncoding = Encoding.UTF8;
 
-            if (data == null)
+            if (!typeof(T).IsValueType && data == null)
                 return;
 
             JsonSerializerSettings settings = new JsonSerializerSettings { Formatting = Formatting.None };

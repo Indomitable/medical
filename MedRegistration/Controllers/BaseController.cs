@@ -7,7 +7,7 @@ namespace MedRegistration.Controllers
 {
     public class BaseController : Controller
     {
-        public JsonResult JsonNet<T>(T data) where T : class
+        public JsonResult JsonNet<T>(T data)
         {
             return new JsonNetResult<T>(data);
         }

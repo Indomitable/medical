@@ -20,32 +20,8 @@ app.config(['$httpProvider', function ($httpProvider) {
 
 }]);
 
-app.service('customFormatter', function () {
-    var __self = this;
+app.controller('rootController', [
+    '$scope', function($scope) {
 
-    __self.getDayParts = function (date) {
-        var year = date.getFullYear();
-        var month = date.getMonth() + 1;
-        var day = date.getDate();
-        if (month < 10)
-            month = "0" + month;
-        if (day < 10)
-            day = "0" + day;
-        return {
-            year: year,
-            month: month,
-            day: day
-        };
-    };
-
-    __self.dateToString = function (date) {
-        var parts = __self.getDayParts(date);
-        return parts.year + "-" + parts.month + "-" + parts.day;
-    };
-
-    __self.dateToUserString = function (date) {
-        var parts = __self.getDayParts(date);
-        return parts.day + "." + parts.month + "." + parts.year;
-    };
-
-});
+    }
+]);

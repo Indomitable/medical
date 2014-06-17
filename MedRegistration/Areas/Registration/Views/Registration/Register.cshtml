@@ -1,17 +1,17 @@
 ﻿<div class="modal-form">
     @Html.AntiForgeryToken()
-    <div class="alert alert-danger" ng-show="model.errors.length > 0">
+    <div class="alert alert-danger alert-small" ng-show="model.errors.length > 0">
         <div ng-repeat="error in model.errors" ng-bind="error"></div>
     </div>
-    <div class="alert alert-warning" ng-show="model.warning && model.warning.length > 0" ng-bind="model.warning">
+    <div class="alert alert-warning alert-small" ng-show="model.warning && model.warning.length > 0" ng-bind="model.warning">
 
     </div>
-    <div class="alert alert-warning" ng-show="!model.nzok && model.paymentType === 1">
+    <div class="alert alert-warning alert-small" ng-show="!model.nzok && model.paymentType === 1">
         В този часови диапазон доктора не преглежда по каса!
     </div>
     <div class="form-horizontal" role="form">
         <div class="form-group">
-            <h4 class="form-control-static text-center" ng-bind="model.doctor.title + ' ' + model.doctor.firstName + ' ' + model.doctor.lastName"></h4>
+            <span class="form-control-static text-left col-xs-offset-1 bold-text" ng-bind="model.doctor.title + ' ' + model.doctor.firstName + ' ' + model.doctor.lastName"></span>
         </div>
         <div class="form-group">
             <label class="col-xs-2 control-label">Дата:</label>
@@ -28,9 +28,9 @@
             </div>
         </div>
     </div>
-    <div class="row">
+    <div class="row form-group">
         <div class="col-xs-8">
-            <h3>Пациент</h3>
+            <span class="bold-text">Пациент</span>
         </div>
         <div class="col-xs-4">
             <button class="btn btn-default" ng-model="model.isNewPatient" data-btn-checkbox data-btn-checkbox-true="1" data-btn-checkbox-false="0" style="width: 150px">
@@ -40,29 +40,35 @@
         </div>
     </div>
     <div ng-show="model.isNewPatient === 0">
-        <input type="text" class="form-control" ng-model="searchText" placeholder="Пациент">
+        <input type="text" class="form-control" ng-model="model.searchText" placeholder="Пациент">
     </div>
     <div class="patient-container" ng-show="model.isNewPatient === 0">
-        <table class="table table-hover table-nomen">
+        <table class="table table-hover table-condensed table-nomen">
             <thead>
                 <tr>
                     <th style="width: 10px"></th>
                     <th style="width: 100px; text-align: center">Име</th>
                     <th style="width: 100px; text-align: center">Фамилия</th>
                     <th style="width: 100px; text-align: center">Телефон</th>
+                    <th style="width: 100px; text-align: center">Идент. Номер</th>
                 </tr>
             </thead>
             <tbody ng-cloak="">
-                <tr ng-repeat="patient in model.patients | filter:searchText | limitTo:20" ng-click="onSelectPatient(patient)" class="clickable">
+                <tr ng-repeat="patient in model.patients | multiSearch:model.searchText | limitTo:10" ng-click="onSelectPatient(patient)" class="clickable">
                     <td class="controls">
                         <input type="radio" ng-value="patient.id" name="patient" ng-model="model.selectedPatient" />
                     </td>
-                    <td ng-bind="patient.firstName">/td>
-                    <td ng-bind="patient.lastName"></td>
-                    <td ng-bind="patient.phoneNumber"></td>
+                    <td ng-bind="patient.fn">/td>
+                    <td ng-bind="patient.ln"></td>
+                    <td ng-bind="patient.pn"></td>
+                    <td ng-bind="patient.in"></td>
                 </tr>
             </tbody>
         </table>
+    </div>
+    <div ng-show="model.isNewPatient === 0">
+        <label for="patientNote" class="col-xs-2 control-label">Бележка:</label>
+        <textarea id="patientNote" rows="3" class="form-control" style="margin-bottom: 10px; width: 80%" ng-model="model.note"></textarea>
     </div>
     <div ng-show="model.isNewPatient === 1">
         <form novalidate>
@@ -83,6 +89,12 @@
                     <label for="patientPhone" class="col-xs-3 control-label">Телефон:</label>
                     <div class="col-xs-7">
                         <input id="patientPhone" class="form-control" ng-model="model.newPatient.phoneNumber" placeholder="Телефон" required />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="newPatientNote" class="col-xs-3 control-label">Бележка:</label>
+                    <div class="col-xs-7">
+                        <textarea id="newPatientNote" rows="3" class="form-control" ng-model="model.newPatient.note"></textarea>
                     </div>
                 </div>
             </div>

@@ -25,15 +25,15 @@
             </tr>
         </thead>
         <tbody ng-cloak="">
-            <tr ng-repeat="patient in patients | filter:searchText">
+            <tr ng-repeat="patient in patients | multiSearch:searchText | limitTo:20">
                 <td class="controls">
                     <a ng-click="edit(patient.id)"><span class="glyphicon glyphicon-pencil"></span></a>
                 </td>
-                <td ng-bind="patient.firstName">/td>
-                <td ng-bind="patient.lastName"></td>
-                <td ng-bind="patient.identNumber"></td>
-                <td ng-bind="patient.phoneNumber"></td>
-                <td ng-bind="patient.email"></td>
+                <td ng-bind="patient.fn">/td>
+                <td ng-bind="patient.ln"></td>
+                <td ng-bind="patient.in"></td>
+                <td ng-bind="patient.pn"></td>
+                <td ng-bind="patient.em"></td>
             </tr>
         </tbody>
     </table>

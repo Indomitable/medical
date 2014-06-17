@@ -64,7 +64,7 @@
             },
         };
     }])
-    .directive('uiRangeSlider', [function() {
+    .directive('uiRangeSlider', [function () {
         return {
             require: 'ngModel',
             link: function (scope, elm, attrs, ngModelCtrl) {
@@ -114,6 +114,36 @@
             };
         }
     ])
+    .filter('multiSearch', [
+        function () {
+            var searchMethod = function (item, queryText) {
+                if (!queryText)
+                    return true;
+                var subQueries = queryText.split(' ');
+                var test = 0;
+                for (var i = 0; i < subQueries.length; i++) {
+                    var subQuery = subQueries[i];
+                    for (var p in item) {
+                        if (p === "$$hashKey" || p === "id" || !item[p])
+                            continue;
+                        if (item[p].toLocaleLowerCase().indexOf(subQuery.toLocaleLowerCase()) > -1) {
+                            test++;
+                            break;
+                        }
+                    }
+                }
+                return test == subQueries.length;
+            }
+
+            return function (collection, queryString) {
+                if (collection.length == 0 || !queryString)
+                    return collection;
+                return _.filter(collection, function(x) {
+                    return searchMethod(x, queryString);
+                });
+            };
+        }
+    ])
     .service('timeConverter', [function () {
         var __self = this;
         __self.convertToHours = function (val) {
@@ -136,4 +166,33 @@
             var minutes = parseInt(parseInt[0]);
             return (hour * 60) + minutes;
         };
-    }]);
+    }])
+    .service('customFormatter', function () {
+        var __self = this;
+
+        __self.getDayParts = function (date) {
+            var year = date.getFullYear();
+            var month = date.getMonth() + 1;
+            var day = date.getDate();
+            if (month < 10)
+                month = "0" + month;
+            if (day < 10)
+                day = "0" + day;
+            return {
+                year: year,
+                month: month,
+                day: day
+            };
+        };
+
+        __self.dateToString = function (date) {
+            var parts = __self.getDayParts(date);
+            return parts.year + "-" + parts.month + "-" + parts.day;
+        };
+
+        __self.dateToUserString = function (date) {
+            var parts = __self.getDayParts(date);
+            return parts.day + "." + parts.month + "." + parts.year;
+        };
+
+    });

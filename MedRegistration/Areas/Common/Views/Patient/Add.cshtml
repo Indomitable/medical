@@ -159,7 +159,7 @@
         <div style="margin-top: 5px; overflow: hidden">
             <button class="btn btn-default" style="float: left; width: 100px">Запис</button>
             <button type="button" class="btn btn-default" style="float: left; width: 100px; margin-left: 10px;" ng-click="cancel()">Отказ</button>
-            <button type="button" class="btn btn-default" style="float: right; width: 100px" ng-click="delete()" ng-show="model.id > 0">Изтрий</button>
+            <button type="button" class="btn btn-default" style="float: right; width: 100px" ng-click="delete()" ng-show="model.id > 0 && model.canBeDeleted">Изтрий</button>
         </div>
     </form>
 </div>
