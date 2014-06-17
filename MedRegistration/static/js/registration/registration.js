@@ -16,6 +16,8 @@
 
         for (var i = 0; i < sortedSchedules.length; i++) {
             var schedule = sortedSchedules[i];
+            if (schedule.toTime === 1439)
+                schedule.toTime = 1440;
             if (i == 0) {
                 doctor.hours.push({
                     work: 0,
@@ -115,6 +117,8 @@
                     continue;
                 for (var k = 0; k < reservationsForDoctor.hours.length; k++) {
                     var reservationHour = reservationsForDoctor.hours[k];
+                    if (reservationHour.toTime === 0 && reservationHour.fromTime > 0)
+                        reservationHour.toTime = 1440;
                     var hour = doctor.hours.find(function (h) { return h.from === reservationHour.fromTime && h.to === reservationHour.toTime; });
                     if (!hour)
                         continue;
