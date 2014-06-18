@@ -53,12 +53,7 @@ namespace MedRegistration.Areas.Registration.Controllers
                             };
 
                 var data = query.ToList();
-                return JsonNet(new
-                {
-                    WeekMinHour = data.Min(d => (int?)d.DayMinHour),
-                    WeekMaxHour = data.Max(d => (int?)d.DayMaxHour),
-                    Schedule = data
-                });
+                return JsonNet(data);
             }
         }
 

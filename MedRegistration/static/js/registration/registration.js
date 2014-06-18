@@ -1,7 +1,6 @@
 ﻿app.factory('week', ['$http', '$q', 'customFormatter', function ($http, $q, customFormatter) {
     var __self = this;
     __self.days = [];
-    __self.hours = [];
     __self.reservations = [];
 
     __self.setWeekByDate = function (date) {
@@ -12,7 +11,7 @@
         __self.to = date;
     };
 
-    __self.buildHours = function (weekMinHour, weekMaxHour, doctor) {
+    __self.buildHours = function (dayMinHour, dayMaxHour, doctor) {
         var sortedSchedules = _.sortBy(doctor.schedule, function (x) { return x.fromTime; });
         doctor.hours = [];
 
@@ -23,7 +22,7 @@
             if (i == 0) {
                 doctor.hours.push({
                     work: 0,
-                    from: weekMinHour,
+                    from: dayMinHour,
                     to: schedule.fromTime
                 });
             } else {
@@ -57,7 +56,7 @@
                 doctor.hours.push({
                     work: 0,
                     from: schedule.toTime,
-                    to: weekMaxHour
+                    to: dayMaxHour
                 });
             }
         }
@@ -65,7 +64,6 @@
     };
 
     __self.getSchedule = function () {
-        __self.hours.clear();
         __self.days.clear();
         return $http({
             method: 'GET',
@@ -76,32 +74,41 @@
             }
         })
         .success(function (data) {
-            for (var k = data.weekMinHour; k < data.weekMaxHour; k += 60) {
-                __self.hours.push(k / 60);
-            }
-            for (var i = 0; i < data.schedule.length; i++) {
-                var dt = data.schedule[i].date;
-                for (var j = 0; j < data.schedule[i].doctors.length; j++) {
-                    var doctor = data.schedule[i].doctors[j];
-                    __self.buildHours(data.weekMinHour, data.weekMaxHour, doctor);
+            for (var i = 0; i < data.length; i++) {
+                var schedule = data[i];
+                var hours = [];
+                for (var k = schedule.dayMinHour; k < schedule.dayMaxHour; k += 60) {
+                    hours.push(k / 60);
+                }
+
+                for (var j = 0; j < schedule.doctors.length; j++) {
+                    var doctor = schedule.doctors[j];
+                    __self.buildHours(schedule.dayMinHour, schedule.dayMaxHour, doctor);
                 }
                 __self.days.push({
-                    date: new Date(dt),
-                    doctors: data.schedule[i].doctors
+                    date: new Date(schedule.date),
+                    hours: hours,
+                    doctors: schedule.doctors
                 });
             }
         });
     };
 
-    __self.getReservations = function () {
+    __self.getReservations = function (date) {
         __self.reservations.clear();
+        var paramsData = {};
+        if (date) {
+            paramsData.fromDate = customFormatter.dateToString(date);
+            paramsData.toDate = customFormatter.dateToString(date);
+        } else {
+            paramsData.fromDate = customFormatter.dateToString(__self.from);
+            paramsData.toDate = customFormatter.dateToString(__self.to);
+        }
+
         return $http({
             method: 'GET',
             url: '/Registration/Registration/GetReservations',
-            params: {
-                fromDate: customFormatter.dateToString(__self.from),
-                toDate: customFormatter.dateToString(__self.to)
-            }
+            params: paramsData
         }).success(function (data) {
             __self.reservations.pushAll(data);
         });
@@ -139,17 +146,19 @@
         }
     }
 
-    __self.reloadResevations = function() {
+    __self.reloadResevations = function (date) {
         for (var i = 0; i < __self.days.length; i++) {
-            for (var j = 0; j < __self.days[i].doctors.length; j++) {
-                for (var k = 0; k < __self.days[i].doctors[j].hours.length; k++) {
-                    var hour = __self.days[i].doctors[j].hours[k];
-                    hour.isReserved = false;
-                    hour.reservation = {};
+            if (!date || __self.days[i].date.valueOf() === date.valueOf()) {
+                for (var j = 0; j < __self.days[i].doctors.length; j++) {
+                    for (var k = 0; k < __self.days[i].doctors[j].hours.length; k++) {
+                        var hour = __self.days[i].doctors[j].hours[k];
+                        hour.isReserved = false;
+                        hour.reservation = {};
+                    }
                 }
             }
         }
-        __self.getReservations().then(__self.applyReservations);
+        __self.getReservations(date).then(__self.applyReservations);
     };
 
     __self.getData = function () {
@@ -163,7 +172,6 @@
         from: __self.from,
         to: __self.to,
         days: __self.days,
-        hours: __self.hours,
 
         setDate: function (date) {
             __self.setWeekByDate(date);
@@ -173,8 +181,8 @@
             __self.getData();
         },
 
-        reloadResevations: function() {
-            __self.reloadResevations();
+        reloadResevations: function (date) {
+            __self.reloadResevations(date);
         },
 
         name: function () {
@@ -198,12 +206,12 @@
 app.controller('registrationController', ['$scope', '$http', 'customFormatter', 'week', '$modal',
     function ($scope, $http, customFormatter, week, $modal) {
         $scope.week = week;
-        var date = new Date();
-        $scope.currentDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+        var _date = new Date();
+        $scope.currentDate = new Date(_date.getFullYear(), _date.getMonth(), _date.getDate());
         $scope.week.setDate($scope.currentDate);
         $scope.week.reload();
 
-        $scope.registerHour = function (doctor, day, hour) {
+        $scope.registerHour = function (doctor, date, hour) {
             var addRegistrationInstance = $modal.open({
                 templateUrl: '/Registration/Registration/Register',
                 controller: 'registrationAddController',
@@ -212,18 +220,18 @@ app.controller('registrationController', ['$scope', '$http', 'customFormatter', 
                     info: function () {
                         return {
                             doctor: doctor,
-                            day: day,
+                            date: date,
                             hour: hour
                         };
                     }
                 }
             });
             addRegistrationInstance.result.then(function () {
-                $scope.week.reloadResevations();
+                $scope.week.reloadResevations(date);
             });
         };
 
-        $scope.unRegisterHour = function (id) {
+        $scope.unRegisterHour = function (id, date) {
             $http({
                 method: 'POST',
                 url: '/Registration/Registration/UnRegisterHour',
@@ -232,7 +240,7 @@ app.controller('registrationController', ['$scope', '$http', 'customFormatter', 
                 }
             })
             .success(function (data) {
-                $scope.week.reloadResevations();
+                $scope.week.reloadResevations(date);
             });
         };
 
@@ -274,7 +282,7 @@ app.controller('registrationAddController', ['$scope', '$http', '$modalInstance'
     };
     $scope.model = {
         errors: [],
-        date: info.day.date,
+        date: info.date,
         doctor: info.doctor,
         fromTime: timeConverter.convertToHours(info.hour.from),
         toTime: timeConverter.convertToHours(info.hour.to),
@@ -450,7 +458,7 @@ app.filter('nonZeroHour', [function () {
 app.directive('vmQtip', ['timeConverter', 'customFormatter', function (timeConverter, customFormatter) {
     return {
         link: function (scope, elm, attrs) {
-            var setTip = function() {
+            var setTip = function () {
 
                 var content = "<div style='font-size: 12px'>";
                 content += scope.doctor.title + " " + scope.doctor.firstName + " " + scope.doctor.lastName + "<br/>";
@@ -496,13 +504,13 @@ app.directive('vmQtip', ['timeConverter', 'customFormatter', function (timeConve
                 });
             };
 
-            var removeTip = function() {
+            var removeTip = function () {
                 elm.qtip('destroy', true);
             };
 
             setTip();
 
-            scope.$watch('hour.isReserved', function() {
+            scope.$watch('hour.isReserved', function () {
                 removeTip();
                 setTip();
             });

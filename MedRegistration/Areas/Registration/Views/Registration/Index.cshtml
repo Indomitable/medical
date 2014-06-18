@@ -13,6 +13,10 @@
             <span class="glyphicon glyphicon-chevron-right"></span>
         </a>
         <input med-week-input style="width: 300px; display: inline-block; margin-left: 10px" class="form-control" ng-model="currentDate" />
+@*        <input list=""/>*@
+@*        <datalist>*@
+@*            <option ng-repeat=""></option>*@
+@*        </datalist>*@
     </div>
 
     <div ng-repeat="day in week.days" class="schedule-day">
@@ -21,7 +25,7 @@
                 <tr>
                     <th style="width: 80px">Ден</th>
                     <th style="width: 250px">Име</th>
-                    <th ng-repeat="hour in week.hours" style="width: 80px" colspan="12" ng-bind="hour"></th>
+                    <th ng-repeat="hour in day.hours" style="width: 80px" colspan="12" ng-bind="hour"></th>
                 </tr>
             </thead>
             <tbody>
@@ -42,10 +46,10 @@
                             <div class="dropdown-toggle"></div>
                             <ul class="dropdown-menu" role="menu">
                                 <li class="clickable" ng-hide="hour.isReserved">
-                                    <a ng-click="registerHour(doctor, day, hour)">Запис на час</a>
+                                    <a ng-click="registerHour(doctor, day.date, hour)">Запис на час</a>
                                 </li>
                                 <li class="clickable" ng-show="hour.isReserved">
-                                    <a ng-click="unRegisterHour(hour.reservation.id)">Отмяна на час</a>
+                                    <a ng-click="unRegisterHour(hour.reservation.id, day.date)">Отмяна на час</a>
                                 </li>
                                 <li class="clickable" ng-show="hour.isReserved">
                                     <a ng-click="viewPatient(hour.reservation.patientId)">Виж пациент</a>
