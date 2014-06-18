@@ -42,29 +42,41 @@
     <div ng-show="model.isNewPatient === 0">
         <input type="text" class="form-control" ng-model="model.searchText" placeholder="Пациент">
     </div>
-    <div class="patient-container" ng-show="model.isNewPatient === 0">
+    <div class="patient-select-container" ng-show="model.isNewPatient === 0">
         <table class="table table-hover table-condensed table-nomen">
             <thead>
                 <tr>
                     <th style="width: 10px"></th>
-                    <th style="width: 100px; text-align: center">Име</th>
-                    <th style="width: 100px; text-align: center">Фамилия</th>
-                    <th style="width: 100px; text-align: center">Телефон</th>
-                    <th style="width: 100px; text-align: center">Идент. Номер</th>
+                    <th class="patient-container-col">Име</th>
+                    <th class="patient-container-col">Фамилия</th>
+                    <th class="patient-container-col">Телефон</th>
+                    <th class="patient-container-col">Идент. Номер</th>
                 </tr>
             </thead>
-            <tbody ng-cloak="">
-                <tr ng-repeat="patient in model.patients | multiSearch:model.searchText | limitTo:10" ng-click="onSelectPatient(patient)" class="clickable">
-                    <td class="controls">
-                        <input type="radio" ng-value="patient.id" name="patient" ng-model="model.selectedPatient" />
-                    </td>
-                    <td ng-bind="patient.fn">/td>
-                    <td ng-bind="patient.ln"></td>
-                    <td ng-bind="patient.pn"></td>
-                    <td ng-bind="patient.in"></td>
-                </tr>
-            </tbody>
+            <tbody></tbody>
         </table>
+        <div class="patient-container">
+            <table class="table table-hover table-condensed table-nomen">
+                <colgroup>
+                    <col style="width: 10px">
+                    <col class="patient-container-col">
+                    <col class="patient-container-col">
+                    <col class="patient-container-col">
+                    <col class="patient-container-col">
+                </colgroup>
+                <tbody>
+                    <tr ng-repeat="patient in model.patients | multiSearch:model.searchText | limitTo:10" ng-click="onSelectPatient(patient)" class="clickable">
+                        <td class="controls">
+                            <input type="radio" ng-value="patient.id" name="patient" ng-model="model.selectedPatient" />
+                        </td>
+                        <td ng-bind="patient.fn">/td>
+                        <td ng-bind="patient.ln"></td>
+                        <td ng-bind="patient.pn"></td>
+                        <td ng-bind="patient.in"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
     <div ng-show="model.isNewPatient === 0">
         <label for="patientNote" class="col-xs-2 control-label">Бележка:</label>

@@ -94,6 +94,7 @@
     };
 
     __self.getReservations = function () {
+        __self.reservations.clear();
         return $http({
             method: 'GET',
             url: '/Registration/Registration/GetReservations',
@@ -126,6 +127,7 @@
                         continue;
                     hour.isReserved = true;
                     hour.reservation = {
+                        id: reservationHour.id,
                         patientId: reservationHour.patientId,
                         firstName: reservationHour.patientFirstName,
                         lastName: reservationHour.patientLastName,
@@ -136,6 +138,19 @@
             }
         }
     }
+
+    __self.reloadResevations = function() {
+        for (var i = 0; i < __self.days.length; i++) {
+            for (var j = 0; j < __self.days[i].doctors.length; j++) {
+                for (var k = 0; k < __self.days[i].doctors[j].hours.length; k++) {
+                    var hour = __self.days[i].doctors[j].hours[k];
+                    hour.isReserved = false;
+                    hour.reservation = {};
+                }
+            }
+        }
+        __self.getReservations().then(__self.applyReservations);
+    };
 
     __self.getData = function () {
         var waits = [];
@@ -150,12 +165,16 @@
         days: __self.days,
         hours: __self.hours,
 
-        setDate: function(date) {
+        setDate: function (date) {
             __self.setWeekByDate(date);
         },
 
         reload: function () {
             __self.getData();
+        },
+
+        reloadResevations: function() {
+            __self.reloadResevations();
         },
 
         name: function () {
@@ -200,11 +219,24 @@ app.controller('registrationController', ['$scope', '$http', 'customFormatter', 
                 }
             });
             addRegistrationInstance.result.then(function () {
-                $scope.week.reload();
+                $scope.week.reloadResevations();
             });
         };
 
-        $scope.viewPatient = function(patientId) {
+        $scope.unRegisterHour = function (id) {
+            $http({
+                method: 'POST',
+                url: '/Registration/Registration/UnRegisterHour',
+                data: {
+                    id: id
+                }
+            })
+            .success(function (data) {
+                $scope.week.reloadResevations();
+            });
+        };
+
+        $scope.viewPatient = function (patientId) {
             $modal.open({
                 templateUrl: '/Common/Patient/Add',
                 controller: 'patientAddController',
@@ -216,7 +248,7 @@ app.controller('registrationController', ['$scope', '$http', 'customFormatter', 
             });
         };
 
-        $scope.$watch("currentDate", function(newVal, oldVal) {
+        $scope.$watch("currentDate", function (newVal, oldVal) {
             if (newVal && oldVal && newVal.valueOf() != oldVal.valueOf()) {
                 var oldDate = new Date(oldVal.getFullYear(), oldVal.getMonth(), oldVal.getDate());
                 var newDate = new Date(newVal.getFullYear(), newVal.getMonth(), newVal.getDate());
@@ -294,7 +326,7 @@ app.controller('registrationAddController', ['$scope', '$http', '$modalInstance'
         }).success(function (res) {
             if (res) {
                 $scope.model.paymentType = 3;
-                $scope.model.fund = $scope.data.funds.find(function(f) {
+                $scope.model.fund = $scope.data.funds.find(function (f) {
                     return f.id === res.fundId;
                 });
                 $scope.model.fundCardNumber = res.fundCardNumber;
@@ -418,44 +450,61 @@ app.filter('nonZeroHour', [function () {
 app.directive('vmQtip', ['timeConverter', 'customFormatter', function (timeConverter, customFormatter) {
     return {
         link: function (scope, elm, attrs) {
-            var content = "<div style='font-size: 12px'>";
-            content += scope.doctor.title + " " + scope.doctor.firstName + " " + scope.doctor.lastName + "<br/>";
-            if (scope.hour.work === 0)
-                content += 'Неработи';
-            else {
-                if (scope.hour.isReserved) {
-                    content += "Запазен";
-                } else {
-                    if (scope.hour.isnzok)
-                        content += 'Работи по здравна каса.';
-                    else
-                        content += 'Работи.';
-                }
-            }
-            content += '<br/>';
-            content += 'Дата: ' + customFormatter.dateToUserString(scope.day.date) + ", Час: " + timeConverter.convertToHours(scope.hour.from) + " - " + timeConverter.convertToHours(scope.hour.to);
-            if (scope.hour.isReserved) {
-                content += '<br/>';
-                content += 'Пациент: ' + scope.hour.reservation.firstName + ' ' + scope.hour.reservation.lastName;
-                content += '<br/>';
-                content += 'Телефон: ' + scope.hour.reservation.phone;
-                if (scope.hour.reservation.note) {
-                    content += '<br/>';
-                    content += 'Забележка: ' + scope.hour.reservation.note;
-                }
-            }
+            var setTip = function() {
 
-            content += "</div>";
-            elm.qtip({
-                content: {
-                    text: content
-                },
-                position: {
-                    my: 'bottom left',
-                    at: 'top right',
-                    //     target: 'mouse',
-                    viewport: $(window)
+                var content = "<div style='font-size: 12px'>";
+                content += scope.doctor.title + " " + scope.doctor.firstName + " " + scope.doctor.lastName + "<br/>";
+                if (scope.hour.work === 0)
+                    content += 'Неработи';
+                else {
+                    if (scope.hour.isReserved) {
+                        content += "Запазен";
+                    } else {
+                        if (scope.hour.isnzok)
+                            content += 'Работи по здравна каса.';
+                        else
+                            content += 'Работи.';
+                    }
                 }
+                content += '<br/>';
+                content += 'Дата: ' + customFormatter.dateToUserString(scope.day.date) + ", Час: " + timeConverter.convertToHours(scope.hour.from) + " - " + timeConverter.convertToHours(scope.hour.to);
+                if (scope.hour.isReserved) {
+                    content += '<br/>';
+                    content += 'Пациент: ' + scope.hour.reservation.firstName + ' ' + scope.hour.reservation.lastName;
+                    content += '<br/>';
+                    content += 'Телефон: ' + scope.hour.reservation.phone;
+                    if (scope.hour.reservation.note) {
+                        content += '<br/>';
+                        content += 'Забележка: ' + scope.hour.reservation.note;
+                    }
+                }
+
+                content += "</div>";
+                elm.qtip({
+                    content: {
+                        text: content
+                    },
+                    position: {
+                        my: 'bottom left',
+                        at: 'top right',
+                        //     target: 'mouse',
+                        viewport: $(window)
+                    },
+                    show: {
+                        solo: true
+                    }
+                });
+            };
+
+            var removeTip = function() {
+                elm.qtip('destroy', true);
+            };
+
+            setTip();
+
+            scope.$watch('hour.isReserved', function() {
+                removeTip();
+                setTip();
             });
         }
     };

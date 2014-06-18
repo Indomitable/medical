@@ -67,11 +67,12 @@ table.schedule {
 	}
 
 	tr.doctor-row {
-		
+
 		td {
 			padding: 0;
 			@include border-left-right(#eee);
 			@include border-top-bottom(#eee);
+
 			div {
 				height: 100%;
 			}
@@ -99,9 +100,10 @@ table.schedule {
 			td {
 				@include border-top-bottom(#000);
 			}
-			td.doctor-name {
-				color: #228b22;
-			}
+
+				td.doctor-name {
+					color: #228b22;
+				}
 		}
 
 		tr.doctor-row.single-row {
@@ -121,7 +123,19 @@ table.schedule {
 		}
 }
 
-div.patient-container {
-	max-height: 400px;
-	overflow: auto;
+.patient-select-container {
+
+	div.patient-container {
+		max-height: 300px;
+		overflow: auto;
+	}
+
+	.patient-container-col {
+		width: 100px;
+		text-align: center;
+	}
+
+	table {
+		margin-bottom: 0px;
+	}
 }

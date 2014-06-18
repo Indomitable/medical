@@ -44,7 +44,7 @@
                                 <a ng-click="registerHour(doctor, day, hour)">Запис на час</a>
                             </li>
                             <li class="clickable" ng-show="hour.isReserved">
-                                <a ng-click="unRegisterHour(doctor, day, hour)">Отмяна на час</a>
+                                <a ng-click="unRegisterHour(hour.reservation.id)">Отмяна на час</a>
                             </li>
                             <li class="clickable" ng-show="hour.isReserved">
                                 <a ng-click="viewPatient(hour.reservation.patientId)">Виж пациент</a>

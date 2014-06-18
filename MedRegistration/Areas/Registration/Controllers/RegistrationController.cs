@@ -78,6 +78,7 @@ namespace MedRegistration.Areas.Registration.Controllers
                                 let patientPhone = h.Patient.PatientPhones.FirstOrDefault(p => p.IsPrimary)
                                 select new
                                 {
+                                    h.Id,
                                     FromTime = h.FromTime.Hours * 60 + h.FromTime.Minutes,
                                     ToTime = h.ToTime.Hours * 60 + h.ToTime.Minutes,
                                     PatientId = h.Patient.Id,
@@ -108,6 +109,15 @@ namespace MedRegistration.Areas.Registration.Controllers
                 using (var context = new DataContext())
                 {
                     context.Reservations.Add(reservation);
+                    if (reservation.PaymentTypeId == 3 && reservation.PaymentInfo != null && reservation.PaymentInfo.FundId.HasValue && reservation.PaymentInfo.FundCardExpiration.HasValue)
+                    {
+                        var patient = context.Patients.Single(p => p.Id == reservation.PatientId);
+                        if (patient.PatientFundInfo == null)
+                            patient.PatientFundInfo = new PatientFundInfo();
+                        patient.PatientFundInfo.FundId = reservation.PaymentInfo.FundId.Value;
+                        patient.PatientFundInfo.FundCardNumber = reservation.PaymentInfo.FundCardNumber;
+                        patient.PatientFundInfo.FundCardExpiration = reservation.PaymentInfo.FundCardExpiration.Value;
+                    }
                     context.SaveChanges();
                 }
                 return JsonNet(new { result = 1 });
@@ -147,6 +157,20 @@ namespace MedRegistration.Areas.Registration.Controllers
                 return JsonNet(new { result = 2, msg = ex.Message });
             }
 
+        }
+
+        [HttpPost]
+        public ActionResult UnRegisterHour(int id)
+        {
+            using (var context = new DataContext())
+            {
+                var reservation = context.Reservations.SingleOrDefault(x => x.Id == id);
+                if (reservation == null)
+                    return JsonNet(3);
+                context.Reservations.Remove(reservation);
+                context.SaveChanges();
+                return JsonNet(1);
+            }
         }
     }
 }
