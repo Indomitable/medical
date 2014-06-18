@@ -3,6 +3,10 @@
 	padding: 0;
 	height: 100%;
 	width: 100%;
+
+	.ui-widget {
+		font-size: .9em;
+	}
 }
 
 $modal-form-input-width: 300px;

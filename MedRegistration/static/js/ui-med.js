@@ -15,13 +15,16 @@
                         return new Date(viewValue);
                     });
                 } else {
-                    $(elm[0]).datepicker(
+                    elm.datepicker(
                     {
                         prevText: "",
                         nextText: "",
                         changeMonth: true,
                         changeYear: true,
-                        dateFormat: "dd/mm/yy"
+                        firstDay: 1,
+                        dateFormat: "dd/mm/yy",
+                        dayNamesMin: ['Нед', 'Пон', 'Вт', 'Ср', 'Чет', 'Пет', 'Съб'],
+                        monthNamesShort: ['Януари', 'Февруари', 'Март', 'Април', 'Май', 'Юни', 'Юли', 'Август', 'Септември', 'Октомври', 'Ноември', 'Декември']
                     });
                     ngModelCtrl.$formatters.unshift(function (modelValue) {
                         return dateFilter(modelValue, 'dd/MM/yyyy');
@@ -42,14 +45,14 @@
             },
         };
     }])
-    .directive('medTimeInput', ['dateFilter', function (dateFilter) {
+    .directive('medTimeInput', [function () {
         return {
             require: 'ngModel',
             template: '<input type="time"></input>',
             replace: true,
             link: function (scope, elm, attrs, ngModelCtrl) {
                 if (!Modernizr.inputtypes.time) {
-                    $(elm[0]).timepicker(
+                    elm.timepicker(
                     {
                         timeOnlyTitle: 'Изберете час',
                         timeText: 'Време:',
@@ -59,6 +62,72 @@
                         currentText: 'Сега',
                         timeFormat: 'HH:mm',
 
+                    });
+                }
+            },
+        };
+    }])
+    .directive('medWeekInput', [function () {
+        return {
+            require: 'ngModel',
+            template: '<input type="week"></input>',
+            replace: true,
+            link: function (scope, elm, attrs, ngModelCtrl) {
+                if (Modernizr.inputtypes.week) {
+                    ngModelCtrl.$formatters.unshift(function (modelValue) {
+                        if (modelValue) {
+                            var weekStartDate = modelValue;
+                            var onejan = new Date(weekStartDate.getFullYear(), 0, 1);
+                            var weekNumber = Math.ceil((((weekStartDate - onejan) / (24 * 60 * 60 * 1000)) + onejan.getDay() + 1) / 7);
+                            return weekStartDate.getFullYear() + "-W" + weekNumber;
+                        }
+                        return "";
+                    });
+
+                    ngModelCtrl.$parsers.unshift(function (viewValue) {
+                        if (viewValue) {
+                            var x = viewValue.split('-');
+                            var year = parseInt(x[0]);
+                            var week = parseInt(x[1].substr(1));
+                            var d = (1 + (week - 1) * 7);
+                            return new Date(year, 0, d);
+                        }
+                        return null;
+                    });
+                } else {
+                    elm.datepicker(
+                    {
+                        prevText: "",
+                        nextText: "",
+                        changeMonth: true,
+                        changeYear: true,
+                        firstDay: 1,
+                        dateFormat: "dd.mm.yy",
+                        dayNamesMin: ['Нед', 'Пон', 'Вт', 'Ср', 'Чет', 'Пет', 'Съб'],
+                        monthNamesShort: ['Януари', 'Февруари', 'Март', 'Април', 'Май', 'Юни', 'Юли', 'Август', 'Септември', 'Октомври', 'Ноември', 'Декември']
+                });
+                    ngModelCtrl.$formatters.unshift(function (modelValue) {
+                        if (modelValue) {
+                            modelValue.setDate(modelValue.getDate() - (7 + modelValue.getDay() - 1) % 7);
+                            var day = modelValue.getDate() < 10 ? '0' + modelValue.getDate() : modelValue.getDate();
+                            var month = (modelValue.getMonth() + 1) < 10 ? '0' + (modelValue.getMonth() + 1) : (modelValue.getMonth() + 1);
+                            return day + '.' + month + '.' + modelValue.getFullYear();
+                        }
+                        return '';
+                    });
+
+                    ngModelCtrl.$parsers.unshift(function (viewValue) {
+                        if (viewValue) {
+                            var dateValue = viewValue.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/);
+                            if (dateValue) {
+                                var selectedDate = new Date(parseInt(dateValue[3]), parseInt(dateValue[2] - 1), parseInt(dateValue[1]));
+                                selectedDate.setDate(selectedDate.getDate() - (7 + selectedDate.getDay() - 1) % 7);
+                                return selectedDate;
+                            } else
+                                return null;
+                        } else {
+                            return null;
+                        }
                     });
                 }
             },

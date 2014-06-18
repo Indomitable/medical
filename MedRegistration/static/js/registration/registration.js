@@ -7,7 +7,7 @@
     __self.setWeekByDate = function (date) {
         date.setDate(date.getDate() - (7 + date.getDay() - 1) % 7);
         __self.from = date;
-        date = new Date();
+        date = new Date(__self.from.getFullYear(), __self.from.getMonth(), __self.from.getDate());
         date.setDate(date.getDate() + (7 - date.getDay() + 7) % 7);
         __self.to = date;
     };
@@ -65,6 +65,8 @@
     };
 
     __self.getSchedule = function () {
+        __self.hours.clear();
+        __self.days.clear();
         return $http({
             method: 'GET',
             url: '/Registration/Registration/GetDoctorsSchedule',
@@ -74,11 +76,9 @@
             }
         })
         .success(function (data) {
-            __self.hours.splice(0, __self.hours.length);
             for (var k = data.weekMinHour; k < data.weekMaxHour; k += 60) {
                 __self.hours.push(k / 60);
             }
-            __self.days.splice(0, __self.days.length);
             for (var i = 0; i < data.schedule.length; i++) {
                 var dt = data.schedule[i].date;
                 for (var j = 0; j < data.schedule[i].doctors.length; j++) {
@@ -159,7 +159,7 @@
         },
 
         name: function () {
-            return "От: " + customFormatter.dateToUserString(__self.from) + ", До: " + customFormatter.dateToUserString(__self.to);
+            return customFormatter.dateToUserString(__self.from) + " - " + customFormatter.dateToUserString(__self.to);
         },
 
         next: function () {
@@ -462,38 +462,38 @@ app.directive('vmQtip', ['timeConverter', 'customFormatter', function (timeConve
 }]);
 
 
-(
-    function (reg, $) {
-        reg.onDoctorRowMouseOver = function (row) {
-            var $row = $(row);
-            var rowDate = $row.data('day');
-            var $tBody = $row.parents('tbody');
-            $tBody.find('tr.doctor-row td').css({
-                'border': '1px solid #eee'
-            });
-            $tBody.find('td.week-day').css({
-                'color': 'black'
-            });
-            var rows = $tBody.find('tr.doctor-row[data-day="' + rowDate + '"]');
-            if (rows.length === 0)
-                return;
-
-            $row.find('td').css({
-                'border-top': '1px solid black',
-                'border-bottom': '1px solid black'
-            });
-
-            $(rows[0]).find('td').css({
-                'border-top': '1px solid red'
-            });
-            $(rows[rows.length - 1]).find('td').css({
-                'border-bottom': '1px solid red'
-            });
-
-            $tBody.find('td.week-day[data-day="' + rowDate + '"]').css(
-            {
-                'color': 'red'
-            });
-        }
-    }
-)(window.registration = window.registration || {}, jQuery);
+//(
+//    function (reg, $) {
+//        reg.onDoctorRowMouseOver = function (row) {
+//            var $row = $(row);
+//            var rowDate = $row.data('day');
+//            var $tBody = $row.parents('tbody');
+//            $tBody.find('tr.doctor-row td').css({
+//                'border': '1px solid #eee'
+//            });
+//            $tBody.find('td.week-day').css({
+//                'color': 'black'
+//            });
+//            var rows = $tBody.find('tr.doctor-row[data-day="' + rowDate + '"]');
+//            if (rows.length === 0)
+//                return;
+//
+//            $row.find('td').css({
+//                'border-top': '1px solid black',
+//                'border-bottom': '1px solid black'
+//            });
+//
+//            $(rows[0]).find('td').css({
+//                'border-top': '1px solid red'
+//            });
+//            $(rows[rows.length - 1]).find('td').css({
+//                'border-bottom': '1px solid red'
+//            });
+//
+//            $tBody.find('td.week-day[data-day="' + rowDate + '"]').css(
+//            {
+//                'color': 'red'
+//            });
+//        }
+//    }
+//)(window.registration = window.registration || {}, jQuery);
