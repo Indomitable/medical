@@ -5,18 +5,28 @@
 <div ng-controller="registrationController" class="registration">
     <h2>График</h2>
     <div class="week">
-        <a class="week-prev clear-href" ng-click="week.prev()">
-            <span class="glyphicon glyphicon-chevron-left"></span>
-        </a>
-        <span class="week-name">{{ week.name() }}</span>
-        <a class="week-next clear-href" ng-click="week.next()">
-            <span class="glyphicon glyphicon-chevron-right"></span>
-        </a>
-        <input med-week-input style="width: 300px; display: inline-block; margin-left: 10px" class="form-control" ng-model="currentDate" />
-@*        <input list=""/>*@
-@*        <datalist>*@
-@*            <option ng-repeat=""></option>*@
-@*        </datalist>*@
+        <form class="form-inline">
+            <div class="form-group">
+                <a class="week-prev clear-href" ng-click="week.prev()">
+                    <span class="glyphicon glyphicon-chevron-left"></span>
+                </a>
+                <span class="week-name">{{ week.name() }}</span>
+                <a class="week-next clear-href" ng-click="week.next()">
+                    <span class="glyphicon glyphicon-chevron-right"></span>
+                </a>
+            </div>
+            <div class="form-group" style="margin-left: 10px">
+                <input data-med-week-input class="form-control" ng-model="currentDate" />
+            </div>
+            <div class="form-group" style="margin-left: 10px">
+                <label for="doctorsList">Избор на Лекър:</label>
+                <select id="doctorsList" class="form-control"
+                        ng-model="selectedDoctor"
+                        ng-options="(d.title + ' ' + d.firstName + ' ' + d.lastName) for d in week.doctors() track by d.doctorId">
+                    <option value="">Всички</option>
+                </select>
+            </div>
+        </form>
     </div>
 
     <div ng-repeat="day in week.days" class="schedule-day">
@@ -36,7 +46,7 @@
                         </span>
                     </td>
                 </tr>
-                <tr ng-repeat="doctor in day.doctors" class="doctor-row" ng-class="{ 'single-row': day.doctors.length === 1, 'multiple-row': day.doctors.length > 1 }"
+                <tr ng-repeat="doctor in day.doctors | doctorFilter:selectedDoctor" class="doctor-row" ng-class="{ 'single-row': day.doctors.length === 1, 'multiple-row': day.doctors.length > 1 }"
                     data-day="{{day.date | date:'yyyy-MM-dd'}}">
                     <td class="doctor-name" ng-bind="doctor.title + ' ' + doctor.firstName + ' ' + doctor.lastName"></td>
                     <td ng-repeat="hour in doctor.hours | nonZeroHour" colspan="{{ (hour.to - hour.from) / 5 }}"

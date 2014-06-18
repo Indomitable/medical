@@ -173,34 +173,46 @@
         to: __self.to,
         days: __self.days,
 
-        setDate: function (date) {
+        setDate: function(date) {
             __self.setWeekByDate(date);
         },
 
-        reload: function () {
+        reload: function() {
             __self.getData();
         },
 
-        reloadResevations: function (date) {
+        reloadResevations: function(date) {
             __self.reloadResevations(date);
         },
 
-        name: function () {
+        name: function() {
             return customFormatter.dateToUserString(__self.from) + " - " + customFormatter.dateToUserString(__self.to);
         },
 
-        next: function () {
+        next: function() {
             __self.from.setDate(__self.from.getDate() + 7);
             __self.to.setDate(__self.to.getDate() + 7);
             __self.getData();
         },
 
-        prev: function () {
+        prev: function() {
             __self.from.setDate(__self.from.getDate() - 7);
             __self.to.setDate(__self.to.getDate() - 7);
             __self.getData();
+        },
+
+        doctors: function() {
+            var doctors = [];
+            for (var i = 0; i < __self.days.length; i++) {
+                for (var j = 0; j < __self.days[i].doctors.length; j++) {
+                    if (!doctors.some(function (d) { return d.doctorId === __self.days[i].doctors[j].doctorId; })) {
+                        doctors.push(__self.days[i].doctors[j]);
+                    }
+                }
+            }
+            return doctors;
         }
-    }
+}
 }]);
 
 app.controller('registrationController', ['$scope', '$http', 'customFormatter', 'week', '$modal',
@@ -451,6 +463,16 @@ app.filter('nonZeroHour', [function () {
     return function (hours) {
         return _.filter(hours, function (h) {
             return h.to - h.from > 0;
+        });
+    };
+}]);
+
+app.filter('doctorFilter', [function () {
+    return function (doctors, doctor) {
+        if (!doctor)
+            return doctors;
+        return _.filter(doctors, function (d) {
+            return d.doctorId === doctor.doctorId;
         });
     };
 }]);
