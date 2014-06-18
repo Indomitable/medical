@@ -32,95 +32,107 @@ $multiple-row-height: 50px;
 	border-bottom: 1px solid $color;
 }
 
-table.schedule {
-	width: 100%;
-	border-collapse: separate;
+div.schedule-day {
+	margin-bottom: 20px;
 
-	th {
-		text-align: center;
-		@include border-top-bottom(#eee);
-		@include border-left-right(#eee);
-	}
+	table.schedule {
+		width: 100%;
+		border-collapse: separate;
 
-	td.week-day {
-		width: 1px;
-		padding: 10px 0;
-		vertical-align: middle;
-		@include border-top-bottom(#eee);
-
-		.rotated-text {
-			display: inline-block;
-			overflow: hidden;
-		}
-
-		.rotated-text_inner {
-			display: inline-block;
-			white-space: nowrap;
-			@include rotate(-90deg);
-		}
-
-			.rotated-text_inner:after {
-				content: "";
-				float: left;
-				margin-top: 100%;
-			}
-	}
-
-	tr.doctor-row {
-
-		td {
-			padding: 0;
-			@include border-left-right(#eee);
+		th {
+			text-align: center;
 			@include border-top-bottom(#eee);
-
-			div {
-				height: 100%;
-			}
+			@include border-left-right(#eee);
 		}
 
-			td.non-work {
-				background-color: #f1f1f1;
+		td.week-day {
+			width: 1px;
+			padding: 10px 0;
+			vertical-align: middle;
+			@include border-top-bottom(#eee);
+			@include border-left-right(#eee);
+
+			.rotated-text {
+				display: inline-block;
+				overflow: hidden;
 			}
 
-			td.nzok {
-				background-color: #0ff;
+			.rotated-text_inner {
+				display: inline-block;
+				white-space: nowrap;
+				@include rotate(-90deg);
 			}
 
-			td.reserved {
-				background-color: #8b0000;
-			}
-
-			td.doctor-name {
-				padding: 0 5px;
-				vertical-align: middle;
-			}
-	}
-
-		tr.doctor-row:hover {
-			td {
-				@include border-top-bottom(#000);
-			}
-
-				td.doctor-name {
-					color: #228b22;
+				.rotated-text_inner:after {
+					content: "";
+					float: left;
+					margin-top: 100%;
 				}
 		}
 
-		tr.doctor-row.single-row {
-			height: $single-row-height;
+		tr.doctor-row {
 
 			td {
+				padding: 0;
+				@include border-left-right(#eee);
+				@include border-top-bottom(#eee);
+
+				div {
+					height: 100%;
+				}
+			}
+
+				td.non-work {
+					background-color: #f1f1f1;
+				}
+
+				td.nzok {
+					background-color: #0ff;
+				}
+
+				td.reserved {
+					background-color: #8b0000;
+				}
+
+				td.doctor-name {
+					padding: 0 5px;
+					vertical-align: middle;
+				}
+		}
+
+			tr.doctor-row:hover {
+				td {
+					@include border-top-bottom(#000);
+				}
+
+					td.doctor-name {
+						color: #228b22;
+					}
+			}
+
+			tr.doctor-row.single-row {
 				height: $single-row-height;
+
+				td {
+					height: $single-row-height;
+				}
 			}
-		}
 
-		tr.doctor-row.multiple-row {
-			height: $multiple-row-height;
-
-			td {
+			tr.doctor-row.multiple-row {
 				height: $multiple-row-height;
+
+				td {
+					height: $multiple-row-height;
+				}
 			}
-		}
+	}
+}
+
+div.schedule-day:hover {
+	@include border-top-bottom(#a81010);
+	td.week-day {
+		color: #228b22;
+	}
 }
 
 .patient-select-container {

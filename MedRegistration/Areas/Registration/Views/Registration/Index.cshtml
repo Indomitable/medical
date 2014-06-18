@@ -15,46 +15,48 @@
         <input med-week-input style="width: 300px; display: inline-block; margin-left: 10px" class="form-control" ng-model="currentDate" />
     </div>
 
-    <table class="schedule">
-        <thead>
-            <tr>
-                <th style="width: 80px">Ден</th>
-                <th style="width: 250px">Име</th>
-                <th ng-repeat="hour in week.hours" style="width: 80px" colspan="12" ng-bind="hour"></th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr ng-repeat-start="day in week.days">
-                <td class="week-day" rowspan="{{ day.doctors.length + 1 }}" data-day="{{day.date | date:'yyyy-MM-dd'}}">
-                    <span class="rotated-text">
-                        <span class="rotated-text_inner" ng-bind="day.date | dateDisplay"></span>
-                    </span>
-                </td>
-            </tr>
-            <tr ng-repeat-end ng-repeat="doctor in day.doctors" class="doctor-row" ng-class="{ 'single-row': day.doctors.length === 1, 'multiple-row': day.doctors.length > 1 }" 
-                data-day="{{day.date | date:'yyyy-MM-dd'}}" @*onmouseover="registration.onDoctorRowMouseOver(this)"*@>
-                <td class="doctor-name" ng-bind="doctor.title + ' ' + doctor.firstName + ' ' + doctor.lastName"></td>
-                <td ng-repeat="hour in doctor.hours | nonZeroHour" colspan="{{ (hour.to - hour.from) / 5 }}"
-                    ng-class="{ 'non-work': hour.work == 0, 'nzok': hour.isnzok, 'reserved': hour.isReserved }" vm-qtip
-                    class="doctor-hour">
-                    <div ng-show="hour.work == 1" class="dropdown">
-                        <div class="dropdown-toggle"></div>
-                        <ul class="dropdown-menu" role="menu">
-                            <li class="clickable" ng-hide="hour.isReserved">
-                                <a ng-click="registerHour(doctor, day, hour)">Запис на час</a>
-                            </li>
-                            <li class="clickable" ng-show="hour.isReserved">
-                                <a ng-click="unRegisterHour(hour.reservation.id)">Отмяна на час</a>
-                            </li>
-                            <li class="clickable" ng-show="hour.isReserved">
-                                <a ng-click="viewPatient(hour.reservation.patientId)">Виж пациент</a>
-                            </li>
-                        </ul>
-                    </div>
-                </td>
-            </tr>
-        </tbody>
-    </table>
+    <div ng-repeat="day in week.days" class="schedule-day">
+        <table class="schedule">
+            <thead>
+                <tr>
+                    <th style="width: 80px">Ден</th>
+                    <th style="width: 250px">Име</th>
+                    <th ng-repeat="hour in week.hours" style="width: 80px" colspan="12" ng-bind="hour"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="week-day" rowspan="{{ day.doctors.length + 1 }}" data-day="{{day.date | date:'yyyy-MM-dd'}}">
+                        <span class="rotated-text">
+                            <span class="rotated-text_inner" ng-bind="day.date | dateDisplay"></span>
+                        </span>
+                    </td>
+                </tr>
+                <tr ng-repeat="doctor in day.doctors" class="doctor-row" ng-class="{ 'single-row': day.doctors.length === 1, 'multiple-row': day.doctors.length > 1 }"
+                    data-day="{{day.date | date:'yyyy-MM-dd'}}">
+                    <td class="doctor-name" ng-bind="doctor.title + ' ' + doctor.firstName + ' ' + doctor.lastName"></td>
+                    <td ng-repeat="hour in doctor.hours | nonZeroHour" colspan="{{ (hour.to - hour.from) / 5 }}"
+                        ng-class="{ 'non-work': hour.work == 0, 'nzok': hour.isnzok, 'reserved': hour.isReserved }" vm-qtip
+                        class="doctor-hour">
+                        <div ng-show="hour.work == 1" class="dropdown">
+                            <div class="dropdown-toggle"></div>
+                            <ul class="dropdown-menu" role="menu">
+                                <li class="clickable" ng-hide="hour.isReserved">
+                                    <a ng-click="registerHour(doctor, day, hour)">Запис на час</a>
+                                </li>
+                                <li class="clickable" ng-show="hour.isReserved">
+                                    <a ng-click="unRegisterHour(hour.reservation.id)">Отмяна на час</a>
+                                </li>
+                                <li class="clickable" ng-show="hour.isReserved">
+                                    <a ng-click="viewPatient(hour.reservation.patientId)">Виж пациент</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </div>
 
 @section Styles
