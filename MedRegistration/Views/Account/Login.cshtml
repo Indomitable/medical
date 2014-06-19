@@ -1,0 +1,46 @@
+﻿@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Вход в системата</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Ventsislav Mladenov">
+    <link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
+    <link href="~/static/css/login.min.css" type="text/css" rel="stylesheet" />
+</head>
+<body>
+    <div class="container">
+        <form class="form-login form-horizontal" role="form" method="POST" action="@Url.Action("Login", "Account")">
+            @Html.AntiForgeryToken()
+            <div class="form-group">
+                <label for="userName" class="col-xs-3 control-label">Потребител:</label>
+                <div class="col-xs-7">
+                    <input id="userName" type="text" name="userName" class="form-control" placeholder="Потребителско Име" required autofocus />
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="password" class="col-xs-3 control-label">Парола:</label>
+                <div class="col-xs-7">
+                    <input id="password" type="password" name="password" class="form-control" placeholder="Парола" required />
+                </div>
+            </div>
+            <label class="remember-me control-label">
+                <input type="checkbox" name="rememberme" onclick="checkClick(this)" value="false" />
+                Запомни ме.
+            </label>
+            <script type="text/javascript">
+                function checkClick(ch) {
+                    if (ch.value === "false")
+                        ch.value = "true";
+                    else
+                        ch.value = "false";
+                }
+            </script>
+            <button type="submit" class="btn btn-default">Влез</button>
+        </form>
+    </div>
+</body>
+</html>

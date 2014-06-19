@@ -1,0 +1,18 @@
+﻿body {
+	padding: 50px 0;
+}
+
+.form-login {
+	max-width: 400px;
+	margin: 0 auto;
+
+	label.remember-me {
+		display: block;
+		text-align: left;
+	}
+
+	button {
+		float: right;
+		width: 150px;
+	}
+}

@@ -26,13 +26,13 @@
                             <div class="form-group">
                                 <label for="patientMiddleName" class="col-xs-3 control-label">Презиме:</label>
                                 <div class="col-xs-9">
-                                    <input id="patientMiddleName" class="form-control" ng-model="model.middleName" placeholder="Презиме" />
+                                    <input type="text" id="patientMiddleName" class="form-control" ng-model="model.middleName" placeholder="Презиме" />
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label for="patientLastName" class="col-xs-3 control-label">Фамилия:</label>
                                 <div class="col-xs-9">
-                                    <input id="patientLastName" class="form-control" ng-model="model.lastName" placeholder="Фамилия" required />
+                                    <input type="text" id="patientLastName" class="form-control" ng-model="model.lastName" placeholder="Фамилия" required />
                                 </div>
                             </div>
                             <div class="form-group">
@@ -41,7 +41,7 @@
                                     <select class="form-control" ng-model="model.identType" ng-options="i.name for i in data.identTypes track by i.id"></select>
                                 </div>
                                 <div class="col-xs-6">
-                                    <input id="patientIdentNumber" class="form-control" ng-model="model.identNumber" placeholder="Идентификационен номер" />
+                                    <input type="text" id="patientIdentNumber" class="form-control" ng-model="model.identNumber" placeholder="Идентификационен номер" />
                                 </div>
                             </div>
                             <div class="form-group">
@@ -55,7 +55,7 @@
                                 <div class="col-xs-9">
                                     <div class="input-group">
                                         <span class="input-group-addon">@@</span>
-                                        <input id="patientEmail" type="email" ng-model="model.email" class="form-control" placeholder="Имейл" />
+                                        <input type="text" id="patientEmail" type="email" ng-model="model.email" class="form-control" placeholder="Имейл" />
                                     </div>
                                 </div>
                             </div>
@@ -141,7 +141,7 @@
                                 <div class="form-group">
                                     <label for="fundCardNumber" class="col-xs-3 control-label">Карта Номер:</label>
                                     <div class="col-xs-9">
-                                        <input id="fundCardNumber" class="form-control" ng-model="model.fundCardNumber" placeholder="Карта Номер" />
+                                        <input type="text" id="fundCardNumber" class="form-control" ng-model="model.fundCardNumber" placeholder="Карта Номер" />
                                     </div>
                                 </div>
                                 <div class="form-group">

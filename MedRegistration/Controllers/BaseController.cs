@@ -5,6 +5,7 @@ using MedRegistration.Infrastructure;
 
 namespace MedRegistration.Controllers
 {
+    [Authorize]
     public class BaseController : Controller
     {
         public JsonResult JsonNet<T>(T data)
