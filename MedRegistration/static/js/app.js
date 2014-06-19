@@ -1,4 +1,4 @@
-﻿var app = angular.module("app", ['ui.bootstrap', 'ui.slider', 'ngCookies', 'ui.med']);
+﻿var app = angular.module("app", ['ui.bootstrap', 'ngCookies', 'ui.med']);
 
 app.config(['$httpProvider', function ($httpProvider) {
     $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
@@ -22,6 +22,5 @@ app.config(['$httpProvider', function ($httpProvider) {
 
 app.controller('rootController', [
     '$scope', function($scope) {
-
     }
 ]);
