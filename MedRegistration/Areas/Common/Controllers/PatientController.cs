@@ -10,6 +10,7 @@ namespace MedRegistration.Areas.Common.Controllers
 {
     public class PatientController : BaseController
     {
+        private static readonly object locker = new object();
         [HttpGet]
         public ActionResult List()
         {
@@ -24,7 +25,7 @@ namespace MedRegistration.Areas.Common.Controllers
                 var patients = from p in context.Patients
                                                 .Include(x => x.PatientPhones)
                                let primaryPhone = p.PatientPhones.FirstOrDefault(pp => pp.IsPrimary)
-                               orderby p.Reservations.Count() descending 
+                               orderby p.Reservations.Count() descending
                                select new
                                {
                                    p.Id,
@@ -145,20 +146,26 @@ namespace MedRegistration.Areas.Common.Controllers
         [AntiForgeryValidate]
         public ActionResult Delete(int id)
         {
-            try
+            lock (locker)
             {
-                using (var context = new DataContext())
+                try
                 {
-                    var patient = context.Patients.SingleOrDefault(p => p.Id == id);
-                    if (patient != null)
-                        context.Patients.Remove(patient);
-                    context.SaveChanges();
+
+                    using (var context = new DataContext())
+                    {
+                        var patient = context.Patients.SingleOrDefault(p => p.Id == id);
+                        if (patient != null)
+                        {
+                            context.Patients.Remove(patient);
+                            context.SaveChanges();
+                        }
+                    }
+                    return JsonNet(new { result = 1 });
                 }
-                return JsonNet(new { result = 1 });
-            }
-            catch (Exception)
-            {
-                return JsonNet(new { result = 2 });
+                catch (Exception)
+                {
+                    return JsonNet(new { result = 2 });
+                }
             }
         }
     }

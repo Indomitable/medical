@@ -10,6 +10,7 @@ namespace MedRegistration.Areas.Registration.Controllers
 {
     public class RegistrationController : BaseController
     {
+        private static readonly object locker = new object();
         [HttpGet]
         public ActionResult Index()
         {
@@ -115,7 +116,7 @@ namespace MedRegistration.Areas.Registration.Controllers
                     }
                     context.SaveChanges();
                 }
-                return JsonNet(new { result = 1 });
+                return JsonNet(1);
             }
             catch (Exception ex)
             {
@@ -145,7 +146,7 @@ namespace MedRegistration.Areas.Registration.Controllers
                     context.Reservations.Add(reservation);
                     context.SaveChanges();
                 }
-                return JsonNet(new { result = 1 });
+                return JsonNet(1);
             }
             catch (Exception ex)
             {
@@ -157,14 +158,24 @@ namespace MedRegistration.Areas.Registration.Controllers
         [HttpPost]
         public ActionResult UnRegisterHour(int id)
         {
-            using (var context = new DataContext())
+            lock (locker)
             {
-                var reservation = context.Reservations.SingleOrDefault(x => x.Id == id);
-                if (reservation == null)
-                    return JsonNet(3);
-                context.Reservations.Remove(reservation);
-                context.SaveChanges();
-                return JsonNet(1);
+                try
+                {
+                    using (var context = new DataContext())
+                    {
+                        var reservation = context.Reservations.SingleOrDefault(x => x.Id == id);
+                        if (reservation == null)
+                            return JsonNet(3);
+                        context.Reservations.Remove(reservation);
+                        context.SaveChanges();
+                        return JsonNet(1);
+                    }
+                }
+                catch
+                {
+                    return JsonNet(2);
+                }
             }
         }
     }

@@ -10,6 +10,7 @@ namespace MedRegistration.Areas.Common.Controllers
 {
     public class DoctorController : BaseController
     {
+        private static readonly object locker = new object();
         [HttpGet]
         public ActionResult List()
         {
@@ -103,20 +104,24 @@ namespace MedRegistration.Areas.Common.Controllers
         [AntiForgeryValidate]
         public ActionResult Delete(int id)
         {
-            try
+            lock (locker)
             {
-                using (var context = new DataContext())
+                try
                 {
-                    var doctor = context.Doctors.SingleOrDefault(p => p.Id == id);
-                    if (doctor != null)
-                        context.Doctors.Remove(doctor);
-                    context.SaveChanges();
+                    using (var context = new DataContext())
+                    {
+                        var doctor = context.Doctors.SingleOrDefault(p => p.Id == id);
+                        if (doctor != null)
+                            context.Doctors.Remove(doctor);
+                        context.SaveChanges();
+                    }
+                    return JsonNet(new {result = 1});
+
                 }
-                return JsonNet(new { result = 1 });
-            }
-            catch (Exception)
-            {
-                return JsonNet(new { result = 2 });
+                catch (Exception)
+                {
+                    return JsonNet(new {result = 2});
+                }
             }
         }
     }
