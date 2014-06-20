@@ -1,12 +1,32 @@
 ﻿<nav class="menu-container">
     <div class="menu">
+        @{
+            var uri = this.ViewContext.HttpContext.Request.Url;
+            var activeMenuItem = -1;
+            if (uri != null)
+            {
+                var url = uri.AbsolutePath;
+                if (url.EndsWith("Common/Doctor/List") || url.EndsWith("Common/Patient/List"))
+                {
+                    activeMenuItem = 1;
+                }
+                else if (url.EndsWith("Registration/Registration"))
+                {
+                    activeMenuItem = 2;
+                }
+                else
+                {
+                    activeMenuItem = 0;
+                }
+            }
+        }
         <ul>
-            <li>
-                <a href='@Url.Action("Index", "Home")'>
+            <li class="@(activeMenuItem == 0 ? "active" : "")">
+                <a href='@Url.Action("Index", "Home", new { area = "" })'>
                     <span>Home</span>
                 </a>
             </li>
-            <li class='has-sub'>
+            <li class='has-sub @(activeMenuItem == 1 ? "active" : "")'>
                 <a href='#'>
                     <span>Номенклатура</span>
                 </a>
@@ -23,12 +43,12 @@
                     </li>
                 </ul>
             </li>
-            <li>
+            <li class="@(activeMenuItem == 2 ? "active" : "")">
                 <a href='@Url.Action("Index", "Registration", new { area = "Registration" })'>
                     <span>График</span>
                 </a>
             </li>
-            <li class='last'>
+            <li>
                 <a href='#'>
                     <span>Настройки</span>
                 </a>
