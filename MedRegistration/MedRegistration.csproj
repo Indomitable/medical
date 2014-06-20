@@ -110,13 +110,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Global.asax" />
-    <None Include="Scripts\jquery-1.6.4-vsdoc.js">
-      <DependentUpon>jquery-1.6.4.js</DependentUpon>
-    </None>
-    <Content Include="Scripts\jquery-1.6.4.js" />
-    <Content Include="Scripts\jquery-1.6.4.min.js">
-      <DependentUpon>jquery-1.6.4.js</DependentUpon>
-    </Content>
     <Content Include="Scripts\jquery.signalR-2.1.0.js" />
     <Content Include="Scripts\jquery.signalR-2.1.0.min.js">
       <DependentUpon>jquery.signalR-2.1.0.js</DependentUpon>
