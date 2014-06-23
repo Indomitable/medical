@@ -35,6 +35,9 @@
         <AssociationConnector Association="MedicalModel.Reservation_PaymentType_FK" />
         <AssociationConnector Association="MedicalModel.ScheduleDate_Schedule_FK" />
         <AssociationConnector Association="MedicalModel.DoctorSpeciality" />
+        <EntityTypeShape EntityType="MedicalModel.Role" Width="1.5" PointX="8.375" PointY="1.375" />
+        <EntityTypeShape EntityType="MedicalModel.User" Width="1.5" PointX="10.625" PointY="1" />
+        <AssociationConnector Association="MedicalModel.RoleUser" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

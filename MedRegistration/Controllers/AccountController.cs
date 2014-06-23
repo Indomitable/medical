@@ -1,6 +1,7 @@
 ﻿using System.Security.Claims;
 using System.Web;
 using System.Web.Mvc;
+using MedRegistration.Data;
 using MedRegistration.Infrastructure;
 using Microsoft.Owin.Security;
 
@@ -28,14 +29,31 @@ namespace MedRegistration.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Login(string userName, string password, bool? rememberme)
         {
-            var identity = new ClaimsIdentity(Constants.AuthenticationType);
-            identity.AddClaim(new Claim(ClaimTypes.Name, userName));
-
-            AuthenticationManager.SignIn(new AuthenticationProperties
+//            if (userName == "admin")
+//            {
+//                User user = new User
+//                {
+//                    FirstName = "Ventsislav",
+//                    LastName = "Mladenov",
+//                    Email = "ventsislav.mladenov@gmail.com",
+//                    Password = password,
+//                    UserName = "admin"
+//                };
+//                UserManager.StoreUser(user);
+//            }
+            string message;
+            if (UserManager.CheckUserName(userName, password, out message))
             {
-                IsPersistent = rememberme.GetValueOrDefault(false)
-            }, identity);
-            return RedirectToAction("Index", "Home");
+                var identity = new ClaimsIdentity(Constants.AuthenticationType);
+                identity.AddClaim(new Claim(ClaimTypes.Name, userName));
+
+                AuthenticationManager.SignIn(new AuthenticationProperties
+                {
+                    IsPersistent = rememberme.GetValueOrDefault(false)
+                }, identity);
+                return RedirectToAction("Index", "Home");
+            }
+            return RedirectToAction("Login");
         }
 
         [HttpGet]
