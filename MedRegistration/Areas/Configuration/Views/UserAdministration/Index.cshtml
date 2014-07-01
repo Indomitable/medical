@@ -1,0 +1,59 @@
+﻿@{
+    ViewBag.Title = "Потребители";
+}
+
+<div class="container" ng-controller="usersController">
+    <div>
+        <div class="col-xs-2">
+            <button class="btn btn-default" ng-click="add()">Добави нов потребител</button>
+        </div>
+        <div class="col-xs-3 form-inline">
+            <div class="form-group" style="padding-left: 5px">
+                <label>Профил:</label>
+                <select class="form-control">
+                    <option value="0" selected="selected">Всички</option>
+                    <option value="1">Администратор</option>
+                    <option value="2">Регистратура</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-xs-3 col-xs-offset-4">
+            <div class="input-group">
+                <input type="search" ng-model="searchText" class="form-control" />
+                <span class="input-group-addon glyphicon glyphicon-search" style="top: 0"></span>
+            </div>
+        </div>
+    </div>
+    <table class="table table-hover table-nomen">
+        <thead>
+            <tr>
+                <th style="width: 10px"></th>
+                <th style="width: 100px; text-align: center">Име</th>
+                <th style="width: 100px; text-align: center">Фамилия</th>
+                <th style="width: 100px; text-align: center">Потребилско Име</th>
+                <th style="width: 100px; text-align: center">Имейл</th>
+            </tr>
+        </thead>
+        <tbody ng-cloak="">
+            <tr ng-repeat="user in users | multiSearch:searchText">
+                <td class="controls">
+                    <a ng-click="edit(user.id)"><span class="glyphicon glyphicon-pencil"></span></a>
+                </td>
+                <td ng-bind="user.userName"></td>
+                <td ng-bind="user.firstName"></td>
+                <td ng-bind="user.lastName"></td>
+                <td ng-bind="user.email"></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+@section Styles
+{
+    <link href="~/static/css/user.min.css" rel="stylesheet" />
+}
+
+@section Scripts
+{
+    <script src="~/static/js/configuration/user.js"></script>
+}
