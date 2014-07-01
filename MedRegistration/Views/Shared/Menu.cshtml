@@ -1,4 +1,12 @@
-﻿<nav class="menu-container">
+﻿@using MedRegistration.Infrastructure.Authorization
+<nav class="menu-container">
+    @if (Request.IsAuthenticated)
+    {
+        <div class="user-name">
+            <span>Добре дошкли: @HttpContext.Current.User.Identity.Name</span>
+            <a href="@Url.Action("Logout", "Account", new { area = "" })" class="clear-href">Изход</a>
+        </div>
+    }
     <div class="menu">
         @{
             var uri = this.ViewContext.HttpContext.Request.Url;
@@ -6,13 +14,17 @@
             if (uri != null)
             {
                 var url = uri.AbsolutePath;
-                if (url.EndsWith("Common/Doctor/List") || url.EndsWith("Common/Patient/List"))
+                if (url.IndexOf("/Common/", StringComparison.OrdinalIgnoreCase) > -1)
                 {
                     activeMenuItem = 1;
                 }
-                else if (url.EndsWith("Registration/Registration"))
+                else if (url.IndexOf("/Registration/", StringComparison.OrdinalIgnoreCase) > -1)
                 {
                     activeMenuItem = 2;
+                }
+                else if (url.IndexOf("/Configuration/", StringComparison.OrdinalIgnoreCase) > -1)
+                {
+                    activeMenuItem = 3;
                 }
                 else
                 {
@@ -48,10 +60,17 @@
                     <span>График</span>
                 </a>
             </li>
-            <li>
+            <li class='has-sub @(activeMenuItem == 3 ? "active" : "")'>
                 <a href='#'>
                     <span>Настройки</span>
                 </a>
+                <ul>
+                    <li class="@(HttpContext.Current.User.IsAdmin() ? "" : "hidden")">
+                        <a href='@Url.Action("Index", "UserAdministration", new { area = "Configuration" })'>
+                            <span>Потребители</span>
+                        </a>
+                    </li>
+                </ul>
             </li>
         </ul>
     </div>

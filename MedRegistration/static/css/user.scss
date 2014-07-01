@@ -1,0 +1,29 @@
+﻿@import 'dialog-styles.scss';
+
+div.multiselect {
+	overflow: auto;
+	height: 200px;
+
+	ul {
+		padding: 0;
+		margin: 0;
+		list-style-type: none;
+
+		li {		
+			input:checked + label {
+				background-color: #87cefa;
+			}
+			input[type=checkbox] {
+				float: left;
+			}
+			label {
+				display: block;
+				padding-left: 20px;
+			}
+			label::after {
+				clear: left;
+				content: '';
+			}
+		}
+	}
+}

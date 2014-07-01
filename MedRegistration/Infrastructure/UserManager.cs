@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using System.Data.Entity;
 using MedRegistration.Data;
 
 namespace MedRegistration.Infrastructure
@@ -58,16 +59,25 @@ namespace MedRegistration.Infrastructure
             }
         }
 
-        internal static void StoreUser(User user)
+        /// <summary>
+        /// Get Plain Text password and hash it with salt
+        /// </summary>
+        /// <param name="password">Plain text password</param>
+        /// <returns>
+        /// Tuple: First Items is Hashed Password, Second Item is Salt.
+        /// </returns>
+        internal static Tuple<string, string> HashPassword(string password)
         {
             var salt = GetSalt();
-            var hashedPassword = HashPassword(Encoding.UTF8.GetBytes(user.Password), salt);
+            var hashedPassword = HashPassword(Encoding.UTF8.GetBytes(password), salt);
+            return new Tuple<string, string>(hashedPassword, Convert.ToBase64String(salt));
+        }
+
+        internal static User GetUser(string userName)
+        {
             using (var context = new DataContext())
             {
-                user.Password = hashedPassword;
-                user.Salt = Convert.ToBase64String(salt);
-                context.Users.Add(user);
-                context.SaveChanges();
+                return context.Users.Include(x => x.Roles).Single(u => u.UserName.ToUpper() == userName.ToUpper());
             }
         }
     }

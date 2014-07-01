@@ -39,13 +39,19 @@ namespace MedRegistration.Controllers
 //                    Password = password,
 //                    UserName = "admin"
 //                };
-//                UserManager.StoreUser(user);
+//                UserManager.StorePassword(user);
 //            }
             string message;
             if (UserManager.CheckUserName(userName, password, out message))
             {
                 var identity = new ClaimsIdentity(Constants.AuthenticationType);
                 identity.AddClaim(new Claim(ClaimTypes.Name, userName));
+                identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, userName));
+                var user = UserManager.GetUser(userName);
+                foreach (var role in user.Roles)
+                {
+                    identity.AddClaim(new Claim(ClaimTypes.Role, role.Name));
+                }
 
                 AuthenticationManager.SignIn(new AuthenticationProperties
                 {

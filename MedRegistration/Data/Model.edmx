@@ -955,6 +955,10 @@
           <End Type="MedicalModel.Role" Role="Role" Multiplicity="*" />
           <End Type="MedicalModel.User" Role="User" Multiplicity="*" />
         </Association>
+        <EnumType Name="Roles">
+          <Member Name="Admin" Value="1" />
+          <Member Name="Registration" Value="2" />
+        </EnumType>
         </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->

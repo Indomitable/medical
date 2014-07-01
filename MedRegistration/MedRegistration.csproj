@@ -138,8 +138,12 @@
     <Content Include="static\css\schedule.min.css">
       <DependentUpon>schedule.scss</DependentUpon>
     </Content>
+    <Content Include="static\css\user.min.css">
+      <DependentUpon>user.scss</DependentUpon>
+    </Content>
     <Content Include="static\js\app.js" />
     <Content Include="static\js\common\doctor.js" />
+    <Content Include="static\js\configuration\user.js" />
     <Content Include="static\js\functions.js" />
     <Content Include="static\js\common\patient.js" />
     <Content Include="static\js\registration\registration.js" />
@@ -152,6 +156,8 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\Startup.Auth.cs" />
     <Compile Include="Areas\Common\CommonAreaRegistration.cs" />
+    <Compile Include="Areas\Configuration\ConfigurationAreaRegistration.cs" />
+    <Compile Include="Areas\Configuration\Controllers\UserAdministrationController.cs" />
     <Compile Include="Areas\Registration\RegistrationAreaRegistration.cs" />
     <Compile Include="Business\Calendar.cs" />
     <Compile Include="Controllers\AccountController.cs" />
@@ -213,6 +219,9 @@
     <Compile Include="Data\Role.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
+    <Compile Include="Data\Roles.cs">
+      <DependentUpon>Model.tt</DependentUpon>
+    </Compile>
     <Compile Include="Data\Schedule.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
@@ -232,6 +241,8 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Infrastructure\AntiForgeryValidate.cs" />
+    <Compile Include="Infrastructure\Authorization\AdminCheckAttribute.cs" />
+    <Compile Include="Infrastructure\Authorization\AuthorizationHelpers.cs" />
     <Compile Include="Infrastructure\Constants.cs" />
     <Compile Include="Infrastructure\JsonNetResult.cs" />
     <Compile Include="Infrastructure\UserManager.cs" />
@@ -309,6 +320,11 @@
     <Content Include="static\css\login.min.css.map">
       <DependentUpon>login.min.css</DependentUpon>
     </Content>
+    <Content Include="Areas\Configuration\Views\web.config" />
+    <Content Include="Areas\Configuration\Views\UserAdministration\Index.cshtml" />
+    <Content Include="Areas\Configuration\Views\_ViewStart.cshtml" />
+    <Content Include="Areas\Configuration\Views\UserAdministration\Add.cshtml" />
+    <Content Include="static\css\user.scss" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -320,6 +336,8 @@
     <Folder Include="Areas\Common\Models\" />
     <Folder Include="Areas\Common\Views\Default\" />
     <Folder Include="Areas\Common\Views\Shared\" />
+    <Folder Include="Areas\Configuration\Models\" />
+    <Folder Include="Areas\Configuration\Views\Shared\" />
     <Folder Include="Areas\Registration\Models\" />
     <Folder Include="Areas\Registration\Views\Shared\" />
     <Folder Include="Models\" />
