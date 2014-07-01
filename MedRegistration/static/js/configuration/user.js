@@ -29,7 +29,7 @@
 
 
     $scope.add = function () {
-        __self.openUser(-1);
+        __self.openUser(0);
     }
 
     $scope.edit = function (id) {
@@ -45,7 +45,7 @@ app.controller('userAddController', [
         };
 
         $scope.model = {
-            id: 0,
+            id: id,
             userName: '',
             password: '',
             confirmPassword: '',
@@ -91,7 +91,7 @@ app.controller('userAddController', [
 
                 if (user.roles) {
                     for (var i = 0; i < user.roles.length; i++) {
-                        var role = $scope.roles.find(function(r) { return r.id == user.roles[i].id; });
+                        var role = $scope.data.roles.find(function(r) { return r.id == user.roles[i].id; });
                         if (role)
                             role.checked = true;
                     }
@@ -127,7 +127,7 @@ app.controller('userAddController', [
             var user = {
                 id: $scope.model.id,
                 userName: $scope.model.userName,
-                passwordName: $scope.model.password,
+                password: $scope.model.password,
                 firstName: $scope.model.firstName,
                 lastName: $scope.model.lastName,
                 email: $scope.model.email

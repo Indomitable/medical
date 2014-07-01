@@ -59,6 +59,9 @@ namespace MedRegistration.Areas.Configuration.Controllers
         {
             try
             {
+                var hash = UserManager.HashPassword(user.Password);
+                user.Password = hash.Item1;
+                user.Salt = hash.Item2;
                 using (var context = new DataContext())
                 {
                     if (user.Id == 0)
@@ -71,9 +74,8 @@ namespace MedRegistration.Areas.Configuration.Controllers
                         if (dbUser == null)
                             return JsonNet(new { result = 3 });
                         dbUser.UserName = user.UserName;
-                        var hash = UserManager.HashPassword(user.Password);
-                        dbUser.Password = hash.Item1;
-                        dbUser.Salt = hash.Item2;
+                        dbUser.Password = user.Password;
+                        dbUser.Salt = user.Salt;
                         dbUser.FirstName = user.FirstName;
                         dbUser.LastName = user.LastName;
                         dbUser.Email = user.Email;
