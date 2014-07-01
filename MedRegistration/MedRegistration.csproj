@@ -334,7 +334,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Areas\Common\Models\" />
-    <Folder Include="Areas\Common\Views\Default\" />
     <Folder Include="Areas\Common\Views\Shared\" />
     <Folder Include="Areas\Configuration\Models\" />
     <Folder Include="Areas\Configuration\Views\Shared\" />
