@@ -12,6 +12,7 @@ namespace MedRegistration.Areas.Configuration.Controllers
     [AdminCheck]
     public class UserAdministrationController : BaseController
     {
+        private static readonly object locker = new object();
         [HttpGet]
         public ActionResult Index()
         {
@@ -54,7 +55,18 @@ namespace MedRegistration.Areas.Configuration.Controllers
             }
         }
 
+        [HttpGet]
+        public ActionResult GetUserByName(string userName)
+        {
+            using (var context = new DataContext(lazyLoading: false))
+            {
+                var user = context.Users.SingleOrDefault(x => x.UserName == userName);
+                return JsonNet(user);
+            }
+        }
+
         [HttpPost]
+        [AntiForgeryValidate]
         public ActionResult Save(User user, int[] roles)
         {
             try
@@ -100,6 +112,33 @@ namespace MedRegistration.Areas.Configuration.Controllers
             catch (Exception)
             {
                 return JsonNet(new { result = 2 });
+            }
+        }
+
+        [HttpPost]
+        [AntiForgeryValidate]
+        public ActionResult Delete(int id)
+        {
+            lock (locker)
+            {
+                try
+                {
+                    using (var context = new DataContext())
+                    {
+                        var user = context.Users.SingleOrDefault(p => p.Id == id);
+                        if (user != null)
+                        {
+                            user.Roles.Clear();
+                            context.Users.Remove(user);
+                        }
+                        context.SaveChanges();
+                    }
+                    return JsonNet(new { result = 1 });
+                }
+                catch (Exception)
+                {
+                    return JsonNet(new { result = 2 });
+                }
             }
         }
     }

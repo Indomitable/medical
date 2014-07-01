@@ -109,6 +109,9 @@ app.controller('userAddController', [
             if (!$scope.model.userName) {
                 $scope.model.errors.push("Моля въведете потребителско име!");
             }
+            if (!$scope.model.password) {
+                $scope.model.errors.push("Моля въведете парола!");
+            }
             if ($scope.model.password != $scope.model.confirmPassword) {
                 $scope.model.errors.push("Двете пароли не са еднакви!");
             }
@@ -121,9 +124,35 @@ app.controller('userAddController', [
             if (!$scope.model.email) {
                 $scope.model.errors.push("Моля въведете електронна поща!");
             }
-            if ($scope.model.errors.length > 0)
-                return false;
+            var hasSelectedRole = false;
+            for (var i = 0; i < $scope.data.roles.length; i++) {
+                if ($scope.data.roles[i].checked) {
+                    hasSelectedRole = true;
+                    break;
+                }
+            }
+            if (!hasSelectedRole)
+                $scope.model.errors.push("Моля изберете поне една група за права!");
 
+            if ($scope.model.errors.length > 0)
+                return;
+
+            $http({
+                method: 'GET',
+                url: '/Configuration/UserAdministration/GetUserByName',
+                params: {
+                    userName: $scope.model.userName
+                }
+            }).success(function (user) {
+                if (user) {
+                    $scope.model.errors.push("Потребител със същото име вече съществува!");
+                } else {
+                    __self.innerSave();
+                }
+            });
+        };
+
+        __self.innerSave = function() {
             var user = {
                 id: $scope.model.id,
                 userName: $scope.model.userName,
@@ -151,9 +180,7 @@ app.controller('userAddController', [
             }).error(function (err) {
                 $scope.model.errors.push(err);
             });
-
-            return true;
-        };
+        }
 
         __self.ok = function () {
             $modalInstance.close();
