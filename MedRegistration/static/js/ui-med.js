@@ -89,8 +89,11 @@
                             var x = viewValue.split('-');
                             var year = parseInt(x[0]);
                             var week = parseInt(x[1].substr(1));
-                            var d = (1 + (week - 1) * 7);
-                            return new Date(year, 0, d);
+                            var firstJanuary = new Date(year, 0, 1); //Get 1st January
+                            firstJanuary.setDate(firstJanuary.getDate() - (7 + firstJanuary.getDay() - 1) % 7); //Get First Monday
+                            var d =  (week - 1) * 7;
+                            firstJanuary.setDate(firstJanuary.getDate() + d);
+                            return firstJanuary;
                         }
                         return null;
                     });

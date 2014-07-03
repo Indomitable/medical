@@ -3,12 +3,15 @@
     __self.days = [];
     __self.reservations = [];
 
+    __self.copyDate = function (date) {
+        return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    }
+
     __self.setWeekByDate = function (date) {
-        date.setDate(date.getDate() - (7 + date.getDay() - 1) % 7);
-        __self.from = date;
-        date = new Date(__self.from.getFullYear(), __self.from.getMonth(), __self.from.getDate());
-        date.setDate(date.getDate() + (7 - date.getDay() + 7) % 7);
-        __self.to = date;
+        __self.from = __self.copyDate(date);
+        __self.from.setDate(__self.from.getDate() - (7 + __self.from.getDay() - 1) % 7);
+        __self.to = __self.copyDate(__self.from);
+        __self.to.setDate(__self.to.getDate() + 6);
     };
 
     __self.buildHours = function (dayMinHour, dayMaxHour, doctor) {
@@ -168,40 +171,48 @@
         $q.all(waits).then(__self.applyReservations);
     };
 
-    return {
-        from: __self.from,
-        to: __self.to,
+    var currentDate = __self.copyDate(new Date()); //Remove hour offset.
+    __self.setWeekByDate(currentDate);
+    __self.currentDate = __self.copyDate(__self.from);
+    __self.getData();
+
+    var res =
+    {
         days: __self.days,
 
-        setDate: function(date) {
+        currentDate: __self.currentDate,
+
+        setDate: function (date) {
             __self.setWeekByDate(date);
         },
 
-        reload: function() {
+        reload: function () {
             __self.getData();
         },
 
-        reloadResevations: function(date) {
+        reloadResevations: function (date) {
             __self.reloadResevations(date);
         },
 
-        name: function() {
+        name: function () {
             return customFormatter.dateToUserString(__self.from) + " - " + customFormatter.dateToUserString(__self.to);
         },
 
-        next: function() {
+        next: function () {
             __self.from.setDate(__self.from.getDate() + 7);
             __self.to.setDate(__self.to.getDate() + 7);
+            res.currentDate.setDate(res.currentDate.getDate() + 7);
             __self.getData();
         },
 
-        prev: function() {
+        prev: function () {
             __self.from.setDate(__self.from.getDate() - 7);
             __self.to.setDate(__self.to.getDate() - 7);
+            res.currentDate.setDate(res.currentDate.getDate() - 7);
             __self.getData();
         },
 
-        doctors: function() {
+        doctors: function () {
             var doctors = [];
             for (var i = 0; i < __self.days.length; i++) {
                 for (var j = 0; j < __self.days[i].doctors.length; j++) {
@@ -212,16 +223,13 @@
             }
             return doctors;
         }
-}
+    }
+    return res;
 }]);
 
 app.controller('registrationController', ['$scope', '$http', 'customFormatter', 'week', '$modal',
     function ($scope, $http, customFormatter, week, $modal) {
         $scope.week = week;
-        var _date = new Date();
-        $scope.currentDate = new Date(_date.getFullYear(), _date.getMonth(), _date.getDate());
-        $scope.week.setDate($scope.currentDate);
-        $scope.week.reload();
 
         $scope.registerHour = function (doctor, date, hour) {
             var addRegistrationInstance = $modal.open({
@@ -268,18 +276,10 @@ app.controller('registrationController', ['$scope', '$http', 'customFormatter', 
             });
         };
 
-        $scope.$watch("currentDate", function (newVal, oldVal) {
+        $scope.$watch("week.currentDate", function (newVal, oldVal) {
             if (newVal && oldVal && newVal.valueOf() != oldVal.valueOf()) {
-                var oldDate = new Date(oldVal.getFullYear(), oldVal.getMonth(), oldVal.getDate());
-                var newDate = new Date(newVal.getFullYear(), newVal.getMonth(), newVal.getDate());
-
-                oldDate.setDate(oldDate.getDate() - (7 + oldDate.getDay() - 1) % 7);
-                newDate.setDate(newDate.getDate() - (7 + newDate.getDay() - 1) % 7);
-
-                if (oldDate.valueOf() != newDate.valueOf()) {
-                    $scope.week.setDate(newDate);
-                    $scope.week.reload();
-                }
+                $scope.week.setDate(newVal);
+                $scope.week.reload();
             }
         });
     }
