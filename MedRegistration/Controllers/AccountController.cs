@@ -1,4 +1,6 @@
-﻿using System.Security.Claims;
+﻿using System;
+using System.Linq;
+using System.Security.Claims;
 using System.Web;
 using System.Web.Mvc;
 using MedRegistration.Data;
@@ -48,6 +50,8 @@ namespace MedRegistration.Controllers
                 identity.AddClaim(new Claim(ClaimTypes.Name, userName));
                 identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, userName));
                 var user = UserManager.GetUser(userName);
+                identity.AddClaim(new Claim(ClaimTypes.SerialNumber, Convert.ToString(user.Id)));
+                identity.AddClaim(new Claim(ClaimTypes.GivenName, user.FirstName + " " + user.LastName));
                 foreach (var role in user.Roles)
                 {
                     identity.AddClaim(new Claim(ClaimTypes.Role, role.Name));
@@ -57,6 +61,10 @@ namespace MedRegistration.Controllers
                 {
                     IsPersistent = rememberme.GetValueOrDefault(false)
                 }, identity);
+                if (user.Roles.Any(x => x.Id == (int) Roles.Registration))
+                {
+                    return RedirectToAction("Index", "Registration", new { area = "Registration" });
+                }
                 return RedirectToAction("Index", "Home");
             }
             return RedirectToAction("Login");

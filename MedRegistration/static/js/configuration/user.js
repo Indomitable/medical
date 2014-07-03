@@ -4,10 +4,13 @@
     __self.openUser = function (id) {
         var userInstance = $modal.open({
             templateUrl: '/Configuration/UserAdministration/Add',
-            controller: 'userAddController',
+            controller: 'userModalController',
             resolve: {
                 id: function () {
                     return id;
+                },
+                canBeDeleted : function() {
+                    return $scope.currentUserId != id && id > 0;
                 }
             }
         });
@@ -37,21 +40,48 @@
     }
 }]);
 
-app.controller('userAddController', [
-    '$scope', '$http', '$q', '$modalInstance', 'id', function ($scope, $http, $q, $modalInstance, id) {
+app.controller('userModalController', ['$scope', '$modalInstance', 'id', 'canBeDeleted', function ($scope, $modalInstance, id, canBeDeleted) {
+    $scope.id = id;
+
+    $scope.canBeDeleted = canBeDeleted;
+
+    $scope.cancel = function () {
+        $modalInstance.dismiss('cancel');
+    };
+
+    $scope.ok = function () {
+        $modalInstance.close();
+    };
+}]);
+
+app.controller('userSelfEditController', ['$scope', function ($scope) {
+    $scope.canBeDeleted = false;
+
+    $scope.init = function (id) {
+        $scope.id = id;
+    };
+
+    $scope.ok = function () {
+        alert('Личните данни бяха запазени успешно!');
+    };
+}]);
+
+app.controller('userEditController', [
+    '$scope', '$http', '$q', function ($scope, $http, $q) {
         var __self = this;
         $scope.data = {
             roles: []
         };
 
         $scope.model = {
-            id: id,
+            id: $scope.id,
             userName: '',
             password: '',
             confirmPassword: '',
             firstName: '',
             lastName: '',
             email: '',
+            changePassword: 0,
             errors: []
         };
 
@@ -81,7 +111,7 @@ app.controller('userAddController', [
                 method: 'GET',
                 url: '/Configuration/UserAdministration/GetUser',
                 params: {
-                    id: id
+                    id: $scope.model.id
                 }
             }).success(function (user) {
                 $scope.model.userName = user.userName;
@@ -91,7 +121,7 @@ app.controller('userAddController', [
 
                 if (user.roles) {
                     for (var i = 0; i < user.roles.length; i++) {
-                        var role = $scope.data.roles.find(function(r) { return r.id == user.roles[i].id; });
+                        var role = $scope.data.roles.find(function (r) { return r.id == user.roles[i].id; });
                         if (role)
                             role.checked = true;
                     }
@@ -100,7 +130,7 @@ app.controller('userAddController', [
         };
 
         __self.loadData().then(function () {
-            if (id > 0)
+            if ($scope.model.id > 0)
                 __self.loadUser();
         });
 
@@ -109,11 +139,13 @@ app.controller('userAddController', [
             if (!$scope.model.userName) {
                 $scope.model.errors.push("Моля въведете потребителско име!");
             }
-            if (!$scope.model.password) {
-                $scope.model.errors.push("Моля въведете парола!");
-            }
-            if ($scope.model.password != $scope.model.confirmPassword) {
-                $scope.model.errors.push("Двете пароли не са еднакви!");
+            if ($scope.model.id === 0 || $scope.model.changePassword === 1) {
+                if (!$scope.model.password) {
+                    $scope.model.errors.push("Моля въведете парола!");
+                }
+                if ($scope.model.password != $scope.model.confirmPassword) {
+                    $scope.model.errors.push("Двете пароли не са еднакви!");
+                }
             }
             if (!$scope.model.firstName) {
                 $scope.model.errors.push("Моля въведете първо име!");
@@ -137,22 +169,30 @@ app.controller('userAddController', [
             if ($scope.model.errors.length > 0)
                 return;
 
-            $http({
+            if ($scope.model.id == 0) {
+                __self.checkExistingUser().success(function (user) {
+                    if (user) {
+                        $scope.model.errors.push("Потребител със същото име вече съществува!");
+                    } else {
+                        __self.innerSave();
+                    }
+                });
+            } else {
+                __self.innerSave();
+            }
+        };
+
+        __self.checkExistingUser = function () {
+            return $http({
                 method: 'GET',
                 url: '/Configuration/UserAdministration/GetUserByName',
                 params: {
                     userName: $scope.model.userName
                 }
-            }).success(function (user) {
-                if (user) {
-                    $scope.model.errors.push("Потребител със същото име вече съществува!");
-                } else {
-                    __self.innerSave();
-                }
             });
-        };
+        }
 
-        __self.innerSave = function() {
+        __self.innerSave = function () {
             var user = {
                 id: $scope.model.id,
                 userName: $scope.model.userName,
@@ -173,22 +213,15 @@ app.controller('userAddController', [
                 url: '/Configuration/UserAdministration/Save',
                 data: {
                     user: user,
-                    roles: roles
+                    roles: roles,
+                    changePassword: $scope.model.changePassword
                 }
             }).success(function (res) {
-                __self.ok();
+                $scope.ok();
             }).error(function (err) {
                 $scope.model.errors.push(err);
             });
         }
-
-        __self.ok = function () {
-            $modalInstance.close();
-        };
-
-        $scope.cancel = function () {
-            $modalInstance.dismiss('cancel');
-        };
 
         $scope.delete = function () {
             if (confirm('Сигурни ли сте, че искате да изтриете потребителя: ' + $scope.model.firstName + ' ' + $scope.model.lastName)) {
@@ -200,7 +233,7 @@ app.controller('userAddController', [
                         id: $scope.model.id
                     }
                 }).success(function (res) {
-                    __self.ok();
+                    $scope.ok();
                 }).error(function (err) {
                     $scope.model.errors.push(err);
                 });

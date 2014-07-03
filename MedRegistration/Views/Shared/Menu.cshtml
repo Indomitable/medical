@@ -3,13 +3,13 @@
     @if (Request.IsAuthenticated)
     {
         <div class="user-name">
-            <span>Добре дошкли: @HttpContext.Current.User.Identity.Name</span>
+            <span>Добре дошли: @HttpContext.Current.User.FullName()</span>
             <a href="@Url.Action("Logout", "Account", new { area = "" })" class="clear-href">Изход</a>
         </div>
     }
     <div class="menu">
         @{
-            var uri = this.ViewContext.HttpContext.Request.Url;
+            var uri = ViewContext.HttpContext.Request.Url;
             var activeMenuItem = -1;
             if (uri != null)
             {
@@ -65,9 +65,14 @@
                     <span>Настройки</span>
                 </a>
                 <ul>
-                    <li class="@(HttpContext.Current.User.IsAdmin() ? "" : "hidden")">
+                    <li class="@ViewBag.AdminViewClass">
                         <a href='@Url.Action("Index", "UserAdministration", new { area = "Configuration" })'>
                             <span>Потребители</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href='@Url.Action("Edit", "UserAdministration", new { area = "Configuration" })'>
+                            <span>Промяна лични данни</span>
                         </a>
                     </li>
                 </ul>

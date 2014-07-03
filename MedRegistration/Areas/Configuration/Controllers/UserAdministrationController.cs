@@ -9,11 +9,13 @@ using MedRegistration.Infrastructure.Authorization;
 
 namespace MedRegistration.Areas.Configuration.Controllers
 {
-    [AdminCheck]
+    
     public class UserAdministrationController : BaseController
     {
         private static readonly object locker = new object();
+
         [HttpGet]
+        [AdminCheck]
         public ActionResult Index()
         {
             return View();
@@ -51,7 +53,16 @@ namespace MedRegistration.Areas.Configuration.Controllers
             using (var context = new DataContext(lazyLoading: false))
             {
                 var user = context.Users.Include(u => u.Roles).SingleOrDefault(x => x.Id == id);
-                return JsonNet(user);
+                if (user == null)
+                    return new EmptyResult();
+                return JsonNet(new
+                {
+                    user.UserName,
+                    user.FirstName,
+                    user.LastName,
+                    user.Email,
+                    user.Roles
+                });
             }
         }
 
@@ -67,17 +78,17 @@ namespace MedRegistration.Areas.Configuration.Controllers
 
         [HttpPost]
         [AntiForgeryValidate]
-        public ActionResult Save(User user, int[] roles)
+        public ActionResult Save(User user, int[] roles, int changePassword)
         {
             try
             {
-                var hash = UserManager.HashPassword(user.Password);
-                user.Password = hash.Item1;
-                user.Salt = hash.Item2;
                 using (var context = new DataContext())
                 {
                     if (user.Id == 0)
                     {
+                        var hash = UserManager.HashPassword(user.Password);
+                        user.Password = hash.Item1;
+                        user.Salt = hash.Item2;
                         context.Users.Add(user);
                     }
                     else
@@ -86,8 +97,12 @@ namespace MedRegistration.Areas.Configuration.Controllers
                         if (dbUser == null)
                             return JsonNet(new { result = 3 });
                         dbUser.UserName = user.UserName;
-                        dbUser.Password = user.Password;
-                        dbUser.Salt = user.Salt;
+                        if (changePassword == 1)
+                        {
+                            var hash = UserManager.HashPassword(user.Password);
+                            dbUser.Password = hash.Item1;
+                            dbUser.Salt = hash.Item2;
+                        }
                         dbUser.FirstName = user.FirstName;
                         dbUser.LastName = user.LastName;
                         dbUser.Email = user.Email;
@@ -140,6 +155,13 @@ namespace MedRegistration.Areas.Configuration.Controllers
                     return JsonNet(new { result = 2 });
                 }
             }
+        }
+
+        [HttpGet]
+        public ActionResult Edit()
+        {
+            ViewBag.Id = HttpContext.User.UserId();
+            return View();
         }
     }
 }

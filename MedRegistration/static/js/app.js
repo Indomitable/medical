@@ -21,6 +21,9 @@ app.config(['$httpProvider', function ($httpProvider) {
 }]);
 
 app.controller('rootController', [
-    '$scope', function($scope) {
+    '$scope', function ($scope) {
+        $scope.init = function(currentUserId) {
+            $scope.currentUserId = currentUserId;
+        }
     }
 ]);

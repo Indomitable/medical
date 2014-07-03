@@ -2,12 +2,20 @@
 using System.Web.Mvc;
 using MedRegistration.Data;
 using MedRegistration.Infrastructure;
+using MedRegistration.Infrastructure.Authorization;
 
 namespace MedRegistration.Controllers
 {
     [Authorize]
     public class BaseController : Controller
     {
+        protected override void OnActionExecuting(ActionExecutingContext filterContext)
+        {
+            base.OnActionExecuting(filterContext);
+            filterContext.Controller.ViewBag.AdminViewClass = filterContext.HttpContext.User.IsAdmin() ? "" : "hidden";
+            //Can Open Session To Database
+        }
+
         public JsonResult JsonNet<T>(T data)
         {
             return new JsonNetResult<T>(data);

@@ -1,0 +1,17 @@
+﻿@{
+    ViewBag.Title = "Промяна на личните данни";
+}
+
+<input type="hidden" name="id" value="@ViewBag.Id"/>
+<div ng-include="'@Url.Action("Add")'" class="edit-user" ng-controller="userSelfEditController" ng-init="init(@ViewBag.Id)"></div>
+
+
+@section Styles
+{
+    <link href="~/static/css/user.min.css" rel="stylesheet" />
+}
+
+@section Scripts
+{
+    <script src="~/static/js/configuration/user.js"></script>
+}

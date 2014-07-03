@@ -325,6 +325,7 @@
     <Content Include="Areas\Configuration\Views\_ViewStart.cshtml" />
     <Content Include="Areas\Configuration\Views\UserAdministration\Add.cshtml" />
     <Content Include="static\css\user.scss" />
+    <Content Include="Areas\Configuration\Views\UserAdministration\Edit.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

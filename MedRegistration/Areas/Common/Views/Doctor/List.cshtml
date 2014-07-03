@@ -4,7 +4,7 @@
 <div class="container" ng-controller="doctorsController">
     <div>
         <div class="col-xs-2">
-            <button class="btn btn-default" ng-click="add()">Добави нов лекар</button>
+            <button class="btn btn-default @ViewBag.AdminViewClass" ng-click="add()">Добави нов лекар</button>
         </div>
         <div class="col-xs-3 col-xs-offset-7">
             <div class="input-group">
@@ -28,7 +28,7 @@
                     <a ng-href="/Common/Schedule?doctorId={{doctor.id}}">
                         <span class="glyphicon glyphicon-calendar"></span>
                     </a>
-                    <a ng-click="edit(doctor.id)"><span class="glyphicon glyphicon-pencil"></span></a>
+                    <a ng-click="edit(doctor.id)"><span class="glyphicon glyphicon-pencil @ViewBag.AdminViewClass"></span></a>
                 </td>
                 <td ng-bind="doctor.title"></td>
                 <td ng-bind="doctor.firstName"></td>
