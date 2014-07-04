@@ -107,43 +107,37 @@
         });
     };
 
-    __self.getReservations = function (doctorId, date, fromTime, toTime) {
-        __self.reservations.clear();
-        return $http({
-            method: 'GET',
-            url: '/Registration/Registration/GetReservations',
-            params: {
-                doctorId: doctorId,
-                fromDate: dateHelper.dateToString(date),
-                toDate: dateHelper.dateToString(date),
-                fromTime: fromTime,
-                toTime: toTime
+    __self.findHour = function (doctorId, date, fromTime, toTime) {
+        if (toTime === 0 && fromTime > 0)
+            toTime = 1440;
+        for (var i = 0; i < __self.days.length; i++) {
+            if (dateHelper.isDatesEqual(__self.days[i].date, date)) {
+                for (var j = 0; j < __self.days[i].doctors.length; j++) {
+                    var doctor = __self.days[i].doctors[j];
+                    if (doctor.doctorId === doctorId) {
+                        for (var k = 0; k < __self.days[i].doctors[j].hours.length; k++) {
+                            var hour = __self.days[i].doctors[j].hours[k];
+                            if (hour.from == fromTime && hour.to == toTime) {
+                                return hour;
+                            }
+                        }
+                    }
+                }
             }
-        }).success(function (data) {
-            __self.reservations.pushAll(data);
-        });
+        }
+        return null;
     };
 
     __self.applyReservations = function () {
-        for (var i = 0; i < __self.days.length; i++) {
-            var day = __self.days[i];
-            var reservationsForDay = _.filter(__self.reservations, function(x) {
-                 return dateHelper.isDatesEqual(dateHelper.parseDate(x.date), day.date);
-            });
-            if (reservationsForDay.length === 0)
-                continue;
-            for (var j = 0; j < day.doctors.length; j++) {
-                var doctor = day.doctors[j];
-                var reservationsForDoctor = reservationsForDay.find(function (x) { return x.doctorId === doctor.doctorId; });
-                if (!reservationsForDoctor)
-                    continue;
-                for (var k = 0; k < reservationsForDoctor.hours.length; k++) {
-                    var reservationHour = reservationsForDoctor.hours[k];
-                    if (reservationHour.toTime === 0 && reservationHour.fromTime > 0)
-                        reservationHour.toTime = 1440;
-                    var hour = doctor.hours.find(function (h) { return h.from === reservationHour.fromTime && h.to === reservationHour.toTime; });
-                    if (!hour)
-                        continue;
+        for (var l = 0; l < __self.reservations.length; l++) {
+            var reservation = __self.reservations[l];
+            for (var m = 0; m < reservation.hours.length; m++) {
+                var reservationHour = reservation.hours[m];
+                var fromTime = timeConverter.convertToMinutes(reservationHour.fromTime);
+                var toTime = timeConverter.convertToMinutes(reservationHour.toTime);
+
+                var hour = __self.findHour(reservation.doctorId, dateHelper.parseDate(reservation.date), fromTime, toTime);
+                if (hour) {
                     hour.isReserved = true;
                     hour.reservation = {
                         id: reservationHour.id,
@@ -156,27 +150,20 @@
                 }
             }
         }
-    }
+    };
 
-    __self.reloadResevations = function (doctorId, date, fromTime, toTime) {
-        for (var i = 0; i < __self.days.length; i++) {
-            if (dateHelper.isDatesEqual(__self.days[i].date, date)) {
-                for (var j = 0; j < __self.days[i].doctors.length; j++) {
-                    var doctor = __self.days[i].doctors[j];
-                    if (doctor.doctorId === doctorId) {
-                        for (var k = 0; k < __self.days[i].doctors[j].hours.length; k++) {
-                            var hour = __self.days[i].doctors[j].hours[k];
-                            if (hour.from == timeConverter.convertToMinutes(fromTime)
-                             && hour.to == timeConverter.convertToMinutes(toTime)) {
-                                hour.isReserved = false;
-                                hour.reservation = {};
-                            }
-                        }
-                    }
-                }
-            }
+    __self.removeReservation = function (doctorId, date, fromTime, toTime) {
+        var hour = __self.findHour(doctorId, date, fromTime, toTime);
+        if (hour) {
+            hour.isReserved = false;
+            hour.reservation = {};
         }
-        __self.getReservations(doctorId, date, fromTime, toTime).then(__self.applyReservations);
+    };
+
+    __self.addReservation = function (reservation) {
+        __self.reservations.clear();
+        __self.reservations.push(reservation);
+        __self.applyReservations();
     };
 
     __self.getData = function () {
@@ -197,17 +184,13 @@
 
         currentDate: __self.currentDate,
 
-        setDate: function (date) {
-            __self.setWeekByDate(date);
-        },
+        setDate: __self.setWeekByDate,
 
-        reload: function () {
-            __self.getData();
-        },
+        reload: __self.getData,
 
-        reloadResevations: function (doctorId, date, fromTime, toTime) {
-            __self.reloadResevations(doctorId, date, fromTime, toTime);
-        },
+        removeReservation: __self.removeReservation,
+
+        addReservation: __self.addReservation,
 
         name: function () {
             return dateHelper.dateToUserString(__self.from) + " - " + dateHelper.dateToUserString(__self.to);
@@ -267,11 +250,31 @@ app.controller('registrationController', ['$scope', '$http', 'dateHelper', 'week
 
         __self.listenForChanges = function () {
             reservationChangeListener.connect(
-                function (doctorId, date, fromTime, toTime) {
-                    $scope.week.reloadResevations(doctorId, dateHelper.parseDate(date), fromTime, toTime);
+                //On Add Reservation
+                function (doctorId, date, fromTime, toTime, reservationId, patientId, firstName, lastName, note, phone) {
+                    var reservation = {
+                        doctorId: doctorId,
+                        date: date,
+                        hours: [
+                            {
+                                id: reservationId,
+                                fromTime: fromTime,
+                                toTime: toTime,
+                                patientId: patientId,
+                                patientFirstName: firstName,
+                                patientLastName: lastName,
+                                note: note,
+                                patientPhone: phone
+                            }
+                        ]
+                    };
+                    $scope.week.addReservation(reservation);
+                    $scope.$apply();
                 },
+                //On Remove Reservation
                 function (doctorId, date, fromTime, toTime) {
-                    $scope.week.reloadResevations(doctorId, dateHelper.parseDate(date), fromTime, toTime);
+                    $scope.week.removeReservation(doctorId, dateHelper.parseDate(date), timeConverter.convertToMinutes(fromTime), timeConverter.convertToMinutes(toTime));
+                    $scope.$apply();
                 });
         };
 
@@ -287,7 +290,6 @@ app.controller('registrationController', ['$scope', '$http', 'dateHelper', 'week
                     alert('Грешка при заключването на часа!');
                 else if (result.result == 3) {
                     alert('Този час вече е резервиран!');
-                  //  $scope.week.reloadResevations(date);
                 }
             });
         };
@@ -309,7 +311,6 @@ app.controller('registrationController', ['$scope', '$http', 'dateHelper', 'week
             });
             addRegistrationInstance.result.then(function () {
                 __self.unLockHour(doctor, date, hour);
-             //   $scope.week.reloadResevations(date);
             }, function () {
                 __self.unLockHour(doctor, date, hour);
             });
@@ -341,7 +342,7 @@ app.controller('registrationController', ['$scope', '$http', 'dateHelper', 'week
             });
         };
 
-        $scope.unRegisterHour = function (id, date) {
+        $scope.unRegisterHour = function (id) {
             $http({
                 method: 'POST',
                 url: '/Registration/Registration/UnRegisterHour',
@@ -349,9 +350,6 @@ app.controller('registrationController', ['$scope', '$http', 'dateHelper', 'week
                     id: id
                 }
             });
-//            .success(function (data) {
-//                $scope.week.reloadResevations(date);
-//            });
         };
 
         $scope.viewPatient = function (patientId) {

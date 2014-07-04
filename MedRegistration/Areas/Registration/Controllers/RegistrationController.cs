@@ -69,30 +69,29 @@ namespace MedRegistration.Areas.Registration.Controllers
             using (var context = new DataContext(lazyLoading: false))
             {
                 var query = from r in context.Reservations
-                    where fromDate <= r.Date && r.Date <= toDate 
-                       && (!doctorId.HasValue || r.DoctorId == doctorId.Value)
-                       && (!fromTime.HasValue || r.FromTime == fromTime.Value)
-                       && (!toTime.HasValue || r.ToTime == toTime.Value)
-                    group r by new { r.Date, r.DoctorId } into gr
-                    select new
-                    {
-                        gr.Key.Date,
-                        gr.Key.DoctorId,
-                        Hours = from h in gr
-                                let patientPhone = h.Patient.PatientPhones.FirstOrDefault(p => p.IsPrimary)
-                                select new
-                                {
-                                    h.Id,
-                                    FromTime = h.FromTime.Hours * 60 + h.FromTime.Minutes,
-                                    ToTime = h.ToTime.Hours * 60 + h.ToTime.Minutes,
-                                    PatientId = h.Patient.Id,
-                                    PatientFirstName = h.Patient.FirstName,
-                                    PatientLastName = h.Patient.LastName,
-                                    h.Note,
-                                    PatientPhone = patientPhone.Number
-                                }
-
-                    };
+                            where fromDate <= r.Date && r.Date <= toDate
+                               && (!doctorId.HasValue || r.DoctorId == doctorId.Value)
+                               && (!fromTime.HasValue || r.FromTime == fromTime.Value)
+                               && (!toTime.HasValue || r.ToTime == toTime.Value)
+                            group r by new { r.Date, r.DoctorId } into gr
+                            select new
+                            {
+                                gr.Key.Date,
+                                gr.Key.DoctorId,
+                                Hours = from h in gr
+                                        let patientPhone = h.Patient.PatientPhones.FirstOrDefault(p => p.IsPrimary)
+                                        select new
+                                        {
+                                            h.Id,
+                                            h.FromTime,
+                                            h.ToTime,
+                                            PatientId = h.Patient.Id,
+                                            PatientFirstName = h.Patient.FirstName,
+                                            PatientLastName = h.Patient.LastName,
+                                            h.Note,
+                                            PatientPhone = patientPhone.Number
+                                        }
+                            };
                 var data = query.ToList();
                 return JsonNet(data);
             }
@@ -123,7 +122,9 @@ namespace MedRegistration.Areas.Registration.Controllers
                         patient.PatientFundInfo.FundCardExpiration = reservation.PaymentInfo.FundCardExpiration.Value;
                     }
                     context.SaveChanges();
-                    BroadCastReservationMade(reservation.DoctorId, reservation.Date, reservation.FromTime, reservation.ToTime);
+                    context.Entry(reservation).Reference(x => x.Patient).Load();
+                    context.Entry(reservation.Patient).Collection(x => x.PatientPhones).Load();
+                    BroadCastReservationMade(reservation);
                 }
                 return JsonNet(1);
             }
@@ -152,9 +153,12 @@ namespace MedRegistration.Areas.Registration.Controllers
                     }
                     context.Patients.Add(patient);
                     reservation.Patient = patient;
+                    reservation.Note = patient.Note;
                     context.Reservations.Add(reservation);
                     context.SaveChanges();
-                    BroadCastReservationMade(reservation.DoctorId, reservation.Date, reservation.FromTime, reservation.ToTime);
+                    context.Entry(reservation).Reference(x => x.Patient).Load();
+                    context.Entry(reservation.Patient).Collection(x => x.PatientPhones).Load();
+                    BroadCastReservationMade(reservation);
                 }
                 return JsonNet(1);
             }
@@ -207,10 +211,10 @@ namespace MedRegistration.Areas.Registration.Controllers
                         {
                             var newLock = new ReservationLock
                             {
-                                UserId = HttpContext.User.UserId(), 
-                                DoctorId = doctorId, 
-                                Date = date, 
-                                FromTime = fromTime, 
+                                UserId = HttpContext.User.UserId(),
+                                DoctorId = doctorId,
+                                Date = date,
+                                FromTime = fromTime,
                                 ToTime = toTime
                             };
                             context.ReservationLocks.Add(newLock);
@@ -260,10 +264,14 @@ namespace MedRegistration.Areas.Registration.Controllers
             }
         }
 
-        private void BroadCastReservationMade(int doctorId, DateTime date, TimeSpan fromTime, TimeSpan toTime)
+        private void BroadCastReservationMade(Reservation reservation)
         {
             IHubContext context = GlobalHost.ConnectionManager.GetHubContext<ReservationHub>();
-            context.Clients.All.SendReservationMade(doctorId, date, fromTime, toTime);
+            //int doctorId, DateTime date, TimeSpan fromTime, TimeSpan toTime,
+            //int reservationId, int patientId, string firstName, string lastName, string note, string phone
+            context.Clients.All.SendReservationMade(reservation.DoctorId, reservation.Date, reservation.FromTime, reservation.ToTime,
+                reservation.Id, reservation.Patient.Id, reservation.Patient.FirstName, reservation.Patient.LastName, 
+                reservation.Note, reservation.Patient.PatientPhones.Single(p => p.IsPrimary).Number);
         }
 
         private void BroadCastReservationRemoved(int doctorId, DateTime date, TimeSpan fromTime, TimeSpan toTime)
