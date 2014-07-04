@@ -570,8 +570,7 @@ app.directive('vmQtip', ['timeConverter', 'dateHelper', function (timeConverter,
         link: function (scope, elm, attrs) {
             var setTip = function () {
 
-                var content = "<div style='font-size: 12px'>";
-                content += scope.doctor.title + " " + scope.doctor.firstName + " " + scope.doctor.lastName + "<br/>";
+                var content = scope.doctor.title + " " + scope.doctor.firstName + " " + scope.doctor.lastName + "\n";
                 if (scope.hour.work === 0)
                     content += 'Неработи';
                 else {
@@ -584,44 +583,26 @@ app.directive('vmQtip', ['timeConverter', 'dateHelper', function (timeConverter,
                             content += 'Работи.';
                     }
                 }
-                content += '<br/>';
-                content += 'Дата: ' + dateHelper.dateToUserString(scope.day.date) + ", Час: " + timeConverter.convertToHours(scope.hour.from) + " - " + timeConverter.convertToHours(scope.hour.to);
+                content += '\n';
+                content += 'Дата: ' + dateHelper.dateToUserString(scope.day.date);
+                content += '\n';
+                content += "Час: " + timeConverter.convertToHours(scope.hour.from) + " - " + timeConverter.convertToHours(scope.hour.to);
                 if (scope.hour.isReserved) {
-                    content += '<br/>';
+                    content += '\n';
                     content += 'Пациент: ' + scope.hour.reservation.firstName + ' ' + scope.hour.reservation.lastName;
-                    content += '<br/>';
+                    content += '\n';
                     content += 'Телефон: ' + scope.hour.reservation.phone;
                     if (scope.hour.reservation.note) {
-                        content += '<br/>';
+                        content += '\n';
                         content += 'Забележка: ' + scope.hour.reservation.note;
                     }
                 }
-
-                content += "</div>";
-                elm.qtip({
-                    content: {
-                        text: content
-                    },
-                    position: {
-                        my: 'bottom left',
-                        at: 'top right',
-                        //     target: 'mouse',
-                        viewport: $(window)
-                    },
-                    show: {
-                        solo: true
-                    }
-                });
-            };
-
-            var removeTip = function () {
-                elm.qtip('destroy', true);
+                attrs.$set('data-title', content);
             };
 
             setTip();
 
             scope.$watch('hour.isReserved', function () {
-                removeTip();
                 setTip();
             });
         }
