@@ -31,6 +31,7 @@ namespace MedRegistration.Infrastructure
             JsonSerializerSettings settings = new JsonSerializerSettings { Formatting = Formatting.None };
             settings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
             settings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+            settings.DateTimeZoneHandling = DateTimeZoneHandling.Local;
             var serializedObject = JsonConvert.SerializeObject(data, settings);
             response.Write(serializedObject);
         }

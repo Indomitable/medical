@@ -248,6 +248,7 @@
     <Compile Include="Infrastructure\Authorization\AdminCheckAttribute.cs" />
     <Compile Include="Infrastructure\Authorization\AuthorizationHelpers.cs" />
     <Compile Include="Infrastructure\Constants.cs" />
+    <Compile Include="Infrastructure\Hubs\ReservationHub.cs" />
     <Compile Include="Infrastructure\JsonNetResult.cs" />
     <Compile Include="Infrastructure\UserManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

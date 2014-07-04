@@ -91,7 +91,7 @@
                             var week = parseInt(x[1].substr(1));
                             var firstJanuary = new Date(year, 0, 1); //Get 1st January
                             firstJanuary.setDate(firstJanuary.getDate() - (7 + firstJanuary.getDay() - 1) % 7); //Get First Monday
-                            var d =  (week - 1) * 7;
+                            var d = (week - 1) * 7;
                             firstJanuary.setDate(firstJanuary.getDate() + d);
                             return firstJanuary;
                         }
@@ -108,7 +108,7 @@
                         dateFormat: "dd.mm.yy",
                         dayNamesMin: ['Нед', 'Пон', 'Вт', 'Ср', 'Чет', 'Пет', 'Съб'],
                         monthNamesShort: ['Януари', 'Февруари', 'Март', 'Април', 'Май', 'Юни', 'Юли', 'Август', 'Септември', 'Октомври', 'Ноември', 'Декември']
-                });
+                    });
                     ngModelCtrl.$formatters.unshift(function (modelValue) {
                         if (modelValue) {
                             modelValue.setDate(modelValue.getDate() - (7 + modelValue.getDay() - 1) % 7);
@@ -167,9 +167,9 @@
         };
     }])
     .filter('dateDisplay', [
-        'customFormatter', function (formatter) {
+        'dateHelper', function (dateHelper) {
             return function (input) {
-                return formatter.dateToUserString(input);
+                return dateHelper.dateToUserString(input);
             };
         }
     ])
@@ -210,7 +210,7 @@
             return function (collection, queryString) {
                 if (collection.length == 0 || !queryString)
                     return collection;
-                return _.filter(collection, function(x) {
+                return _.filter(collection, function (x) {
                     return searchMethod(x, queryString);
                 });
             };
@@ -235,11 +235,11 @@
         __self.convertToMinutes = function (val) {
             var parts = val.split(':');
             var hour = parseInt(parts[0]);
-            var minutes = parseInt(parseInt[0]);
+            var minutes = parseInt(parts[1]);
             return (hour * 60) + minutes;
         };
     }])
-    .service('customFormatter', function () {
+    .service('dateHelper', function () {
         var __self = this;
 
         __self.getDayParts = function (date) {
@@ -267,4 +267,16 @@
             return parts.day + "." + parts.month + "." + parts.year;
         };
 
+        __self.copyDate = function (date) {
+            return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+        };
+
+        __self.isDatesEqual = function (date1, date2) {
+            return date1.getFullYear() === date2.getFullYear() && date1.getMonth() == date2.getMonth() && date1.getDate() === date2.getDate();
+        };
+
+        __self.parseDate = function (dateStr) {
+            var dateValue = dateStr.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+            return new Date(parseInt(dateValue[1]), parseInt(dateValue[2] - 1), parseInt(dateValue[3]));
+        };
     });

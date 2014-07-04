@@ -1,16 +1,12 @@
-﻿app.factory('week', ['$http', '$q', 'customFormatter', function ($http, $q, customFormatter) {
+﻿app.factory('week', ['$http', '$q', 'dateHelper', 'timeConverter', function ($http, $q, dateHelper, timeConverter) {
     var __self = this;
     __self.days = [];
     __self.reservations = [];
 
-    __self.copyDate = function (date) {
-        return new Date(date.getFullYear(), date.getMonth(), date.getDate());
-    }
-
     __self.setWeekByDate = function (date) {
-        __self.from = __self.copyDate(date);
+        __self.from = dateHelper.copyDate(date);
         __self.from.setDate(__self.from.getDate() - (7 + __self.from.getDay() - 1) % 7);
-        __self.to = __self.copyDate(__self.from);
+        __self.to = dateHelper.copyDate(__self.from);
         __self.to.setDate(__self.to.getDate() + 6);
     };
 
@@ -72,8 +68,8 @@
             method: 'GET',
             url: '/Registration/Registration/GetDoctorsSchedule',
             params: {
-                fromDate: customFormatter.dateToString(__self.from),
-                toDate: customFormatter.dateToString(__self.to)
+                fromDate: dateHelper.dateToString(__self.from),
+                toDate: dateHelper.dateToString(__self.to)
             }
         })
         .success(function (data) {
@@ -89,7 +85,7 @@
                     __self.buildHours(schedule.dayMinHour, schedule.dayMaxHour, doctor);
                 }
                 __self.days.push({
-                    date: new Date(schedule.date),
+                    date: dateHelper.parseDate(schedule.date),
                     hours: hours,
                     doctors: schedule.doctors
                 });
@@ -97,21 +93,32 @@
         });
     };
 
-    __self.getReservations = function (date) {
+    __self.getAllReservations = function () {
         __self.reservations.clear();
-        var paramsData = {};
-        if (date) {
-            paramsData.fromDate = customFormatter.dateToString(date);
-            paramsData.toDate = customFormatter.dateToString(date);
-        } else {
-            paramsData.fromDate = customFormatter.dateToString(__self.from);
-            paramsData.toDate = customFormatter.dateToString(__self.to);
-        }
-
         return $http({
             method: 'GET',
             url: '/Registration/Registration/GetReservations',
-            params: paramsData
+            params: {
+                fromDate: dateHelper.dateToString(__self.from),
+                toDate: dateHelper.dateToString(__self.to)
+            }
+        }).success(function (data) {
+            __self.reservations.pushAll(data);
+        });
+    };
+
+    __self.getReservations = function (doctorId, date, fromTime, toTime) {
+        __self.reservations.clear();
+        return $http({
+            method: 'GET',
+            url: '/Registration/Registration/GetReservations',
+            params: {
+                doctorId: doctorId,
+                fromDate: dateHelper.dateToString(date),
+                toDate: dateHelper.dateToString(date),
+                fromTime: fromTime,
+                toTime: toTime
+            }
         }).success(function (data) {
             __self.reservations.pushAll(data);
         });
@@ -120,7 +127,9 @@
     __self.applyReservations = function () {
         for (var i = 0; i < __self.days.length; i++) {
             var day = __self.days[i];
-            var reservationsForDay = _.filter(__self.reservations, function (x) { return new Date(x.date).valueOf() === day.date.valueOf(); });
+            var reservationsForDay = _.filter(__self.reservations, function(x) {
+                 return dateHelper.isDatesEqual(dateHelper.parseDate(x.date), day.date);
+            });
             if (reservationsForDay.length === 0)
                 continue;
             for (var j = 0; j < day.doctors.length; j++) {
@@ -149,31 +158,37 @@
         }
     }
 
-    __self.reloadResevations = function (date) {
+    __self.reloadResevations = function (doctorId, date, fromTime, toTime) {
         for (var i = 0; i < __self.days.length; i++) {
-            if (!date || __self.days[i].date.valueOf() === date.valueOf()) {
+            if (dateHelper.isDatesEqual(__self.days[i].date, date)) {
                 for (var j = 0; j < __self.days[i].doctors.length; j++) {
-                    for (var k = 0; k < __self.days[i].doctors[j].hours.length; k++) {
-                        var hour = __self.days[i].doctors[j].hours[k];
-                        hour.isReserved = false;
-                        hour.reservation = {};
+                    var doctor = __self.days[i].doctors[j];
+                    if (doctor.doctorId === doctorId) {
+                        for (var k = 0; k < __self.days[i].doctors[j].hours.length; k++) {
+                            var hour = __self.days[i].doctors[j].hours[k];
+                            if (hour.from == timeConverter.convertToMinutes(fromTime)
+                             && hour.to == timeConverter.convertToMinutes(toTime)) {
+                                hour.isReserved = false;
+                                hour.reservation = {};
+                            }
+                        }
                     }
                 }
             }
         }
-        __self.getReservations(date).then(__self.applyReservations);
+        __self.getReservations(doctorId, date, fromTime, toTime).then(__self.applyReservations);
     };
 
     __self.getData = function () {
         var waits = [];
         waits.push(__self.getSchedule());
-        waits.push(__self.getReservations());
+        waits.push(__self.getAllReservations());
         $q.all(waits).then(__self.applyReservations);
     };
 
-    var currentDate = __self.copyDate(new Date()); //Remove hour offset.
+    var currentDate = new Date(); //Remove hour offset.
     __self.setWeekByDate(currentDate);
-    __self.currentDate = __self.copyDate(__self.from);
+    __self.currentDate = dateHelper.copyDate(__self.from);
     __self.getData();
 
     var res =
@@ -190,12 +205,12 @@
             __self.getData();
         },
 
-        reloadResevations: function (date) {
-            __self.reloadResevations(date);
+        reloadResevations: function (doctorId, date, fromTime, toTime) {
+            __self.reloadResevations(doctorId, date, fromTime, toTime);
         },
 
         name: function () {
-            return customFormatter.dateToUserString(__self.from) + " - " + customFormatter.dateToUserString(__self.to);
+            return dateHelper.dateToUserString(__self.from) + " - " + dateHelper.dateToUserString(__self.to);
         },
 
         next: function () {
@@ -227,14 +242,43 @@
     return res;
 }]);
 
-app.controller('registrationController', ['$scope', '$http', 'customFormatter', 'week', '$modal', 'timeConverter',
-    function ($scope, $http, customFormatter, week, $modal, timeConverter) {
+
+app.service('reservationChangeListener', function () {
+    var __self = this;
+    __self.hub = $.connection.reservationHub;
+
+    __self.connect = function (onReservationMade, onReservationRemoved) {
+        $.connection.hub.url = "/signalr";
+        __self.hub.client.sendReservationMade = onReservationMade;
+        __self.hub.client.sendReservationRemoved = onReservationRemoved;
+        return $.connection.hub.start();
+    };
+
+    __self.getId = function () {
+        return $.connection.hub.id;
+    }
+});
+
+app.controller('registrationController', ['$scope', '$http', 'dateHelper', 'week', '$modal', 'timeConverter', 'reservationChangeListener',
+    function ($scope, $http, dateHelper, week, $modal, timeConverter, reservationChangeListener) {
         var __self = this;
 
         $scope.week = week;
 
+        __self.listenForChanges = function () {
+            reservationChangeListener.connect(
+                function (doctorId, date, fromTime, toTime) {
+                    $scope.week.reloadResevations(doctorId, dateHelper.parseDate(date), fromTime, toTime);
+                },
+                function (doctorId, date, fromTime, toTime) {
+                    $scope.week.reloadResevations(doctorId, dateHelper.parseDate(date), fromTime, toTime);
+                });
+        };
+
+        __self.listenForChanges();
+
         $scope.registerHour = function (doctor, date, hour) {
-            __self.lockHour(doctor, date, hour).success(function(result) {
+            __self.lockHour(doctor, date, hour).success(function (result) {
                 if (result.result == 0)
                     alert(result.lockedByUser + ' в момента резервира този час!');
                 else if (result.result == 1)
@@ -243,12 +287,12 @@ app.controller('registrationController', ['$scope', '$http', 'customFormatter', 
                     alert('Грешка при заключването на часа!');
                 else if (result.result == 3) {
                     alert('Този час вече е резервиран!');
-                    $scope.week.reloadResevations(date);
+                  //  $scope.week.reloadResevations(date);
                 }
             });
         };
 
-        __self.showRegistrationDialog = function(doctor, date, hour) {
+        __self.showRegistrationDialog = function (doctor, date, hour) {
             var addRegistrationInstance = $modal.open({
                 templateUrl: '/Registration/Registration/Register',
                 controller: 'registrationAddController',
@@ -265,8 +309,8 @@ app.controller('registrationController', ['$scope', '$http', 'customFormatter', 
             });
             addRegistrationInstance.result.then(function () {
                 __self.unLockHour(doctor, date, hour);
-                $scope.week.reloadResevations(date);
-            }, function() {
+             //   $scope.week.reloadResevations(date);
+            }, function () {
                 __self.unLockHour(doctor, date, hour);
             });
         };
@@ -304,10 +348,10 @@ app.controller('registrationController', ['$scope', '$http', 'customFormatter', 
                 data: {
                     id: id
                 }
-            })
-            .success(function (data) {
-                $scope.week.reloadResevations(date);
             });
+//            .success(function (data) {
+//                $scope.week.reloadResevations(date);
+//            });
         };
 
         $scope.viewPatient = function (patientId) {
@@ -523,7 +567,7 @@ app.filter('doctorFilter', [function () {
     };
 }]);
 
-app.directive('vmQtip', ['timeConverter', 'customFormatter', function (timeConverter, customFormatter) {
+app.directive('vmQtip', ['timeConverter', 'dateHelper', function (timeConverter, dateHelper) {
     return {
         link: function (scope, elm, attrs) {
             var setTip = function () {
@@ -543,7 +587,7 @@ app.directive('vmQtip', ['timeConverter', 'customFormatter', function (timeConve
                     }
                 }
                 content += '<br/>';
-                content += 'Дата: ' + customFormatter.dateToUserString(scope.day.date) + ", Час: " + timeConverter.convertToHours(scope.hour.from) + " - " + timeConverter.convertToHours(scope.hour.to);
+                content += 'Дата: ' + dateHelper.dateToUserString(scope.day.date) + ", Час: " + timeConverter.convertToHours(scope.hour.from) + " - " + timeConverter.convertToHours(scope.hour.to);
                 if (scope.hour.isReserved) {
                     content += '<br/>';
                     content += 'Пациент: ' + scope.hour.reservation.firstName + ' ' + scope.hour.reservation.lastName;
