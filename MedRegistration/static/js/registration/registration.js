@@ -227,11 +227,28 @@
     return res;
 }]);
 
-app.controller('registrationController', ['$scope', '$http', 'customFormatter', 'week', '$modal',
-    function ($scope, $http, customFormatter, week, $modal) {
+app.controller('registrationController', ['$scope', '$http', 'customFormatter', 'week', '$modal', 'timeConverter',
+    function ($scope, $http, customFormatter, week, $modal, timeConverter) {
+        var __self = this;
+
         $scope.week = week;
 
         $scope.registerHour = function (doctor, date, hour) {
+            __self.lockHour(doctor, date, hour).success(function(result) {
+                if (result.result == 0)
+                    alert(result.lockedByUser + ' в момента резервира този час!');
+                else if (result.result == 1)
+                    __self.showRegistrationDialog(doctor, date, hour);
+                else if (result.result == 2)
+                    alert('Грешка при заключването на часа!');
+                else if (result.result == 3) {
+                    alert('Този час вече е резервиран!');
+                    $scope.week.reloadResevations(date);
+                }
+            });
+        };
+
+        __self.showRegistrationDialog = function(doctor, date, hour) {
             var addRegistrationInstance = $modal.open({
                 templateUrl: '/Registration/Registration/Register',
                 controller: 'registrationAddController',
@@ -247,7 +264,36 @@ app.controller('registrationController', ['$scope', '$http', 'customFormatter', 
                 }
             });
             addRegistrationInstance.result.then(function () {
+                __self.unLockHour(doctor, date, hour);
                 $scope.week.reloadResevations(date);
+            }, function() {
+                __self.unLockHour(doctor, date, hour);
+            });
+        };
+
+        __self.lockHour = function (doctor, date, hour) {
+            return $http({
+                method: 'POST',
+                url: '/Registration/Registration/LockReservation',
+                data: {
+                    doctorId: doctor.doctorId,
+                    date: date,
+                    fromTime: timeConverter.convertToHours(hour.from),
+                    toTime: timeConverter.convertToHours(hour.to),
+                }
+            });
+        };
+
+        __self.unLockHour = function (doctor, date, hour) {
+            return $http({
+                method: 'POST',
+                url: '/Registration/Registration/UnLockReservation',
+                data: {
+                    doctorId: doctor.doctorId,
+                    date: date,
+                    fromTime: timeConverter.convertToHours(hour.from),
+                    toTime: timeConverter.convertToHours(hour.to),
+                }
             });
         };
 

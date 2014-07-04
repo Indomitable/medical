@@ -5,12 +5,14 @@ using System.Web.Mvc;
 using MedRegistration.Controllers;
 using MedRegistration.Data;
 using MedRegistration.Infrastructure;
+using MedRegistration.Infrastructure.Authorization;
 
 namespace MedRegistration.Areas.Registration.Controllers
 {
     public class RegistrationController : BaseController
     {
-        private static readonly object locker = new object();
+        private static readonly object unRegisterLocker = new object();
+        private static readonly object lockHourLocker = new object();
         [HttpGet]
         public ActionResult Index()
         {
@@ -158,7 +160,7 @@ namespace MedRegistration.Areas.Registration.Controllers
         [HttpPost]
         public ActionResult UnRegisterHour(int id)
         {
-            lock (locker)
+            lock (unRegisterLocker)
             {
                 try
                 {
@@ -175,6 +177,76 @@ namespace MedRegistration.Areas.Registration.Controllers
                 catch
                 {
                     return JsonNet(2);
+                }
+            }
+        }
+
+        [HttpPost]
+        public ActionResult LockReservation(int doctorId, DateTime date, TimeSpan fromTime, TimeSpan toTime)
+        {
+            lock (lockHourLocker)
+            {
+                using (var context = new DataContext())
+                {
+                    try
+                    {
+                        var reservation = context.Reservations.SingleOrDefault(rl => rl.DoctorId == doctorId && rl.Date == date.Date && rl.FromTime == fromTime && rl.ToTime == toTime);
+                        if (reservation != null)
+                            return JsonNet(new { result = 3 });
+                        var reservationLock = context.ReservationLocks.SingleOrDefault(rl => rl.DoctorId == doctorId && rl.Date == date.Date && rl.FromTime == fromTime && rl.ToTime == toTime);
+                        if (reservationLock == null)
+                        {
+                            var newLock = new ReservationLock
+                            {
+                                UserId = HttpContext.User.UserId(), 
+                                DoctorId = doctorId, 
+                                Date = date, 
+                                FromTime = fromTime, 
+                                ToTime = toTime
+                            };
+                            context.ReservationLocks.Add(newLock);
+                            context.SaveChanges();
+                            return JsonNet(new { result = 1 });
+                        }
+                        else
+                        {
+                            var user = reservationLock.User;
+                            return JsonNet(new
+                            {
+                                result = 0,
+                                lockedByUser = user.FullName
+                            });
+                        }
+                    }
+                    catch
+                    {
+                        return JsonNet(new { result = 2 });
+                    }
+                }
+            }
+        }
+
+        [HttpPost]
+        public ActionResult UnLockReservation(int doctorId, DateTime date, TimeSpan fromTime, TimeSpan toTime)
+        {
+            lock (lockHourLocker)
+            {
+                using (var context = new DataContext())
+                {
+                    try
+                    {
+                        var reservationLock = context.ReservationLocks.SingleOrDefault(rl => rl.DoctorId == doctorId && rl.Date == date.Date && rl.FromTime == fromTime && rl.ToTime == toTime);
+                        if (reservationLock != null)
+                        {
+                            context.ReservationLocks.Remove(reservationLock);
+                            context.SaveChanges();
+                        }
+                        return JsonNet(new { result = 1 });
+                    }
+                    catch
+                    {
+                        return JsonNet(new { result = 2 });
+                    }
                 }
             }
         }

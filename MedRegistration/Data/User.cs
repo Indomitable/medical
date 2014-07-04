@@ -17,6 +17,7 @@ namespace MedRegistration.Data
         public User()
         {
             this.Roles = new HashSet<Role>();
+            this.ReservationLocks = new HashSet<ReservationLock>();
         }
     
         public int Id { get; set; }
@@ -28,5 +29,6 @@ namespace MedRegistration.Data
         public string Salt { get; set; }
     
         public virtual ICollection<Role> Roles { get; set; }
+        public virtual ICollection<ReservationLock> ReservationLocks { get; set; }
     }
 }

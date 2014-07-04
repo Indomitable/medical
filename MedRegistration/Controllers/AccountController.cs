@@ -51,7 +51,7 @@ namespace MedRegistration.Controllers
                 identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, userName));
                 var user = UserManager.GetUser(userName);
                 identity.AddClaim(new Claim(ClaimTypes.SerialNumber, Convert.ToString(user.Id)));
-                identity.AddClaim(new Claim(ClaimTypes.GivenName, user.FirstName + " " + user.LastName));
+                identity.AddClaim(new Claim(ClaimTypes.GivenName, user.FullName));
                 foreach (var role in user.Roles)
                 {
                     identity.AddClaim(new Claim(ClaimTypes.Role, role.Name));

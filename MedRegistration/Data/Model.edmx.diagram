@@ -38,6 +38,9 @@
         <EntityTypeShape EntityType="MedicalModel.Role" Width="1.5" PointX="8.375" PointY="1.375" />
         <EntityTypeShape EntityType="MedicalModel.User" Width="1.5" PointX="10.625" PointY="1" />
         <AssociationConnector Association="MedicalModel.RoleUser" />
+        <EntityTypeShape EntityType="MedicalModel.ReservationLock" Width="1.5" PointX="12.875" PointY="1.25" />
+        <AssociationConnector Association="MedicalModel.ReservationLock_User_Fk" />
+        <AssociationConnector Association="MedicalModel.ReservationLock_Doctor_Fk" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>
