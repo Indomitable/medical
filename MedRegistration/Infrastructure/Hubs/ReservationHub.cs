@@ -8,9 +8,10 @@ namespace MedRegistration.Infrastructure.Hubs
     public class ReservationHub : Hub
     {
         public void SendReservationMade(int doctorId, DateTime date, TimeSpan fromTime, TimeSpan toTime,
-                                        int reservationId, int patientId, string firstName, string lastName, string note, string phone)
+                                        int reservationId, int patientId, string firstName, string lastName, string note, string phone, 
+                                        string userName)
         {
-            Clients.All.sendReservationMade(doctorId, date, fromTime, toTime, reservationId, patientId, firstName, lastName, note, phone);
+            Clients.All.sendReservationMade(doctorId, date, fromTime, toTime, reservationId, patientId, firstName, lastName, note, phone, userName);
         }
 
         public void SendReservationRemoved(int doctorId, DateTime date, TimeSpan fromTime, TimeSpan toTime)

@@ -12,23 +12,18 @@ namespace MedRegistration.Data
     using System;
     using System.Collections.Generic;
     
-    public partial class Reservation
+    public partial class ReservationLog
     {
         public int Id { get; set; }
-        public int PatientId { get; set; }
+        public int UserId { get; set; }
+        public System.DateTime LogTime { get; set; }
+        public OperationType OperationType { get; set; }
         public int DoctorId { get; set; }
         public System.DateTime Date { get; set; }
         public System.TimeSpan FromTime { get; set; }
         public System.TimeSpan ToTime { get; set; }
-        public int PaymentTypeId { get; set; }
-        public Nullable<int> PaymentInfoId { get; set; }
-        public string Note { get; set; }
-        public int CreatedBy { get; set; }
     
         public virtual Doctor Doctor { get; set; }
-        public virtual Patient Patient { get; set; }
-        public virtual PaymentInfo PaymentInfo { get; set; }
-        public virtual PaymentType PaymentType { get; set; }
-        public virtual User CreatedByUser { get; set; }
+        public virtual User User { get; set; }
     }
 }

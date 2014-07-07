@@ -145,7 +145,8 @@
                         firstName: reservationHour.patientFirstName,
                         lastName: reservationHour.patientLastName,
                         phone: reservationHour.patientPhone,
-                        note: reservationHour.note
+                        note: reservationHour.note,
+                        createdBy: reservationHour.createdBy
                     };
                 }
             }
@@ -251,7 +252,7 @@ app.controller('registrationController', ['$scope', '$http', 'dateHelper', 'week
         __self.listenForChanges = function () {
             reservationChangeListener.connect(
                 //On Add Reservation
-                function (doctorId, date, fromTime, toTime, reservationId, patientId, firstName, lastName, note, phone) {
+                function (doctorId, date, fromTime, toTime, reservationId, patientId, firstName, lastName, note, phone, userName) {
                     var reservation = {
                         doctorId: doctorId,
                         date: date,
@@ -264,7 +265,8 @@ app.controller('registrationController', ['$scope', '$http', 'dateHelper', 'week
                                 patientFirstName: firstName,
                                 patientLastName: lastName,
                                 note: note,
-                                patientPhone: phone
+                                patientPhone: phone,
+                                createdBy: userName
                             }
                         ]
                     };
@@ -583,19 +585,15 @@ app.directive('vmQtip', ['timeConverter', 'dateHelper', function (timeConverter,
                             content += 'Работи.';
                     }
                 }
-                content += '\n';
-                content += 'Дата: ' + dateHelper.dateToUserString(scope.day.date);
-                content += '\n';
-                content += "Час: " + timeConverter.convertToHours(scope.hour.from) + " - " + timeConverter.convertToHours(scope.hour.to);
+                content += '\nДата: ' + dateHelper.dateToUserString(scope.day.date);
+                content += "\nЧас: " + timeConverter.convertToHours(scope.hour.from) + " - " + timeConverter.convertToHours(scope.hour.to);
                 if (scope.hour.isReserved) {
-                    content += '\n';
-                    content += 'Пациент: ' + scope.hour.reservation.firstName + ' ' + scope.hour.reservation.lastName;
-                    content += '\n';
-                    content += 'Телефон: ' + scope.hour.reservation.phone;
+                    content += '\nПациент: ' + scope.hour.reservation.firstName + ' ' + scope.hour.reservation.lastName;
+                    content += '\nТелефон: ' + scope.hour.reservation.phone;
                     if (scope.hour.reservation.note) {
-                        content += '\n';
-                        content += 'Забележка: ' + scope.hour.reservation.note;
+                        content += '\nЗабележка: ' + scope.hour.reservation.note;
                     }
+                    content += '\nСъздаден от: ' + scope.hour.reservation.createdBy;
                 }
                 attrs.$set('data-title', content);
             };

@@ -89,7 +89,8 @@ namespace MedRegistration.Areas.Registration.Controllers
                                             PatientFirstName = h.Patient.FirstName,
                                             PatientLastName = h.Patient.LastName,
                                             h.Note,
-                                            PatientPhone = patientPhone.Number
+                                            PatientPhone = patientPhone.Number,
+                                            CreatedBy = h.CreatedByUser.FirstName + " " + h.CreatedByUser.LastName
                                         }
                             };
                 var data = query.ToList();
@@ -111,6 +112,7 @@ namespace MedRegistration.Areas.Registration.Controllers
             {
                 using (var context = new DataContext())
                 {
+                    reservation.CreatedBy = HttpContext.User.UserId();
                     context.Reservations.Add(reservation);
                     if (reservation.PaymentTypeId == 3 && reservation.PaymentInfo != null && reservation.PaymentInfo.FundId.HasValue && reservation.PaymentInfo.FundCardExpiration.HasValue)
                     {
@@ -124,7 +126,9 @@ namespace MedRegistration.Areas.Registration.Controllers
                     context.SaveChanges();
                     context.Entry(reservation).Reference(x => x.Patient).Load();
                     context.Entry(reservation.Patient).Collection(x => x.PatientPhones).Load();
+                    context.Entry(reservation).Reference(x => x.CreatedByUser).Load();
                     BroadCastReservationMade(reservation);
+                    LogRegistrationOperation(reservation, OperationType.Create);
                 }
                 return JsonNet(1);
             }
@@ -142,6 +146,7 @@ namespace MedRegistration.Areas.Registration.Controllers
             {
                 using (var context = new DataContext())
                 {
+                    reservation.CreatedBy = HttpContext.User.UserId();
                     if (reservation.PaymentInfo != null)
                     {
                         patient.PatientFundInfo = new PatientFundInfo
@@ -158,7 +163,9 @@ namespace MedRegistration.Areas.Registration.Controllers
                     context.SaveChanges();
                     context.Entry(reservation).Reference(x => x.Patient).Load();
                     context.Entry(reservation.Patient).Collection(x => x.PatientPhones).Load();
+                    context.Entry(reservation).Reference(x => x.CreatedByUser).Load();
                     BroadCastReservationMade(reservation);
+                    LogRegistrationOperation(reservation, OperationType.Create);
                 }
                 return JsonNet(1);
             }
@@ -184,6 +191,7 @@ namespace MedRegistration.Areas.Registration.Controllers
                         context.Reservations.Remove(reservation);
                         context.SaveChanges();
                         BroadCastReservationRemoved(reservation.DoctorId, reservation.Date, reservation.FromTime, reservation.ToTime);
+                        LogRegistrationOperation(reservation, OperationType.Delete);
                         return JsonNet(1);
                     }
                 }
@@ -271,13 +279,32 @@ namespace MedRegistration.Areas.Registration.Controllers
             //int reservationId, int patientId, string firstName, string lastName, string note, string phone
             context.Clients.All.SendReservationMade(reservation.DoctorId, reservation.Date, reservation.FromTime, reservation.ToTime,
                 reservation.Id, reservation.Patient.Id, reservation.Patient.FirstName, reservation.Patient.LastName, 
-                reservation.Note, reservation.Patient.PatientPhones.Single(p => p.IsPrimary).Number);
+                reservation.Note, reservation.Patient.PatientPhones.Single(p => p.IsPrimary).Number,
+                reservation.CreatedByUser.FullName);
         }
 
         private void BroadCastReservationRemoved(int doctorId, DateTime date, TimeSpan fromTime, TimeSpan toTime)
         {
             IHubContext context = GlobalHost.ConnectionManager.GetHubContext<ReservationHub>();
             context.Clients.All.SendReservationRemoved(doctorId, date, fromTime, toTime);
+        }
+
+        private void LogRegistrationOperation(Reservation reservation, OperationType operationType)
+        {
+            using (var context = new DataContext())
+            {
+                var log = new ReservationLog
+                {
+                    UserId = reservation.CreatedBy, 
+                    OperationType = operationType, 
+                    DoctorId = reservation.DoctorId, 
+                    Date = reservation.Date, 
+                    FromTime = reservation.FromTime, 
+                    ToTime = reservation.ToTime
+                };
+                context.ReservationLogs.Add(log);
+                context.SaveChanges();
+            }
         }
     }
 }

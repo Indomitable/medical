@@ -32,7 +32,13 @@
         <AssociationConnector Association="MedicalModel.Reservation_Patient_FK" />
         <AssociationConnector Association="MedicalModel.PatientPhone_PhoneType_FK" />
         <AssociationConnector Association="MedicalModel.Reservation_PaymentInfo_FK" />
-        <AssociationConnector Association="MedicalModel.Reservation_PaymentType_FK" />
+        <AssociationConnector Association="MedicalModel.Reservation_PaymentType_FK" ManuallyRouted="true" >
+          <ConnectorPoint PointX="7.5" PointY="10.922841796875" />
+          <ConnectorPoint PointX="7.791666666666667" PointY="10.922841796875" />
+          <ConnectorPoint PointX="7.958333333333333" PointY="10.922841796875" />
+          <ConnectorPoint PointX="9" PointY="10.922841796875" />
+          <ConnectorPoint PointX="9" PointY="10.02830078125" />
+        </AssociationConnector>
         <AssociationConnector Association="MedicalModel.ScheduleDate_Schedule_FK" />
         <AssociationConnector Association="MedicalModel.DoctorSpeciality" />
         <EntityTypeShape EntityType="MedicalModel.Role" Width="1.5" PointX="8.375" PointY="1.375" />
@@ -41,6 +47,10 @@
         <EntityTypeShape EntityType="MedicalModel.ReservationLock" Width="1.5" PointX="12.875" PointY="1.25" />
         <AssociationConnector Association="MedicalModel.ReservationLock_User_Fk" />
         <AssociationConnector Association="MedicalModel.ReservationLock_Doctor_Fk" />
+        <AssociationConnector Association="MedicalModel.Reservation_User_FK" />
+        <EntityTypeShape EntityType="MedicalModel.ReservationLog" Width="1.5" PointX="12.875" PointY="7.875" />
+        <AssociationConnector Association="MedicalModel.ReservationLog_Doctor_Fk" />
+        <AssociationConnector Association="MedicalModel.ReservationLog_User_Fk" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

@@ -116,6 +116,7 @@
           <Property Name="PaymentTypeId" Type="int" Nullable="false" />
           <Property Name="PaymentInfoId" Type="int" />
           <Property Name="Note" Type="nvarchar(max)" />
+          <Property Name="CreatedBy" Type="int" Nullable="false" />
         </EntityType>
         <EntityType Name="ReservationLock">
           <Key>
@@ -125,6 +126,19 @@
           <Property Name="UserId" Type="int" Nullable="false" />
           <Property Name="DoctorId" Type="int" Nullable="false" />
           <Property Name="LockTime" Type="datetime" Nullable="false" StoreGeneratedPattern="Computed" />
+          <Property Name="Date" Type="date" Nullable="false" />
+          <Property Name="FromTime" Type="time" Precision="7" Nullable="false" />
+          <Property Name="ToTime" Type="time" Precision="7" Nullable="false" />
+        </EntityType>
+        <EntityType Name="ReservationLog">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="UserId" Type="int" Nullable="false" />
+          <Property Name="LogTime" Type="datetime" Nullable="false" StoreGeneratedPattern="Computed" />
+          <Property Name="OperationType" Type="int" Nullable="false" />
+          <Property Name="DoctorId" Type="int" Nullable="false" />
           <Property Name="Date" Type="date" Nullable="false" />
           <Property Name="FromTime" Type="time" Precision="7" Nullable="false" />
           <Property Name="ToTime" Type="time" Precision="7" Nullable="false" />
@@ -364,6 +378,18 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="Reservation_User_FK">
+          <End Role="User" Type="Self.User" Multiplicity="1" />
+          <End Role="Reservation" Type="Self.Reservation" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Reservation">
+              <PropertyRef Name="CreatedBy" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="ReservationLock_Doctor_Fk">
           <End Role="Doctor" Type="Self.Doctor" Multiplicity="1" />
           <End Role="ReservationLock" Type="Self.ReservationLock" Multiplicity="*" />
@@ -384,6 +410,30 @@
               <PropertyRef Name="Id" />
             </Principal>
             <Dependent Role="ReservationLock">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="ReservationLog_Doctor_Fk">
+          <End Role="Doctor" Type="Self.Doctor" Multiplicity="1" />
+          <End Role="ReservationLog" Type="Self.ReservationLog" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Doctor">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="ReservationLog">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="ReservationLog_User_Fk">
+          <End Role="User" Type="Self.User" Multiplicity="1" />
+          <End Role="ReservationLog" Type="Self.ReservationLog" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="ReservationLog">
               <PropertyRef Name="UserId" />
             </Dependent>
           </ReferentialConstraint>
@@ -454,6 +504,7 @@
           <EntitySet Name="PhoneType" EntityType="Self.PhoneType" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Reservation" EntityType="Self.Reservation" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ReservationLock" EntityType="Self.ReservationLock" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ReservationLog" EntityType="Self.ReservationLog" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Role" EntityType="Self.Role" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="RoleUser" EntityType="Self.RoleUser" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Schedule" EntityType="Self.Schedule" Schema="dbo" store:Type="Tables" />
@@ -517,6 +568,10 @@
             <End Role="PaymentType" EntitySet="PaymentType" />
             <End Role="Reservation" EntitySet="Reservation" />
           </AssociationSet>
+          <AssociationSet Name="Reservation_User_FK" Association="Self.Reservation_User_FK">
+            <End Role="User" EntitySet="User" />
+            <End Role="Reservation" EntitySet="Reservation" />
+          </AssociationSet>
           <AssociationSet Name="ReservationLock_Doctor_Fk" Association="Self.ReservationLock_Doctor_Fk">
             <End Role="Doctor" EntitySet="Doctor" />
             <End Role="ReservationLock" EntitySet="ReservationLock" />
@@ -524,6 +579,14 @@
           <AssociationSet Name="ReservationLock_User_Fk" Association="Self.ReservationLock_User_Fk">
             <End Role="User" EntitySet="User" />
             <End Role="ReservationLock" EntitySet="ReservationLock" />
+          </AssociationSet>
+          <AssociationSet Name="ReservationLog_Doctor_Fk" Association="Self.ReservationLog_Doctor_Fk">
+            <End Role="Doctor" EntitySet="Doctor" />
+            <End Role="ReservationLog" EntitySet="ReservationLog" />
+          </AssociationSet>
+          <AssociationSet Name="ReservationLog_User_Fk" Association="Self.ReservationLog_User_Fk">
+            <End Role="User" EntitySet="User" />
+            <End Role="ReservationLog" EntitySet="ReservationLog" />
           </AssociationSet>
           <AssociationSet Name="RoleUser_Role_FK" Association="Self.RoleUser_Role_FK">
             <End Role="Role" EntitySet="Role" />
@@ -637,6 +700,19 @@
             <End Role="Doctor" EntitySet="Doctors" />
             <End Role="ReservationLock" EntitySet="ReservationLocks" />
           </AssociationSet>
+          <AssociationSet Name="Reservation_User_FK" Association="MedicalModel.Reservation_User_FK">
+            <End Role="User" EntitySet="Users" />
+            <End Role="Reservation" EntitySet="Reservations" />
+          </AssociationSet>
+          <EntitySet Name="ReservationLogs" EntityType="MedicalModel.ReservationLog" />
+          <AssociationSet Name="ReservationLog_Doctor_Fk" Association="MedicalModel.ReservationLog_Doctor_Fk">
+            <End Role="Doctor" EntitySet="Doctors" />
+            <End Role="ReservationLog" EntitySet="ReservationLogs" />
+          </AssociationSet>
+          <AssociationSet Name="ReservationLog_User_Fk" Association="MedicalModel.ReservationLog_User_Fk">
+            <End Role="User" EntitySet="Users" />
+            <End Role="ReservationLog" EntitySet="ReservationLogs" />
+          </AssociationSet>
         </EntityContainer>
         <EntityType Name="Doctor">
           <Key>
@@ -652,6 +728,7 @@
           <NavigationProperty Name="Schedules" Relationship="MedicalModel.Schedule_Doctor_FK" FromRole="Doctor" ToRole="Schedule" />
           <NavigationProperty Name="Specialities" Relationship="MedicalModel.DoctorSpeciality" FromRole="Doctor" ToRole="Speciality" />
           <NavigationProperty Name="ReservationLocks" Relationship="MedicalModel.ReservationLock_Doctor_Fk" FromRole="Doctor" ToRole="ReservationLock" />
+          <NavigationProperty Name="ReservationLogs" Relationship="MedicalModel.ReservationLog_Doctor_Fk" FromRole="Doctor" ToRole="ReservationLog" />
         </EntityType>
         <EntityType Name="Fund">
           <Key>
@@ -767,6 +844,8 @@
           <NavigationProperty Name="PaymentInfo" Relationship="MedicalModel.Reservation_PaymentInfo_FK" FromRole="Reservation" ToRole="PaymentInfo" />
           <NavigationProperty Name="PaymentType" Relationship="MedicalModel.Reservation_PaymentType_FK" FromRole="Reservation" ToRole="PaymentType" />
           <Property Name="Note" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="CreatedBy" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="CreatedByUser" Relationship="MedicalModel.Reservation_User_FK" FromRole="Reservation" ToRole="User" />
         </EntityType>
         <EntityType Name="Schedule">
           <Key>
@@ -1006,6 +1085,8 @@
           <NavigationProperty Name="Roles" Relationship="MedicalModel.RoleUser" FromRole="User" ToRole="Role" />
           <Property Name="Salt" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="false" />
           <NavigationProperty Name="ReservationLocks" Relationship="MedicalModel.ReservationLock_User_Fk" FromRole="User" ToRole="ReservationLock" />
+          <NavigationProperty Name="Reservations" Relationship="MedicalModel.Reservation_User_FK" FromRole="User" ToRole="Reservation" />
+          <NavigationProperty Name="ReservationLogs" Relationship="MedicalModel.ReservationLog_User_Fk" FromRole="User" ToRole="ReservationLog" />
         </EntityType>
         <Association Name="RoleUser">
           <End Type="MedicalModel.Role" Role="Role" Multiplicity="*" />
@@ -1053,6 +1134,61 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="Reservation_User_FK">
+          <End Type="MedicalModel.User" Role="User" Multiplicity="1" />
+          <End Type="MedicalModel.Reservation" Role="Reservation" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Reservation">
+              <PropertyRef Name="CreatedBy" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="ReservationLog">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="UserId" Type="Int32" Nullable="false" />
+          <Property Name="LogTime" Type="DateTime" Nullable="false" Precision="3" annotation:StoreGeneratedPattern="Computed" />
+          <Property Name="OperationType" Type="MedicalModel.OperationType" Nullable="false" />
+          <Property Name="DoctorId" Type="Int32" Nullable="false" />
+          <Property Name="Date" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="FromTime" Type="Time" Nullable="false" Precision="7" />
+          <Property Name="ToTime" Type="Time" Nullable="false" Precision="7" />
+          <NavigationProperty Name="Doctor" Relationship="MedicalModel.ReservationLog_Doctor_Fk" FromRole="ReservationLog" ToRole="Doctor" />
+          <NavigationProperty Name="User" Relationship="MedicalModel.ReservationLog_User_Fk" FromRole="ReservationLog" ToRole="User" />
+        </EntityType>
+        <Association Name="ReservationLog_Doctor_Fk">
+          <End Type="MedicalModel.Doctor" Role="Doctor" Multiplicity="1" />
+          <End Type="MedicalModel.ReservationLog" Role="ReservationLog" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Doctor">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="ReservationLog">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="ReservationLog_User_Fk">
+          <End Type="MedicalModel.User" Role="User" Multiplicity="1" />
+          <End Type="MedicalModel.ReservationLog" Role="ReservationLog" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="ReservationLog">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EnumType Name="OperationType">
+          <Member Name="Create" Value="1" />
+          <Member Name="Delete" Value="2" />
+        </EnumType>
         </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -1162,6 +1298,7 @@
           <EntitySetMapping Name="Reservations">
             <EntityTypeMapping TypeName="MedicalModel.Reservation">
               <MappingFragment StoreEntitySet="Reservation">
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
                 <ScalarProperty Name="Note" ColumnName="Note" />
                 <ScalarProperty Name="PaymentInfoId" ColumnName="PaymentInfoId" />
                 <ScalarProperty Name="PaymentTypeId" ColumnName="PaymentTypeId" />
@@ -1257,6 +1394,20 @@
                 <ScalarProperty Name="FromTime" ColumnName="FromTime" />
                 <ScalarProperty Name="Date" ColumnName="Date" />
                 <ScalarProperty Name="LockTime" ColumnName="LockTime" />
+                <ScalarProperty Name="UserId" ColumnName="UserId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ReservationLogs">
+            <EntityTypeMapping TypeName="MedicalModel.ReservationLog">
+              <MappingFragment StoreEntitySet="ReservationLog">
+                <ScalarProperty Name="ToTime" ColumnName="ToTime" />
+                <ScalarProperty Name="FromTime" ColumnName="FromTime" />
+                <ScalarProperty Name="Date" ColumnName="Date" />
+                <ScalarProperty Name="DoctorId" ColumnName="DoctorId" />
+                <ScalarProperty Name="OperationType" ColumnName="OperationType" />
+                <ScalarProperty Name="LogTime" ColumnName="LogTime" />
                 <ScalarProperty Name="UserId" ColumnName="UserId" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>

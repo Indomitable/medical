@@ -18,6 +18,8 @@ namespace MedRegistration.Data
         {
             this.Roles = new HashSet<Role>();
             this.ReservationLocks = new HashSet<ReservationLock>();
+            this.Reservations = new HashSet<Reservation>();
+            this.ReservationLogs = new HashSet<ReservationLog>();
         }
     
         public int Id { get; set; }
@@ -30,5 +32,7 @@ namespace MedRegistration.Data
     
         public virtual ICollection<Role> Roles { get; set; }
         public virtual ICollection<ReservationLock> ReservationLocks { get; set; }
+        public virtual ICollection<Reservation> Reservations { get; set; }
+        public virtual ICollection<ReservationLog> ReservationLogs { get; set; }
     }
 }

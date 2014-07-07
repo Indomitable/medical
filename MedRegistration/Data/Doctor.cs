@@ -20,6 +20,7 @@ namespace MedRegistration.Data
             this.Schedules = new HashSet<Schedule>();
             this.Specialities = new HashSet<Speciality>();
             this.ReservationLocks = new HashSet<ReservationLock>();
+            this.ReservationLogs = new HashSet<ReservationLog>();
         }
     
         public int Id { get; set; }
@@ -33,5 +34,6 @@ namespace MedRegistration.Data
         public virtual ICollection<Schedule> Schedules { get; set; }
         public virtual ICollection<Speciality> Specialities { get; set; }
         public virtual ICollection<ReservationLock> ReservationLocks { get; set; }
+        public virtual ICollection<ReservationLog> ReservationLogs { get; set; }
     }
 }
